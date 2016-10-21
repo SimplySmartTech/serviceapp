@@ -6,12 +6,13 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ExpandableListView;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixListAdapter;
-import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
@@ -19,6 +20,7 @@ import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.MatrixResponse;
+import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.User;
 
@@ -45,6 +47,20 @@ public class MainActivity extends BaseActivity {
         getUserInfo();
 
         getMatrixRequest(GlobalData.getInstance().getUnits().get(0).getId(), GlobalData.getInstance().getSubDomain());
+
+        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                ReadingData readingData = new ReadingData();
+                readingData.setUtility_id("58087fd341707003d7010000");
+                readingData.setValue("25");
+                readingData.setPhotographic_evidence_url("shekhar_test.jpg");
+                readingData.setSensor_name("weight sensor");
+                postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+                return true;
+            }
+        });
+
     }
 
     @Override
@@ -68,6 +84,7 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    //Do network call to fetch matrix data
     private void getMatrixRequest(String unitId, String subDomain) {
 
         if (NetworkUtilities.isInternet(MainActivity.this)) {
@@ -93,7 +110,38 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onFailure(Call<MatrixResponse> call, Throwable t) {
                     dismissActivitySpinner();
-                    DebugLog.d("Failed " + t.getLocalizedMessage());
+                    displayMessage(getResources().getString(R.string.error_in_network));
+                }
+            });
+        } else {
+            displayMessage(getString(R.string.error_no_internet_connection));
+        }
+    }
+
+    private void postReadingRequest(ReadingData readingData, String subDomain) {
+
+        if (NetworkUtilities.isInternet(MainActivity.this)) {
+
+            showActivitySpinner();
+
+            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+            Call<JsonObject> call = apiInterface.submitReading(subDomain, readingData);
+            call.enqueue(new Callback<JsonObject>() {
+
+                @Override
+                public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
+
+                    if (response.isSuccessful()) {
+                    } else {
+                        APIError error = ErrorUtils.parseError(response);
+                        displayMessage(error.message());
+                    }
+                    dismissActivitySpinner();
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    dismissActivitySpinner();
                     displayMessage(getResources().getString(R.string.error_in_network));
                 }
             });

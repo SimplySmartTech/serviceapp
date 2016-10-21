@@ -320,10 +320,7 @@ public class LoginActivity extends BaseActivity {
             displayMessage("Please enter username.");
             return false;
         } else if (Password.equals("")) {
-            displayMessage("Please enter pin.");
-            return false;
-        } else if (Password.trim().length() > 6 || Password.trim().length() < 6) {
-            displayMessage("Invalid pin number, please check");
+            displayMessage("Please enter password.");
             return false;
         }
         return true;

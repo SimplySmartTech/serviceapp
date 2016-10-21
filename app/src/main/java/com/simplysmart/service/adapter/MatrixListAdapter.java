@@ -1,10 +1,13 @@
 package com.simplysmart.service.adapter;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.TextView;
 
+import com.simplysmart.service.R;
 import com.simplysmart.service.model.matrix.MatrixData;
 
 import java.util.ArrayList;
@@ -17,20 +20,22 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
 
     private Context mContext;
     private ArrayList<MatrixData> matrixData;
+    private final LayoutInflater inflater;
 
     public MatrixListAdapter(Context context, ArrayList<MatrixData> data) {
+        inflater = LayoutInflater.from(context);
         mContext = context;
         matrixData = data;
     }
 
     @Override
     public int getGroupCount() {
-        return 0;
+        return matrixData.size();
     }
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return 0;
+        return matrixData.get(groupPosition).getSensors().size();
     }
 
     @Override
@@ -60,16 +65,59 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        return null;
+
+        GroupHolder holder;
+        if (convertView == null) {
+            holder = new GroupHolder();
+            convertView = inflater.inflate(R.layout.matrix_list_row_parent, parent, false);
+            holder.typeName = (TextView) convertView.findViewById(R.id.typeName);
+            convertView.setTag(holder);
+        } else {
+            holder = (GroupHolder) convertView.getTag();
+        }
+
+        if (matrixData.get(groupPosition).getType() != null) {
+            holder.typeName.setText(matrixData.get(groupPosition).getType());
+        } else {
+            holder.typeName.setText("");
+        }
+
+        return convertView;
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        return null;
+
+        ChildHolder holder;
+        if (convertView == null) {
+            holder = new ChildHolder();
+            convertView = inflater.inflate(R.layout.matrix_list_row_child, parent, false);
+            holder.sensorName = (TextView) convertView.findViewById(R.id.sensorName);
+            convertView.setTag(holder);
+        } else {
+            holder = (ChildHolder) convertView.getTag();
+        }
+
+        if (matrixData.get(groupPosition).getSensors().get(childPosition).getName() != null) {
+            holder.sensorName.setText(matrixData.get(groupPosition).getSensors().get(childPosition).getName());
+        } else {
+            holder.sensorName.setText("");
+        }
+
+        return convertView;
     }
 
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
+    }
+
+
+    private static class ChildHolder {
+        private TextView sensorName;
+    }
+
+    private static class GroupHolder {
+        private TextView typeName;
     }
 }

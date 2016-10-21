@@ -2,16 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/card_bg"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:background="@color/bw_color_white"
+    android:padding="20dp">
 
     <TextView
         android:id="@+id/typeName"
+        android:layout_marginStart="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:gravity="start"
+        android:textSize="20sp" />
 
 </LinearLayout>

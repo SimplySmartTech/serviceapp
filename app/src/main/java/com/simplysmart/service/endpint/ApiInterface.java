@@ -1,7 +1,9 @@
 package com.simplysmart.service.endpint;
 
 
+import com.google.gson.JsonObject;
 import com.simplysmart.service.model.matrix.MatrixResponse;
+import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.user.LoginRequest;
 import com.simplysmart.service.model.user.LoginResponse;
 
@@ -26,5 +28,9 @@ public interface ApiInterface {
     @GET("/api/waste_management/metrics")
     Call<MatrixResponse> getMetrics(@Query("unit_id") String unitId,
                                     @Query("subdomain") String subDomain);
+
+    @POST("/api/waste_management/reading/")
+    Call<JsonObject> submitReading(@Query("subdomain") String subDomain,
+                                   @Body ReadingData readingData);
 
 }

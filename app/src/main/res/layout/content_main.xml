@@ -12,6 +12,7 @@
     <ExpandableListView
         android:id="@+id/matrixList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:childDivider="@android:color/transparent" />
 
 </RelativeLayout>

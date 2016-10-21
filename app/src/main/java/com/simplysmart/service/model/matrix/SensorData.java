@@ -8,7 +8,7 @@ import android.os.Parcelable;
  */
 public class SensorData implements Parcelable {
 
-    private String name;
+    private String sensor_name;
     private boolean mandatory;
     private String unit;
     private String data_type;
@@ -19,7 +19,7 @@ public class SensorData implements Parcelable {
 
 
     protected SensorData(Parcel in) {
-        name = in.readString();
+        sensor_name = in.readString();
         mandatory = in.readByte() != 0;
         unit = in.readString();
         data_type = in.readString();
@@ -31,7 +31,7 @@ public class SensorData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
+        dest.writeString(sensor_name);
         dest.writeByte((byte) (mandatory ? 1 : 0));
         dest.writeString(unit);
         dest.writeString(data_type);
@@ -59,11 +59,11 @@ public class SensorData implements Parcelable {
     };
 
     public String getName() {
-        return name;
+        return sensor_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String sensor_name) {
+        this.sensor_name = sensor_name;
     }
 
     public boolean isMandatory() {
