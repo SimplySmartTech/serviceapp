@@ -5,7 +5,7 @@
     android:background="@color/bw_color_white"
     android:orientation="horizontal"
     android:padding="20dp">
-
+    
     <TextView
         android:id="@+id/sensorName"
         android:layout_width="match_parent"

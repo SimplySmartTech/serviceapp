@@ -9,10 +9,10 @@ import android.os.Parcelable;
 public class SensorData implements Parcelable {
 
     private String sensor_name;
-    private boolean mandatory;
+    private String mandatory;
     private String unit;
     private String data_type;
-    private boolean photographic_evidence;
+    private String photographic_evidence;
     private String no_of_times;
     private String duration_unit;
     private String duration_type;
@@ -20,10 +20,10 @@ public class SensorData implements Parcelable {
 
     protected SensorData(Parcel in) {
         sensor_name = in.readString();
-        mandatory = in.readByte() != 0;
+        mandatory = in.readString();
         unit = in.readString();
         data_type = in.readString();
-        photographic_evidence = in.readByte() != 0;
+        photographic_evidence = in.readString();
         no_of_times = in.readString();
         duration_unit = in.readString();
         duration_type = in.readString();
@@ -32,10 +32,10 @@ public class SensorData implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(sensor_name);
-        dest.writeByte((byte) (mandatory ? 1 : 0));
+        dest.writeString(mandatory);
         dest.writeString(unit);
         dest.writeString(data_type);
-        dest.writeByte((byte) (photographic_evidence ? 1 : 0));
+        dest.writeString(photographic_evidence);
         dest.writeString(no_of_times);
         dest.writeString(duration_unit);
         dest.writeString(duration_type);
@@ -58,19 +58,19 @@ public class SensorData implements Parcelable {
         }
     };
 
-    public String getName() {
+    public String getSensor_name() {
         return sensor_name;
     }
 
-    public void setName(String sensor_name) {
+    public void setSensor_name(String sensor_name) {
         this.sensor_name = sensor_name;
     }
 
-    public boolean isMandatory() {
+    public String getMandatory() {
         return mandatory;
     }
 
-    public void setMandatory(boolean mandatory) {
+    public void setMandatory(String mandatory) {
         this.mandatory = mandatory;
     }
 
@@ -90,11 +90,11 @@ public class SensorData implements Parcelable {
         this.data_type = data_type;
     }
 
-    public boolean isPhotographic_evidence() {
+    public String getPhotographic_evidence() {
         return photographic_evidence;
     }
 
-    public void setPhotographic_evidence(boolean photographic_evidence) {
+    public void setPhotographic_evidence(String photographic_evidence) {
         this.photographic_evidence = photographic_evidence;
     }
 

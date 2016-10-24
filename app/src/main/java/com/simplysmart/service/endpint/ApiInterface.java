@@ -25,11 +25,11 @@ public interface ApiInterface {
     @POST("/api/sessions/sign_in")
     Call<LoginResponse> residentLoginWithSubDomain(@Query("subdomain") String subDomain, @Body LoginRequest request);
 
-    @GET("/api/waste_management/metrics")
+    @GET("/api/metrics")
     Call<MatrixResponse> getMetrics(@Query("unit_id") String unitId,
                                     @Query("subdomain") String subDomain);
 
-    @POST("/api/waste_management/reading/")
+    @POST("/api/sensor_readings/")
     Call<JsonObject> submitReading(@Query("subdomain") String subDomain,
                                    @Body ReadingData readingData);
 

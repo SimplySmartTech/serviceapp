@@ -1,6 +1,7 @@
 package com.simplysmart.service.activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixListAdapter;
+import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
@@ -51,12 +53,16 @@ public class MainActivity extends BaseActivity {
         matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                ReadingData readingData = new ReadingData();
-                readingData.setUtility_id("58087fd341707003d7010000");
-                readingData.setValue("25");
-                readingData.setPhotographic_evidence_url("shekhar_test.jpg");
-                readingData.setSensor_name("weight sensor");
-                postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+
+                Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
+                startActivity(intent);
+
+//                ReadingData readingData = new ReadingData();
+//                readingData.setUtility_id("58087fd341707003d7010000");
+//                readingData.setValue("25");
+//                readingData.setPhotographic_evidence_url("shekhar_test.jpg");
+//                readingData.setSensor_name("weight sensor");
+//                postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                 return true;
             }
         });
@@ -142,6 +148,7 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     dismissActivitySpinner();
+                    DebugLog.d(t.getLocalizedMessage());
                     displayMessage(getResources().getString(R.string.error_in_network));
                 }
             });

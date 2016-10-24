@@ -98,8 +98,8 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder = (ChildHolder) convertView.getTag();
         }
 
-        if (matrixData.get(groupPosition).getSensors().get(childPosition).getName() != null) {
-            holder.sensorName.setText(matrixData.get(groupPosition).getSensors().get(childPosition).getName());
+        if (matrixData.get(groupPosition).getSensors().get(childPosition).getSensor_name() != null) {
+            holder.sensorName.setText(matrixData.get(groupPosition).getSensors().get(childPosition).getSensor_name());
         } else {
             holder.sensorName.setText("");
         }

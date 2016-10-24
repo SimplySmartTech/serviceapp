@@ -42,6 +42,12 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".activity.InputFormActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:screenOrientation="portrait" />
+
         <!-- Push Notification GCM Services & Receivers-->
         <service android:name=".gcm.RegistrationIntentService" />
 
