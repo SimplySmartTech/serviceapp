@@ -10,5 +10,9 @@
 
     <string name="error_no_internet_connection">Please check your internet connection.</string>
     <string name="error_in_network">Oops! something went wrong.</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

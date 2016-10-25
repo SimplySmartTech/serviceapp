@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 
     <permission
@@ -20,7 +19,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".activity.SplashActivity"
             android:label="@string/app_name"
@@ -34,21 +32,21 @@
 
         <activity
             android:name=".activity.LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".activity.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".activity.InputFormActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            android:screenOrientation="portrait" />
+            android:windowSoftInputMode="stateAlwaysHidden" />
 
-        <!-- Push Notification GCM Services & Receivers-->
+        <activity
+            android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <!-- Push Notification GCM Services & Receivers -->
         <service android:name=".gcm.RegistrationIntentService" />
 
         <receiver
@@ -57,6 +55,7 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.simplysmart.service" />
             </intent-filter>
         </receiver>
@@ -67,8 +66,9 @@
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <!--support pre-4.4 KitKat devices, add the following action to the intent filter declaration-->
+                <!-- support pre-4.4 KitKat devices, add the following action to the intent filter declaration -->
                 <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
                 <category android:name="com.google.android.gcm.demo" />
             </intent-filter>
         </service>
