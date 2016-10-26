@@ -8,6 +8,8 @@ import android.os.Parcelable;
  */
 public class SensorData implements Parcelable {
 
+    private String site_name;
+    private String metric;
     private String sensor_name;
     private String mandatory;
     private String unit;
@@ -16,9 +18,11 @@ public class SensorData implements Parcelable {
     private String no_of_times;
     private String duration_unit;
     private String duration_type;
-
+    private String utility_identifier;
 
     protected SensorData(Parcel in) {
+        site_name = in.readString();
+        metric = in.readString();
         sensor_name = in.readString();
         mandatory = in.readString();
         unit = in.readString();
@@ -27,10 +31,13 @@ public class SensorData implements Parcelable {
         no_of_times = in.readString();
         duration_unit = in.readString();
         duration_type = in.readString();
+        utility_identifier = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(site_name);
+        dest.writeString(metric);
         dest.writeString(sensor_name);
         dest.writeString(mandatory);
         dest.writeString(unit);
@@ -39,6 +46,7 @@ public class SensorData implements Parcelable {
         dest.writeString(no_of_times);
         dest.writeString(duration_unit);
         dest.writeString(duration_type);
+        dest.writeString(utility_identifier);
     }
 
     @Override
@@ -57,6 +65,22 @@ public class SensorData implements Parcelable {
             return new SensorData[size];
         }
     };
+
+    public String getSite_name() {
+        return site_name;
+    }
+
+    public void setSite_name(String site_name) {
+        this.site_name = site_name;
+    }
+
+    public String getMetric() {
+        return metric;
+    }
+
+    public void setMetric(String metric) {
+        this.metric = metric;
+    }
 
     public String getSensor_name() {
         return sensor_name;
@@ -120,5 +144,13 @@ public class SensorData implements Parcelable {
 
     public void setDuration_type(String duration_type) {
         this.duration_type = duration_type;
+    }
+
+    public String getUtility_identifier() {
+        return utility_identifier;
+    }
+
+    public void setUtility_identifier(String utility_identifier) {
+        this.utility_identifier = utility_identifier;
     }
 }

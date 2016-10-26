@@ -15,10 +15,8 @@ import android.view.View;
 import android.widget.ExpandableListView;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixListAdapter;
-import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
@@ -26,7 +24,6 @@ import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.MatrixResponse;
-import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.User;
 
@@ -38,6 +35,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
     private ExpandableListView matrixList;
     private MatrixListAdapter matrixListAdapter;
+    private MatrixResponse matrixResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +66,8 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
 
                 Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
+                intent.putExtra("SENSOR_DATA", matrixResponse.getData().get(groupPosition).getSensors().get(childPosition));
                 startActivity(intent);
-
-//                ReadingData readingData = new ReadingData();
-//                readingData.setUtility_id("58087fd341707003d7010000");
-//                readingData.setValue("25");
-//                readingData.setPhotographic_evidence_url("shekhar_test.jpg");
-//                readingData.setSensor_name("weight sensor");
-//                postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                 return true;
             }
         });
@@ -171,42 +163,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         }
     }
 
-    private void postReadingRequest(ReadingData readingData, String subDomain) {
-
-        if (NetworkUtilities.isInternet(MainActivity.this)) {
-
-            showActivitySpinner();
-
-            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-            Call<JsonObject> call = apiInterface.submitReading(subDomain, readingData);
-            call.enqueue(new Callback<JsonObject>() {
-
-                @Override
-                public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
-
-                    if (response.isSuccessful()) {
-                    } else {
-                        APIError error = ErrorUtils.parseError(response);
-                        displayMessage(error.message());
-                    }
-                    dismissActivitySpinner();
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    dismissActivitySpinner();
-                    DebugLog.d(t.getLocalizedMessage());
-                    displayMessage(getResources().getString(R.string.error_in_network));
-                }
-            });
-        } else {
-            displayMessage(getString(R.string.error_no_internet_connection));
-        }
-    }
-
     //Set matrix data to list
-    private void setMatrixData(MatrixResponse matrixResponse) {
-        matrixListAdapter = new MatrixListAdapter(MainActivity.this, matrixResponse.getData());
+    private void setMatrixData(MatrixResponse response) {
+
+        matrixResponse = response;
+        matrixListAdapter = new MatrixListAdapter(MainActivity.this, response.getData());
         matrixList.setAdapter(matrixListAdapter);
     }
 

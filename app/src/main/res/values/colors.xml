@@ -23,4 +23,7 @@
 
     <color name="graph_line_user_average">#90009F55</color>
     <color name="graph_line_township_average">#90CC68BD</color>
+
+    <color name="gal_color_pale_green">#00b300</color>
+    <color name="gal_color_amber">#FFC200</color>
 </resources>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/parentLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -24,9 +25,9 @@
                 android:id="@+id/inputReadingValue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
                 android:hint="Enter value.."
-                android:inputType="numberDecimal" />
+                android:inputType="numberDecimal"
+                android:padding="5dp" />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -37,6 +38,22 @@
             android:layout_marginTop="15dp"
             android:text="UPLOAD IMAGE" />
 
+        <ImageView
+            android:id="@+id/readingImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/card_bg" />
+
     </LinearLayout>
+
+    <Button
+        android:id="@+id/submitForm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="15dp"
+        android:padding="10dp"
+        android:text="SAVE READING" />
 
 </RelativeLayout>
