@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
@@ -93,6 +94,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder = new ChildHolder();
             convertView = inflater.inflate(R.layout.matrix_list_row_child, parent, false);
             holder.sensorName = (TextView) convertView.findViewById(R.id.sensorName);
+            holder.checkDoneImage = (ImageView) convertView.findViewById(R.id.checkDoneImage);
             convertView.setTag(holder);
         } else {
             holder = (ChildHolder) convertView.getTag();
@@ -102,6 +104,12 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder.sensorName.setText(matrixData.get(groupPosition).getSensors().get(childPosition).getSensor_name());
         } else {
             holder.sensorName.setText("");
+        }
+
+        if (matrixData.get(groupPosition).getSensors().get(childPosition).isChecked()) {
+            holder.checkDoneImage.setImageResource(R.drawable.tick_green);
+        } else {
+            holder.checkDoneImage.setImageResource(R.drawable.tick_grey);
         }
 
         return convertView;
@@ -115,6 +123,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
 
     private static class ChildHolder {
         private TextView sensorName;
+        private ImageView checkDoneImage;
     }
 
     private static class GroupHolder {

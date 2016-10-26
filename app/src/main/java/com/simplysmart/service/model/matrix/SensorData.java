@@ -19,6 +19,7 @@ public class SensorData implements Parcelable {
     private String duration_unit;
     private String duration_type;
     private String utility_identifier;
+    private boolean isChecked;
 
     protected SensorData(Parcel in) {
         site_name = in.readString();
@@ -32,6 +33,7 @@ public class SensorData implements Parcelable {
         duration_unit = in.readString();
         duration_type = in.readString();
         utility_identifier = in.readString();
+        isChecked = in.readByte() != 0;
     }
 
     @Override
@@ -47,6 +49,7 @@ public class SensorData implements Parcelable {
         dest.writeString(duration_unit);
         dest.writeString(duration_type);
         dest.writeString(utility_identifier);
+        dest.writeByte((byte) (isChecked ? 1 : 0));
     }
 
     @Override
@@ -65,6 +68,14 @@ public class SensorData implements Parcelable {
             return new SensorData[size];
         }
     };
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
 
     public String getSite_name() {
         return site_name;

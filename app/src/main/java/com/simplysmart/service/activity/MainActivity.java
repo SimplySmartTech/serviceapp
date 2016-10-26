@@ -1,10 +1,13 @@
 package com.simplysmart.service.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -41,6 +44,9 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getUserInfo();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -57,8 +63,6 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
 
-        getUserInfo();
-
         getMatrixRequest(GlobalData.getInstance().getUnits().get(0).getId(), GlobalData.getInstance().getSubDomain());
 
         matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -67,10 +71,24 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
                 intent.putExtra("SENSOR_DATA", matrixResponse.getData().get(groupPosition).getSensors().get(childPosition));
+                intent.putExtra("groupPosition", groupPosition);
+                intent.putExtra("childPosition", childPosition);
                 startActivity(intent);
                 return true;
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(UPDATE_METRIC_SENSOR_LIST_ROW, new IntentFilter("UPDATE_METRIC_SENSOR_LIST_ROW"));
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UPDATE_METRIC_SENSOR_LIST_ROW);
+        super.onDestroy();
     }
 
     @Override
@@ -169,6 +187,21 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
         matrixResponse = response;
         matrixListAdapter = new MatrixListAdapter(MainActivity.this, response.getData());
         matrixList.setAdapter(matrixListAdapter);
+    }
+
+    private BroadcastReceiver UPDATE_METRIC_SENSOR_LIST_ROW = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateMetricList(intent);
+        }
+    };
+
+    private void updateMetricList(Intent intent) {
+        int groupPosition = intent.getIntExtra("groupPosition", -1);
+        int childPosition = intent.getIntExtra("childPosition", -1);
+
+        matrixResponse.getData().get(groupPosition).getSensors().get(childPosition).setChecked(true);
+        matrixListAdapter.notifyDataSetChanged();
     }
 
     //Fetch logged user info from shared preferences

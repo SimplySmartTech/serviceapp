@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -60,6 +62,7 @@ public class InputFormActivity extends BaseActivity {
     private TransferUtility transferUtility;
     private RelativeLayout mParentLayout;
     private ImageView mReadingImage;
+    private ProgressBar mHorizontalBar;
     private Button mUploadImage;
     private Button mSubmitForm;
     private EditText mInputReadingValue;
@@ -67,6 +70,8 @@ public class InputFormActivity extends BaseActivity {
     private String uploadedReadingUrl = "";
 
     private SensorData sensorData;
+    private int groupPosition;
+    private int childPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +80,12 @@ public class InputFormActivity extends BaseActivity {
 
         if (getIntent() != null && getIntent().getExtras() != null) {
             sensorData = getIntent().getParcelableExtra("SENSOR_DATA");
+            groupPosition = getIntent().getIntExtra("groupPosition", -1);
+            childPosition = getIntent().getIntExtra("childPosition", -1);
+        } else {
+            sensorData = null;
+            groupPosition = -1;
+            childPosition = -1;
         }
 
         transferUtility = Util.getTransferUtility(this);
@@ -90,6 +101,7 @@ public class InputFormActivity extends BaseActivity {
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         mReadingImage = (ImageView) findViewById(R.id.readingImage);
         mUploadImage = (Button) findViewById(R.id.uploadImage);
+        mHorizontalBar = (ProgressBar) findViewById(R.id.horizontalBar);
         mSubmitForm = (Button) findViewById(R.id.submitForm);
         mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
 
@@ -272,12 +284,15 @@ public class InputFormActivity extends BaseActivity {
         File file = new File(filePath);
         image = file;
 
+        mHorizontalBar.setVisibility(View.VISIBLE);
+        mSubmitForm.setEnabled(false);
+        mSubmitForm.setText("PLEASE WAIT..");
+
         TransferObserver observer = transferUtility.upload(
                 AWSConstants.BUCKET_NAME,
                 AWSConstants.PATH_FOLDER + file.getName(),
                 file, CannedAccessControlList.PublicRead);
 
-        showActivitySpinner("Uploading image");
         observer.setTransferListener(new UploadListener());
     }
 
@@ -285,7 +300,9 @@ public class InputFormActivity extends BaseActivity {
 
         @Override
         public void onError(int id, Exception e) {
-            dismissActivitySpinner();
+            mHorizontalBar.setVisibility(View.INVISIBLE);
+            mSubmitForm.setEnabled(true);
+            mSubmitForm.setText("SUBMIT FORM");
             Log.e(TAG, "Error during upload: " + id, e);
         }
 
@@ -299,6 +316,7 @@ public class InputFormActivity extends BaseActivity {
             Log.d(TAG, "onStateChanged: " + id + ", " + newState);
 
             if (newState == TransferState.COMPLETED) {
+
                 String url = AWSConstants.S3_URL
                         + AWSConstants.BUCKET_NAME + "/"
                         + AWSConstants.PATH_FOLDER
@@ -306,8 +324,13 @@ public class InputFormActivity extends BaseActivity {
 
                 DebugLog.d("URL :::: " + url);
                 uploadedReadingUrl = url;
+
+                mUploadImage.setText("CHANGE IMAGE");
+                mSubmitForm.setEnabled(true);
+                mSubmitForm.setText("SUBMIT FORM");
+
+                mHorizontalBar.setVisibility(View.INVISIBLE);
             }
-            dismissActivitySpinner();
         }
     }
 
@@ -325,7 +348,13 @@ public class InputFormActivity extends BaseActivity {
                 public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
 
                     if (response.isSuccessful()) {
+
+                        Intent i = new Intent("UPDATE_METRIC_SENSOR_LIST_ROW");
+                        i.putExtra("groupPosition", groupPosition);
+                        i.putExtra("childPosition", childPosition);
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
                         finish();
+
                     } else {
                         APIError error = ErrorUtils.parseError(response);
                         displayMessage(error.message());
