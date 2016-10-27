@@ -7,19 +7,32 @@
     android:padding="20dp">
 
     <TextView
+        android:id="@+id/iconLabel"
+        android:layout_width="20dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:textColor="@color/bw_color_black"
+        android:textSize="20sp" />
 
+    <TextView
         android:id="@+id/typeName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/iconLabel"
         android:gravity="start"
-        android:textSize="20sp" />
+        android:textColor="@color/bw_color_black"
+        android:textSize="16sp" />
 
-    <!--<CheckBox-->
-        <!--android:id="@+id/checkboxDone"-->
-        <!--android:layout_width="35dp"-->
-        <!--android:layout_height="35dp"-->
-        <!--android:layout_alignParentEnd="true"-->
-        <!--android:enabled="false" />-->
+    <ImageView
+        android:id="@+id/clickArrow"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentEnd="true"
+        android:scaleType="center"
+        android:src="@drawable/gal_ic_arrow_down" />
 
 </RelativeLayout>

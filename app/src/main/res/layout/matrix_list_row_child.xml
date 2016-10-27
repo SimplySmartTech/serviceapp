@@ -4,27 +4,46 @@
     android:layout_height="wrap_content"
     android:background="@color/bw_color_white"
     android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="15dp">
-
-    <ImageView
-        android:id="@+id/checkDoneImage"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="2dp"
-        android:src="@drawable/tick_grey" />
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/sensorName"
+        android:id="@+id/topSeparator"
+        android:layout_width="match_parent"
+        android:layout_height=".5dp"
+        android:background="@color/bw_color_dark_gray" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:drawableEnd="@drawable/gal_ic_arrow"
-        android:ellipsize="end"
-        android:gravity="start|center_vertical"
-        android:maxLines="1"
-        android:padding="10dp"
-        android:textSize="16sp" />
+        android:background="@color/bw_color_white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="10dp">
 
+        <ImageView
+            android:id="@+id/checkDoneImage"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="2dp"
+            android:src="@drawable/tick_grey" />
+
+        <TextView
+            android:id="@+id/sensorName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:drawableEnd="@drawable/gal_ic_arrow"
+            android:ellipsize="end"
+            android:gravity="start|center_vertical"
+            android:maxLines="1"
+            android:padding="10dp"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/bottomSeparator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bw_color_dark_gray" />
 </LinearLayout>

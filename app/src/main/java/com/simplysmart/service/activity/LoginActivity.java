@@ -11,10 +11,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
@@ -42,7 +42,7 @@ public class LoginActivity extends BaseActivity {
 
     private Context context;
     private EditText editUsername, editPassword;
-    private TextView buttonLogin;
+    private Button buttonLogin;
     private RelativeLayout llCompanySpinner;
     private Spinner companySpinner;
     private String subDomain = "";
@@ -65,7 +65,7 @@ public class LoginActivity extends BaseActivity {
     private void initializeWidgets() {
         editUsername = (EditText) findViewById(R.id.user_name);
         editPassword = (EditText) findViewById(R.id.password);
-        buttonLogin = (TextView) findViewById(R.id.btn_login);
+        buttonLogin = (Button) findViewById(R.id.btn_login);
         llCompanySpinner = (RelativeLayout) findViewById(R.id.llCompanySpinner);
         companySpinner = (Spinner) findViewById(R.id.companySpinner);
     }

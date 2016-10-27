@@ -12,12 +12,14 @@ public class MatrixData implements Parcelable {
 
     private String type;
     private String utility_id;
+    private String icon;
 
     private ArrayList<SensorData> sensors;
 
     protected MatrixData(Parcel in) {
         type = in.readString();
         utility_id = in.readString();
+        icon = in.readString();
         sensors = in.createTypedArrayList(SensorData.CREATOR);
     }
 
@@ -25,6 +27,7 @@ public class MatrixData implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(type);
         dest.writeString(utility_id);
+        dest.writeString(icon);
         dest.writeTypedList(sensors);
     }
 
@@ -44,6 +47,14 @@ public class MatrixData implements Parcelable {
             return new MatrixData[size];
         }
     };
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 
     public String getType() {
         return type;

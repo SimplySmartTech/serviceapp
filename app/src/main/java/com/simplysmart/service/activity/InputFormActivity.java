@@ -1,11 +1,11 @@
 package com.simplysmart.service.activity;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
@@ -105,6 +105,16 @@ public class InputFormActivity extends BaseActivity {
         mSubmitForm = (Button) findViewById(R.id.submitForm);
         mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
 
+        if (sensorData != null && sensorData.getPhotographic_evidence() != null && sensorData.getPhotographic_evidence().equalsIgnoreCase("true")) {
+            mHorizontalBar.setVisibility(View.GONE);
+            mUploadImage.setVisibility(View.VISIBLE);
+            mReadingImage.setVisibility(View.VISIBLE);
+        } else {
+            mHorizontalBar.setVisibility(View.GONE);
+            mUploadImage.setVisibility(View.GONE);
+            mReadingImage.setVisibility(View.GONE);
+        }
+
         mUploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,13 +126,17 @@ public class InputFormActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
 
-                ReadingData readingData = new ReadingData();
-                readingData.setUtility_id(sensorData.getUtility_identifier());
-                readingData.setValue(mInputReadingValue.getText().toString());
-                readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-                readingData.setSensor_name(sensorData.getSensor_name());
-                postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+                if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
+                    ReadingData readingData = new ReadingData();
+                    readingData.setUtility_id(sensorData.getUtility_identifier());
+                    readingData.setValue(mInputReadingValue.getText().toString());
+                    readingData.setPhotographic_evidence_url(uploadedReadingUrl);
+                    readingData.setSensor_name(sensorData.getSensor_name());
+                    postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+                    postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+                } else {
+                    showSnackBar(mParentLayout, "Please enter reading before submit.");
+                }
             }
         });
 
@@ -220,11 +234,26 @@ public class InputFormActivity extends BaseActivity {
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-        image = File.createTempFile(imageFileName, ".jpg", storageDir);
+
+//        File file = new File(InputFormActivity.this.getFilesDir(), imageFileName);
+        image = getTempFile(InputFormActivity.this, imageFileName);
+//        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+//        image = File.createTempFile(imageFileName, ".jpg", storageDir);
 
         mCurrentPhotoPath = image.getAbsolutePath();
+        DebugLog.d("mCurrentPhotoPath : " + mCurrentPhotoPath);
         return image;
+    }
+
+    public File getTempFile(Context context, String url) {
+        File file = null;
+        try {
+            String fileName = Uri.parse(url).getLastPathSegment();
+            file = File.createTempFile(fileName, ".jpg", context.getCacheDir());
+        } catch (IOException e) {
+            // Error while creating file
+        }
+        return file;
     }
 
     @Override

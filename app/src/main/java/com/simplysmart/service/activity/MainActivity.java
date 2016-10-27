@@ -39,6 +39,7 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     private ExpandableListView matrixList;
     private MatrixListAdapter matrixListAdapter;
     private MatrixResponse matrixResponse;
+    private int lastExpandedPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,17 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 return true;
             }
         });
+
+        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
+                    matrixList.collapseGroup(lastExpandedPosition);
+                }
+                lastExpandedPosition = groupPosition;
+            }
+        });
+
     }
 
     @Override
