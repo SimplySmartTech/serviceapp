@@ -79,6 +79,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder.typeName = (TextView) convertView.findViewById(R.id.typeName);
             holder.iconLabel = (TextView) convertView.findViewById(R.id.iconLabel);
             holder.clickArrow = (ImageView) convertView.findViewById(R.id.clickArrow);
+            holder.topSeparator = (View)convertView.findViewById(R.id.topSeparator);
             convertView.setTag(holder);
         } else {
             holder = (GroupHolder) convertView.getTag();
@@ -94,10 +95,12 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder.clickArrow.setImageResource(R.drawable.gal_ic_arrow_up);
             holder.iconLabel.setTextColor(mContext.getResources().getColor(R.color.accent));
             holder.typeName.setTextColor(mContext.getResources().getColor(R.color.accent));
+            holder.topSeparator.setVisibility(View.VISIBLE);
         } else {
             holder.clickArrow.setImageResource(R.drawable.gal_ic_arrow_down);
             holder.iconLabel.setTextColor(mContext.getResources().getColor(R.color.bw_color_black));
             holder.typeName.setTextColor(mContext.getResources().getColor(R.color.bw_color_black));
+            holder.topSeparator.setVisibility(View.GONE);
         }
 
         if (matrixData.get(groupPosition).getIcon() != null && !matrixData.get(groupPosition).getIcon().equalsIgnoreCase("")) {
@@ -120,8 +123,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.matrix_list_row_child, parent, false);
             holder.sensorName = (TextView) convertView.findViewById(R.id.sensorName);
             holder.checkDoneImage = (ImageView) convertView.findViewById(R.id.checkDoneImage);
-            holder.topSeparator = (TextView) convertView.findViewById(R.id.topSeparator);
-            holder.bottomSeparator = (TextView) convertView.findViewById(R.id.bottomSeparator);
+            holder.bottomSeparator = (View) convertView.findViewById(R.id.bottomSeparator);
             convertView.setTag(holder);
         } else {
             holder = (ChildHolder) convertView.getTag();
@@ -133,20 +135,9 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder.sensorName.setText("");
         }
 
-        if (matrixData.get(groupPosition).getSensors().size() == 1) {
-            holder.topSeparator.setVisibility(View.VISIBLE);
+        if(isLastChild){
             holder.bottomSeparator.setVisibility(View.VISIBLE);
-
-        } else if (childPosition == matrixData.get(groupPosition).getSensors().size() - 1) {
-            holder.topSeparator.setVisibility(View.GONE);
-            holder.bottomSeparator.setVisibility(View.VISIBLE);
-
-        } else if (childPosition == 0) {
-            holder.topSeparator.setVisibility(View.VISIBLE);
-            holder.bottomSeparator.setVisibility(View.GONE);
-
-        } else {
-            holder.topSeparator.setVisibility(View.GONE);
+        }else {
             holder.bottomSeparator.setVisibility(View.GONE);
         }
 
@@ -168,12 +159,13 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
     private static class ChildHolder {
         private TextView sensorName;
         private ImageView checkDoneImage;
-        private TextView topSeparator, bottomSeparator;
+        private View bottomSeparator;
     }
 
     private static class GroupHolder {
         private TextView typeName;
         private TextView iconLabel;
         private ImageView clickArrow;
+        private View topSeparator;
     }
 }
