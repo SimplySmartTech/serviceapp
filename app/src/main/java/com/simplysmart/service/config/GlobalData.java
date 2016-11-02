@@ -3,6 +3,7 @@ package com.simplysmart.service.config;
 import android.app.Application;
 import android.content.Context;
 
+import com.activeandroid.ActiveAndroid;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 
@@ -24,6 +25,12 @@ public class GlobalData extends Application {
 
     private ArrayList<Unit> units;
     private AccessPolicy accessPolicy;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        ActiveAndroid.initialize(this);
+    }
 
     @Override
     protected void attachBaseContext(Context base) {

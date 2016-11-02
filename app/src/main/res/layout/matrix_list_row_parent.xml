@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_alignParentTop="true"
-        android:background="@color/bw_color_dark_gray"
+        android:background="@color/bw_color_dark_red"
         android:visibility="gone"/>
 
     <RelativeLayout

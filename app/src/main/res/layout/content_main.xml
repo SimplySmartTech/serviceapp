@@ -9,12 +9,9 @@
     tools:context="com.simplysmart.service.activity.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <ExpandableListView
-        android:id="@+id/matrixList"
+    <FrameLayout
+        android:id="@+id/container_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:childIndicator="@color/primary"
-        android:divider="@android:color/transparent"
-        android:groupIndicator="@color/accent" />
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
