@@ -7,9 +7,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -28,9 +25,6 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.endpint.ApiInterface;
-import com.simplysmart.service.fragment.SettingsFragment;
-import com.simplysmart.service.fragment.SummaryFragment;
-import com.simplysmart.service.fragment.TakeReadingFragment;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.user.AccessPolicy;
@@ -40,7 +34,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private ExpandableListView matrixList;
+    private MatrixListAdapter matrixListAdapter;
+    private MatrixResponse matrixResponse;
+    private int lastExpandedPosition = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,27 +53,53 @@ public class MainActivity extends BaseActivity {
 
         getSupportActionBar().setTitle("Service");
 
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-//                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-//        drawer.setDrawerListener(toggle);
-//        toggle.syncState();
-//
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(this);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
-        setFragmentInScreen(new TakeReadingFragment(),"ReadingFragment");
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        matrixList = (ExpandableListView) findViewById(R.id.matrixList);
+
+        getMatrixRequest(GlobalData.getInstance().getUnits().get(0).getId(), GlobalData.getInstance().getSubDomain());
+
+        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
+                intent.putExtra("SENSOR_DATA", matrixResponse.getData().get(groupPosition).getSensors().get(childPosition));
+                intent.putExtra("groupPosition", groupPosition);
+                intent.putExtra("childPosition", childPosition);
+                startActivity(intent);
+                return true;
+            }
+        });
+
+        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
+                    matrixList.collapseGroup(lastExpandedPosition);
+                }
+                lastExpandedPosition = groupPosition;
+            }
+        });
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(UPDATE_METRIC_SENSOR_LIST_ROW, new IntentFilter("UPDATE_METRIC_SENSOR_LIST_ROW"));
     }
 
     @Override
     protected void onDestroy() {
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UPDATE_METRIC_SENSOR_LIST_ROW);
         super.onDestroy();
     }
 
@@ -95,7 +120,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -103,49 +128,93 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.submit_readings) {
-            return true;
-        }else if(id == R.id.summary) {
-            setFragmentInScreen(new SummaryFragment(),"SummaryFragment");
-            return true;
-        }else if(id == R.id.logout){
+        if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//
-//
-//        int id = item.getItemId();
-//
-//        if (id == R.id.reading) {
-//            setFragmentInScreen(new TakeReadingFragment());
-//        } else if (id == R.id.summary) {
-//            setFragmentInScreen(new SummaryFragment());
-//        } else if (id == R.id.logout) {
-//            //add action later.
-//        } else if (id == R.id.settings) {
-//            setFragmentInScreen(new SettingsFragment());
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
 
-    private void setFragmentInScreen(Fragment fragment,String tag){
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container_layout,fragment);
-        transaction.addToBackStack(tag);
-        transaction.commit();
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
+    //Do network call to fetch matrix data
+    private void getMatrixRequest(String unitId, String subDomain) {
 
+        if (NetworkUtilities.isInternet(MainActivity.this)) {
+
+            showActivitySpinner();
+
+            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+            Call<MatrixResponse> call = apiInterface.getMetrics(unitId, subDomain);
+            call.enqueue(new Callback<MatrixResponse>() {
+
+                @Override
+                public void onResponse(Call<MatrixResponse> call, final Response<MatrixResponse> response) {
+
+                    if (response.isSuccessful()) {
+                        setMatrixData(response.body());
+                    } else {
+                        APIError error = ErrorUtils.parseError(response);
+                        displayMessage(error.message());
+                    }
+                    dismissActivitySpinner();
+                }
+
+                @Override
+                public void onFailure(Call<MatrixResponse> call, Throwable t) {
+                    dismissActivitySpinner();
+                    displayMessage(getResources().getString(R.string.error_in_network));
+                }
+            });
+        } else {
+            displayMessage(getString(R.string.error_no_internet_connection));
+        }
+    }
+
+    //Set matrix data to list
+    private void setMatrixData(MatrixResponse response) {
+
+        matrixResponse = response;
+        matrixListAdapter = new MatrixListAdapter(MainActivity.this, response.getData());
+        matrixList.setAdapter(matrixListAdapter);
+    }
+
+    private BroadcastReceiver UPDATE_METRIC_SENSOR_LIST_ROW = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateMetricList(intent);
+        }
+    };
+
+    private void updateMetricList(Intent intent) {
+        int groupPosition = intent.getIntExtra("groupPosition", -1);
+        int childPosition = intent.getIntExtra("childPosition", -1);
+
+        matrixResponse.getData().get(groupPosition).getSensors().get(childPosition).setChecked(true);
+        matrixListAdapter.notifyDataSetChanged();
+    }
 
     //Fetch logged user info from shared preferences
     private void getUserInfo() {

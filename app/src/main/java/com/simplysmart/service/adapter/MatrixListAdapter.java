@@ -2,7 +2,6 @@ package com.simplysmart.service.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,7 +122,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder = new ChildHolder();
             convertView = inflater.inflate(R.layout.matrix_list_row_child, parent, false);
             holder.sensorName = (TextView) convertView.findViewById(R.id.sensorName);
-            holder.checkDoneImage = (TextView) convertView.findViewById(R.id.checkDoneImage);
+            holder.checkDoneImage = (ImageView) convertView.findViewById(R.id.checkDoneImage);
             holder.bottomSeparator = (View) convertView.findViewById(R.id.bottomSeparator);
             convertView.setTag(holder);
         } else {
@@ -135,9 +134,6 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
         } else {
             holder.sensorName.setText("");
         }
-        String check = "&#xf00c;";
-        holder.checkDoneImage.setText(Html.fromHtml(check));
-        holder.checkDoneImage.setTypeface(textTypeface);
 
         if(isLastChild){
             holder.bottomSeparator.setVisibility(View.VISIBLE);
@@ -146,9 +142,9 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
         }
 
         if (matrixData.get(groupPosition).getSensors().get(childPosition).isChecked()) {
-            holder.checkDoneImage.setTextColor(ContextCompat.getColor(mContext,R.color.bw_color_dark_green));
+            holder.checkDoneImage.setImageResource(R.drawable.tick_green);
         } else {
-            holder.checkDoneImage.setTextColor(ContextCompat.getColor(mContext,R.color.bw_color_light_gray));
+            holder.checkDoneImage.setImageResource(R.drawable.tick_grey);
         }
 
         return convertView;
@@ -162,7 +158,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
 
     private static class ChildHolder {
         private TextView sensorName;
-        private TextView checkDoneImage;
+        private ImageView checkDoneImage;
         private View bottomSeparator;
     }
 

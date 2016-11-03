@@ -17,7 +17,4 @@
 
     <string name="txt_capture_image_selection">Please Select Your Choice</string>
 
-    <string name="icon_check">&#xf00c;</string>
-    <string name="icon_camera">&#xf030;</string>
-
 </resources>

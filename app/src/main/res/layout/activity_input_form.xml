@@ -10,20 +10,16 @@
         layout="@layout/toolbar" />
 
     <LinearLayout
-        android:id="@+id/readingLayout"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="match_parent"
         android:layout_below="@+id/toolbar_Layout"
-        android:orientation="horizontal"
-        android:paddingEnd="8dp"
+        android:orientation="vertical"
         android:padding="20dp">
 
         <android.support.design.widget.TextInputLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="5dp"
-            android:layout_weight="0.6">
+            android:layout_marginTop="5dp">
 
             <EditText
                 android:id="@+id/inputReadingValue"
@@ -33,79 +29,57 @@
                 android:layout_marginStart="5dp"
                 android:hint="Enter value.."
                 android:inputType="numberDecimal"
-                android:padding="8dp" />
+                android:padding="5dp" />
 
         </android.support.design.widget.TextInputLayout>
 
-        <TextView
+        <Button
             android:id="@+id/uploadImage"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.2"
-            android:background="@color/transparent"
-            android:gravity="center"
-            android:padding="8dp"
-            android:text="@string/icon_camera"
-            android:textColor="@color/bw_color_light_gray"
-            android:textSize="32sp" />
+            android:layout_marginTop="15dp"
+            android:padding="10dp"
+            android:text="UPLOAD IMAGE" />
 
-        <TextView
-            android:id="@+id/submit"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.2"
-            android:background="@color/transparent"
-            android:gravity="center"
-            android:padding="8dp"
-            android:text="@string/icon_check"
-            android:textColor="@color/bw_color_light_gray"
-            android:textSize="32sp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="15dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/readingImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:background="@drawable/card_bg"
+                android:visibility="invisible" />
+
+            <ProgressBar
+                android:id="@+id/horizontalBar"
+                style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:indeterminate="true"
+                android:visibility="invisible" />
+
+        </RelativeLayout>
 
     </LinearLayout>
 
-    <RelativeLayout
-        android:id="@+id/photoLayout"
+    <Button
+        android:id="@+id/submitForm"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_below="@id/readingLayout"
-        android:layout_marginEnd="5dp"
-        android:layout_marginStart="5dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="15dp"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/readingImage"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@drawable/card_bg"
-            android:visibility="invisible" />
-
-        <ProgressBar
-            android:id="@+id/horizontalBar"
-            style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
-            android:indeterminate="true"
-            android:visibility="invisible" />
-
-    </RelativeLayout>
-
-
-    <!--<Button-->
-    <!--android:id="@+id/submitForm"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:layout_marginTop="15dp"-->
-    <!--android:background="@color/accent"-->
-    <!--android:padding="10dp"-->
-    <!--android:text="SUBMIT"-->
-    <!--android:textColor="@color/bw_color_white" />-->
+        android:background="@color/accent"
+        android:padding="10dp"
+        android:text="SAVE READING"
+        android:textColor="@color/bw_color_white" />
 
 </RelativeLayout>

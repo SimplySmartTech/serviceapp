@@ -3,31 +3,24 @@ package com.simplysmart.service.activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
@@ -42,7 +35,6 @@ import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
-import com.simplysmart.service.database.SensorReadingTable;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
@@ -71,18 +63,15 @@ public class InputFormActivity extends BaseActivity {
     private RelativeLayout mParentLayout;
     private ImageView mReadingImage;
     private ProgressBar mHorizontalBar;
-    private TextView mUploadImage;
-    private TextView mSubmitForm;
+    private Button mUploadImage;
+    private Button mSubmitForm;
     private EditText mInputReadingValue;
-    private RelativeLayout mPhotoLayout;
 
     private String uploadedReadingUrl = "";
 
     private SensorData sensorData;
     private int groupPosition;
     private int childPosition;
-
-    private Typeface typeface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +89,6 @@ public class InputFormActivity extends BaseActivity {
         }
 
         transferUtility = Util.getTransferUtility(this);
-        typeface = Typeface.createFromAsset(getAssets(), "fontawesome-webfont.ttf");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,23 +100,10 @@ public class InputFormActivity extends BaseActivity {
 
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         mReadingImage = (ImageView) findViewById(R.id.readingImage);
-        mUploadImage = (TextView) findViewById(R.id.uploadImage);
+        mUploadImage = (Button) findViewById(R.id.uploadImage);
         mHorizontalBar = (ProgressBar) findViewById(R.id.horizontalBar);
-        mSubmitForm = (TextView) findViewById(R.id.submit);
+        mSubmitForm = (Button) findViewById(R.id.submitForm);
         mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
-        mPhotoLayout = (RelativeLayout)findViewById(R.id.photoLayout);
-
-        String camera = "&#xf030;";
-        String check = "&#xf00c;";
-
-        mUploadImage.setText(Html.fromHtml(camera));
-        mUploadImage.setTypeface(typeface);
-        mUploadImage.setTextColor(ContextCompat.getColor(this,R.color.bw_color_light_gray));
-
-        mSubmitForm.setText(Html.fromHtml(check));
-        mSubmitForm.setTypeface(typeface);
-        mSubmitForm.setTextColor(ContextCompat.getColor(this,R.color.bw_color_light_gray));
-
 
         if (sensorData != null && sensorData.getPhotographic_evidence() != null && sensorData.getPhotographic_evidence().equalsIgnoreCase("true")) {
             mHorizontalBar.setVisibility(View.GONE);
@@ -157,20 +132,7 @@ public class InputFormActivity extends BaseActivity {
                     readingData.setValue(mInputReadingValue.getText().toString());
                     readingData.setPhotographic_evidence_url(uploadedReadingUrl);
                     readingData.setSensor_name(sensorData.getSensor_name());
-
-                    ActiveAndroid.beginTransaction();
-                    try {
-                        SensorReadingTable sensorReadingTable = new SensorReadingTable(readingData);
-                        sensorReadingTable.save();
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        showSnackBar(mParentLayout,"Unable to save data.",false);
-                    }finally {
-                        ActiveAndroid.endTransaction();
-                    }
-
                     postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                    //TODO: Same call twice?
                     postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                 } else {
                     showSnackBar(mParentLayout, "Please enter reading before submit.");
@@ -300,8 +262,6 @@ public class InputFormActivity extends BaseActivity {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             try {
                 if (mCurrentPhotoPath != null) {
-                    mUploadImage.setTextColor(ContextCompat.getColor(this,R.color.bw_color_dark_green));
-                    mPhotoLayout.setVisibility(View.VISIBLE);
                     if (NetworkUtilities.isInternet(this)) {
                         beginUpload(compressImage(mCurrentPhotoPath));
                         setPic();
@@ -309,7 +269,6 @@ public class InputFormActivity extends BaseActivity {
                         showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
                     }
                 } else {
-                    mPhotoLayout.setVisibility(View.GONE);
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
                 }
             } catch (Exception e) {
@@ -320,8 +279,6 @@ public class InputFormActivity extends BaseActivity {
                 Uri uri = data.getData();
                 String path = getPath(uri);
                 if (path != null) {
-                    mUploadImage.setTextColor(ContextCompat.getColor(this,R.color.bw_color_dark_green));
-                    mPhotoLayout.setVisibility(View.VISIBLE);
                     if (NetworkUtilities.isInternet(this)) {
                         beginUpload(compressImage(path));
                         setPic();
@@ -329,7 +286,6 @@ public class InputFormActivity extends BaseActivity {
                         showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
                     }
                 } else {
-                    mPhotoLayout.setVisibility(View.GONE);
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
                 }
             } catch (URISyntaxException e) {
@@ -359,8 +315,7 @@ public class InputFormActivity extends BaseActivity {
 
         mHorizontalBar.setVisibility(View.VISIBLE);
         mSubmitForm.setEnabled(false);
-//        showActivitySpinner("Please wait");
-//        mSubmitForm.setText("PLEASE WAIT..");
+        mSubmitForm.setText("PLEASE WAIT..");
 
         TransferObserver observer = transferUtility.upload(
                 AWSConstants.BUCKET_NAME,
@@ -376,8 +331,7 @@ public class InputFormActivity extends BaseActivity {
         public void onError(int id, Exception e) {
             mHorizontalBar.setVisibility(View.INVISIBLE);
             mSubmitForm.setEnabled(true);
-//            dismissActivitySpinner();
-//            mSubmitForm.setText("SUBMIT FORM");
+            mSubmitForm.setText("SUBMIT FORM");
             Log.e(TAG, "Error during upload: " + id, e);
         }
 
@@ -400,10 +354,9 @@ public class InputFormActivity extends BaseActivity {
                 DebugLog.d("URL :::: " + url);
                 uploadedReadingUrl = url;
 
-//                mUploadImage.setText("CHANGE IMAGE");
+                mUploadImage.setText("CHANGE IMAGE");
                 mSubmitForm.setEnabled(true);
-                dismissActivitySpinner();
-//                mSubmitForm.setText("SUBMIT FORM");
+                mSubmitForm.setText("SUBMIT FORM");
 
                 mHorizontalBar.setVisibility(View.INVISIBLE);
             }
