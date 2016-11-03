@@ -20,11 +20,6 @@ android {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-}
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -56,9 +51,6 @@ dependencies {
 
     //Image downloader library
     compile 'com.squareup.picasso:picasso:2.5.2'
-
-    //Database library
-    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
 }
 
 apply plugin: 'com.google.gms.google-services'

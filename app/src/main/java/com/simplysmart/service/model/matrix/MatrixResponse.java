@@ -13,9 +13,6 @@ public class MatrixResponse implements Parcelable {
 
     private ArrayList<MatrixData> data;
 
-    public MatrixResponse() {
-    }
-
     protected MatrixResponse(Parcel in) {
         data = in.createTypedArrayList(MatrixData.CREATOR);
     }
