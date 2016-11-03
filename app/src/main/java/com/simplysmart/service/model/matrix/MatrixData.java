@@ -5,16 +5,20 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 
+import io.realm.RealmObject;
+
 /**
  * Created by shekhar on 20/10/16.
  */
-public class MatrixData implements Parcelable {
+public class MatrixData implements Parcelable  {
 
     private String type;
     private String utility_id;
     private String icon;
 
     private ArrayList<SensorData> sensors;
+
+    public MatrixData(){}
 
     protected MatrixData(Parcel in) {
         type = in.readString();

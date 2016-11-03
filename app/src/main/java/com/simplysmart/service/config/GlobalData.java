@@ -8,6 +8,8 @@ import com.simplysmart.service.model.user.Unit;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
+
 
 /**
  * Created by shekhar on 17/8/15.
@@ -24,6 +26,12 @@ public class GlobalData extends Application {
 
     private ArrayList<Unit> units;
     private AccessPolicy accessPolicy;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Realm.init(this);
+    }
 
     @Override
     protected void attachBaseContext(Context base) {

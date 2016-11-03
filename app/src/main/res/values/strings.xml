@@ -16,5 +16,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="txt_capture_image_selection">Please Select Your Choice</string>
+    <string name="edit">Edit</string>
+    <string name="reading_image">Reading Image</string>
 
 </resources>

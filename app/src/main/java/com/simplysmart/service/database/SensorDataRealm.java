@@ -1,17 +1,17 @@
-package com.simplysmart.service.model.matrix;
+package com.simplysmart.service.database;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.simplysmart.service.model.matrix.SensorData;
 
-import com.simplysmart.service.database.SensorDataRealm;
-
+import io.realm.Realm;
 import io.realm.RealmObject;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 
 /**
- * Created by shekhar on 20/10/16.
+ * Created by shailendrapsp on 3/11/16.
  */
-public class SensorData implements Parcelable {
 
+public class SensorDataRealm extends RealmObject{
     private String site_name;
     private String metric;
     private String sensor_name;
@@ -25,9 +25,14 @@ public class SensorData implements Parcelable {
     private String utility_identifier;
     private boolean isChecked;
 
-    public SensorData(){}
+    public SensorDataRealm(){}
 
-    public SensorData(SensorDataRealm sensorData){
+    public SensorDataRealm(SensorData sensorData) {
+        super();
+        setData(sensorData);
+    }
+
+    public void setData(SensorData sensorData){
         this.site_name = sensorData.getSite_name();
         this.metric = sensorData.getMetric();
         this.sensor_name = sensorData.getSensor_name();
@@ -42,60 +47,17 @@ public class SensorData implements Parcelable {
         this.isChecked = sensorData.isChecked();
     }
 
-    protected SensorData(Parcel in) {
-        site_name = in.readString();
-        metric = in.readString();
-        sensor_name = in.readString();
-        mandatory = in.readString();
-        unit = in.readString();
-        data_type = in.readString();
-        photographic_evidence = in.readString();
-        no_of_times = in.readString();
-        duration_unit = in.readString();
-        duration_type = in.readString();
-        utility_identifier = in.readString();
-        isChecked = in.readByte() != 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(site_name);
-        dest.writeString(metric);
-        dest.writeString(sensor_name);
-        dest.writeString(mandatory);
-        dest.writeString(unit);
-        dest.writeString(data_type);
-        dest.writeString(photographic_evidence);
-        dest.writeString(no_of_times);
-        dest.writeString(duration_unit);
-        dest.writeString(duration_type);
-        dest.writeString(utility_identifier);
-        dest.writeByte((byte) (isChecked ? 1 : 0));
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<SensorData> CREATOR = new Creator<SensorData>() {
-        @Override
-        public SensorData createFromParcel(Parcel in) {
-            return new SensorData(in);
+    public static boolean alreadyExists(String sensor_name){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<SensorDataRealm> results = realm
+                .where(SensorDataRealm.class)
+                .equalTo("sensor_name",sensor_name)
+                .findAll();
+        if(results.size()>0){
+            return true;
+        }else {
+            return false;
         }
-
-        @Override
-        public SensorData[] newArray(int size) {
-            return new SensorData[size];
-        }
-    };
-
-    public boolean isChecked() {
-        return isChecked;
-    }
-
-    public void setChecked(boolean checked) {
-        isChecked = checked;
     }
 
     public String getSite_name() {
@@ -184,5 +146,13 @@ public class SensorData implements Parcelable {
 
     public void setUtility_identifier(String utility_identifier) {
         this.utility_identifier = utility_identifier;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 }
