@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.simplysmart.service.activity.HomeActivity">
     <item
-        android:id="@+id/summary"
-        android:title="Summary"
+        android:id="@+id/submit"
+        android:title="@string/submit"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/logout"
-        android:title="Logout"
+        android:title="@string/logout"
         app:showAsAction="never" />
 
 </menu>

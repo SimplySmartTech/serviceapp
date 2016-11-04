@@ -18,5 +18,7 @@
     <string name="txt_capture_image_selection">Please Select Your Choice</string>
     <string name="edit">Edit</string>
     <string name="reading_image">Reading Image</string>
+    <string name="submit">Submit</string>
+    <string name="logout">Logout</string>
 
 </resources>

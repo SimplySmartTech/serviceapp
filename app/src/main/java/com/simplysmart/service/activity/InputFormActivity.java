@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
@@ -15,10 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
@@ -28,6 +32,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
+import com.simplysmart.service.adapter.ReadingListAdapter;
 import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.DebugLog;
@@ -35,6 +40,7 @@ import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
+import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
@@ -45,9 +51,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import io.realm.Realm;
+import io.realm.RealmList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -61,17 +71,25 @@ public class InputFormActivity extends BaseActivity {
     private File image;
     private TransferUtility transferUtility;
     private RelativeLayout mParentLayout;
-    private ImageView mReadingImage;
-    private ProgressBar mHorizontalBar;
-    private Button mUploadImage;
-    private Button mSubmitForm;
     private EditText mInputReadingValue;
+    private TextView unit;
+    private RelativeLayout uploadImage;
+    private ImageView photoDone;
+    private ImageButton submitForm;
+    private ProgressBar mHorizontalBar;
+
+    private ListView readingList;
 
     private String uploadedReadingUrl = "";
 
     private SensorData sensorData;
     private int groupPosition;
     private int childPosition;
+
+    private boolean imageTaken = false;
+    private boolean uploadedImage = false;
+
+    private ReadingListAdapter readingListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,53 +110,21 @@ public class InputFormActivity extends BaseActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-
         getSupportActionBar().setTitle("Input Reading");
 
-        mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
-        mReadingImage = (ImageView) findViewById(R.id.readingImage);
-        mUploadImage = (Button) findViewById(R.id.uploadImage);
-        mHorizontalBar = (ProgressBar) findViewById(R.id.horizontalBar);
-        mSubmitForm = (Button) findViewById(R.id.submitForm);
-        mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
+        bindViews();
 
-        if (sensorData != null && sensorData.getPhotographic_evidence() != null && sensorData.getPhotographic_evidence().equalsIgnoreCase("true")) {
-            mHorizontalBar.setVisibility(View.GONE);
-            mUploadImage.setVisibility(View.VISIBLE);
-            mReadingImage.setVisibility(View.VISIBLE);
-        } else {
-            mHorizontalBar.setVisibility(View.GONE);
-            mUploadImage.setVisibility(View.GONE);
-            mReadingImage.setVisibility(View.GONE);
+        RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(),sensorData.getSensor_name());
+        if(localDataList==null || localDataList.size()==0){
+            //do nothing.
+        }else{
+            setList(localDataList);
         }
 
-        mUploadImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customImagePicker();
-            }
-        });
+        initialiseViews();
 
-        mSubmitForm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
-                    ReadingData readingData = new ReadingData();
-                    readingData.setUtility_id(sensorData.getUtility_identifier());
-                    readingData.setValue(mInputReadingValue.getText().toString());
-                    readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-                    readingData.setSensor_name(sensorData.getSensor_name());
-                    postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                    postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                } else {
-                    showSnackBar(mParentLayout, "Please enter reading before submit.");
-                }
-            }
-        });
 
     }
 
@@ -162,6 +148,136 @@ public class InputFormActivity extends BaseActivity {
 
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    
+    private void bindViews(){
+        mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
+        mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
+        unit = (TextView)findViewById(R.id.unit);
+        uploadImage = (RelativeLayout)findViewById(R.id.uploadImage);
+        photoDone = (ImageView)findViewById(R.id.photo_done);
+        submitForm = (ImageButton)findViewById(R.id.submitForm);
+        mHorizontalBar = (ProgressBar)findViewById(R.id.horizontalBar);
+        readingList = (ListView)findViewById(R.id.readingList);
+
+        unit.setText(sensorData.getUnit());
+
+    }
+
+    private void initialiseViews() {
+        if (sensorData != null && sensorData.getPhotographic_evidence() != null && sensorData.getPhotographic_evidence().equalsIgnoreCase("true")) {
+            mHorizontalBar.setVisibility(View.INVISIBLE);
+            uploadImage.setVisibility(View.VISIBLE);
+        } else {
+            mHorizontalBar.setVisibility(View.INVISIBLE);
+            uploadImage.setVisibility(View.GONE);
+        }
+
+        uploadImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                customImagePicker();
+            }
+        });
+
+        submitForm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sensorData.getPhotographic_evidence().contains("true")) {
+                    if(imageTaken){
+                        if(!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
+                            ReadingData readingData = new ReadingData();
+                            readingData.setUtility_id(sensorData.getUtility_identifier());
+                            readingData.setValue(mInputReadingValue.getText().toString());
+                            readingData.setPhotographic_evidence_url(uploadedReadingUrl);
+                            readingData.setSensor_name(sensorData.getSensor_name());
+
+                            saveToDisk(readingData);
+
+//                            postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+                        }else{
+                            showSnackBar(mParentLayout, "Please enter reading before submit.");
+                        }
+                    }else{
+                        showSnackBar(mParentLayout,"Please take photo of reading.");
+                    }
+                }else{
+                    if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
+                        ReadingData readingData = new ReadingData();
+                        readingData.setUtility_id(sensorData.getUtility_identifier());
+                        readingData.setValue(mInputReadingValue.getText().toString());
+                        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
+                        readingData.setSensor_name(sensorData.getSensor_name());
+
+                        saveToDisk(readingData);
+
+//                        postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+                        //TODO : Why make same api call twice.?
+//                        postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
+                    }
+                    else {
+                        showSnackBar(mParentLayout, "Please enter reading before submit.");
+                    }
+                }
+
+            }
+        });
+    }
+
+    private void setList(ReadingDataRealm dataRealm) {
+        ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
+        readingsList.add(dataRealm);
+        readingListAdapter = new ReadingListAdapter(readingsList,this);
+        readingList.setAdapter(readingListAdapter);
+    }
+
+    private void setList(RealmList<ReadingDataRealm> localDataList) {
+        RealmList<ReadingDataRealm> list =ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(),sensorData.getSensor_name());
+        ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
+
+        for(int i =0;i<list.size();i++){
+            readingsList.add(list.get(i));
+        }
+
+        readingListAdapter = new ReadingListAdapter(readingsList,this);
+        readingList.setAdapter(readingListAdapter);
+    }
+
+
+    private void saveToDisk(ReadingData readingData) {
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh-mm aa");
+        String time = simpleDateFormat.format(calendar.getTimeInMillis());
+
+        Realm realm = Realm.getDefaultInstance();
+        ReadingDataRealm readingDataRealm;
+
+
+        realm.beginTransaction();
+        readingDataRealm = realm.createObject(ReadingDataRealm.class);
+        readingDataRealm.setData(readingData);
+        readingDataRealm.setDate(time);
+        readingDataRealm.setTimestamp(calendar.getTimeInMillis());
+        readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
+
+        if(uploadedImage){
+            readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);
+            readingDataRealm.setUploadedImage(true);
+        }else{
+            readingDataRealm.setUploadedImage(false);
+        }
+        realm.commitTransaction();
+        updateList(readingDataRealm);
+
+    }
+
+    private void updateList(ReadingDataRealm dataRealm) {
+        if(readingListAdapter!=null) {
+            readingListAdapter.addElement(dataRealm);
+        }else{
+            setList(dataRealm);
         }
     }
 
@@ -231,18 +347,13 @@ public class InputFormActivity extends BaseActivity {
     }
 
     private File createImageFile() throws IOException {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+            File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+            image = File.createTempFile(imageFileName, ".jpg", storageDir);
 
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-
-//        File file = new File(InputFormActivity.this.getFilesDir(), imageFileName);
-        image = getTempFile(InputFormActivity.this, imageFileName);
-//        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-//        image = File.createTempFile(imageFileName, ".jpg", storageDir);
-
-        mCurrentPhotoPath = image.getAbsolutePath();
-        DebugLog.d("mCurrentPhotoPath : " + mCurrentPhotoPath);
-        return image;
+            mCurrentPhotoPath = image.getAbsolutePath();
+            return image;
     }
 
     public File getTempFile(Context context, String url) {
@@ -262,11 +373,14 @@ public class InputFormActivity extends BaseActivity {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             try {
                 if (mCurrentPhotoPath != null) {
+                    imageTaken = true;
                     if (NetworkUtilities.isInternet(this)) {
                         beginUpload(compressImage(mCurrentPhotoPath));
-                        setPic();
+                        photoDone.setVisibility(View.VISIBLE);
+//                        setPic();
                     } else {
-                        showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
+                        photoDone.setVisibility(View.INVISIBLE);
+                        //do nothing.
                     }
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
@@ -279,11 +393,15 @@ public class InputFormActivity extends BaseActivity {
                 Uri uri = data.getData();
                 String path = getPath(uri);
                 if (path != null) {
+                    mCurrentPhotoPath = path;
+                    imageTaken = true;
                     if (NetworkUtilities.isInternet(this)) {
                         beginUpload(compressImage(path));
-                        setPic();
+                        photoDone.setVisibility(View.VISIBLE);
+//                        setPic();
                     } else {
-                        showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
+                        photoDone.setVisibility(View.INVISIBLE);
+//                        showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
                     }
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
@@ -294,15 +412,15 @@ public class InputFormActivity extends BaseActivity {
         }
     }
 
-    private void setPic() {
+    private void setPic(ImageView view) {
 
         Picasso.with(InputFormActivity.this).load(image)
                 .placeholder(R.drawable.ic_menu_slideshow)
                 .noFade()
-                .error(R.drawable.ic_menu_slideshow).into(mReadingImage);
+                .error(R.drawable.ic_menu_slideshow).into(view);
 
-        mReadingImage.setVisibility(View.VISIBLE);
-        mReadingImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        view.setVisibility(View.VISIBLE);
+        view.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 
     private void beginUpload(String filePath) {
@@ -314,8 +432,6 @@ public class InputFormActivity extends BaseActivity {
         image = file;
 
         mHorizontalBar.setVisibility(View.VISIBLE);
-        mSubmitForm.setEnabled(false);
-        mSubmitForm.setText("PLEASE WAIT..");
 
         TransferObserver observer = transferUtility.upload(
                 AWSConstants.BUCKET_NAME,
@@ -330,8 +446,9 @@ public class InputFormActivity extends BaseActivity {
         @Override
         public void onError(int id, Exception e) {
             mHorizontalBar.setVisibility(View.INVISIBLE);
-            mSubmitForm.setEnabled(true);
-            mSubmitForm.setText("SUBMIT FORM");
+//            mSubmitForm.setEnabled(true);
+//            mSubmitForm.setText("SUBMIT FORM");
+            uploadedImage = false;
             Log.e(TAG, "Error during upload: " + id, e);
         }
 
@@ -353,10 +470,10 @@ public class InputFormActivity extends BaseActivity {
 
                 DebugLog.d("URL :::: " + url);
                 uploadedReadingUrl = url;
-
-                mUploadImage.setText("CHANGE IMAGE");
-                mSubmitForm.setEnabled(true);
-                mSubmitForm.setText("SUBMIT FORM");
+                uploadedImage = true;
+//                uploadImage.setText("CHANGE IMAGE");
+//                mSubmitForm.setEnabled(true);
+//                mSubmitForm.setText("SUBMIT FORM");
 
                 mHorizontalBar.setVisibility(View.INVISIBLE);
             }

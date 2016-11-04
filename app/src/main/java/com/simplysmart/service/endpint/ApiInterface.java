@@ -2,6 +2,7 @@ package com.simplysmart.service.endpint;
 
 
 import com.google.gson.JsonObject;
+import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.user.LoginRequest;
@@ -32,5 +33,9 @@ public interface ApiInterface {
     @POST("/api/sensor_readings/")
     Call<JsonObject> submitReading(@Query("subdomain") String subDomain,
                                    @Body ReadingData readingData);
+
+    @POST("/api/sensor_readings/")
+    Call<JsonObject> submitAllReadings(@Query("subdomain") String subDomain,
+                                       @Body AllReadingsData allReadingsData);
 
 }

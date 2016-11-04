@@ -8,20 +8,37 @@ import android.os.Parcelable;
  */
 public class ReadingData implements Parcelable {
 
+    private int local_id;
     private String utility_id;
     private String sensor_name;
     private String value;
     private String photographic_evidence_url;
 
-    public ReadingData(){
 
+
+    public ReadingData(){
     }
 
     protected ReadingData(Parcel in) {
+        local_id = in.readInt();
         utility_id = in.readString();
         sensor_name = in.readString();
         value = in.readString();
         photographic_evidence_url = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(local_id);
+        dest.writeString(utility_id);
+        dest.writeString(sensor_name);
+        dest.writeString(value);
+        dest.writeString(photographic_evidence_url);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<ReadingData> CREATOR = new Creator<ReadingData>() {
@@ -68,16 +85,11 @@ public class ReadingData implements Parcelable {
         this.photographic_evidence_url = photographic_evidence_url;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public int getLocal_id() {
+        return local_id;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(utility_id);
-        dest.writeString(sensor_name);
-        dest.writeString(value);
-        dest.writeString(photographic_evidence_url);
+    public void setLocal_id(int local_id) {
+        this.local_id = local_id;
     }
 }

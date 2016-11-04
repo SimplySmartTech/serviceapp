@@ -71,7 +71,11 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
 
-        getMatrixRequest(GlobalData.getInstance().getUnits().get(0).getId(), GlobalData.getInstance().getSubDomain());
+        if(NetworkUtilities.isInternet(this)) {
+            getMatrixRequest(GlobalData.getInstance().getUnits().get(0).getId(), GlobalData.getInstance().getSubDomain());
+        }else {
+            setDataInList(Realm.getDefaultInstance());
+        }
 
         matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override

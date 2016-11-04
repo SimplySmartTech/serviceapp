@@ -9,11 +9,24 @@
         android:id="@+id/toolbar_Layout"
         layout="@layout/toolbar" />
 
+    <ProgressBar
+        android:id="@+id/horizontalBar"
+        style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/inputReadingLayout"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
     <LinearLayout
         android:id="@+id/inputReadingLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar_Layout"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal"
         android:padding="8dp"
         android:weightSum="1.0">
@@ -22,7 +35,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="0.5"
+            android:layout_weight="0.4"
             android:gravity="center">
 
             <EditText
@@ -32,7 +45,7 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 android:gravity="center_vertical"
-                android:hint="Enter value.."
+                android:hint="*Enter value"
                 android:inputType="numberDecimal"
                 android:padding="5dp"
                 android:textSize="19sp" />
@@ -44,10 +57,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_weight="0.1"
+            android:layout_weight="0.2"
             android:padding="8dp"
             android:text="kg"
-            android:textSize="19sp" />
+            android:textSize="15sp" />
 
         <RelativeLayout
             android:id="@+id/uploadImage"
@@ -71,16 +84,18 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:scaleType="fitCenter"
-                android:src="@drawable/tick_green" />
+                android:src="@drawable/tick_green"
+                android:visibility="invisible" />
 
         </RelativeLayout>
 
-        <ImageView
+        <ImageButton
             android:id="@+id/submitForm"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
             android:alpha="0.4"
+            android:background="@color/transparent"
             android:padding="8dp"
             android:src="@drawable/ic_done_black_48dp" />
 
@@ -88,9 +103,11 @@
 
     <ListView
         android:id="@+id/readingList"
-        android:layout_marginTop="48dp"
-        android:layout_below="@id/inputReadingLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@id/inputReadingLayout"
+        android:layout_marginTop="48dp" />
+
+
 
 </RelativeLayout>
