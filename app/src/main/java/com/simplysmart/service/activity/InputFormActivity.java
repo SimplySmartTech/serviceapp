@@ -261,6 +261,7 @@ public class InputFormActivity extends BaseActivity {
         readingDataRealm.setDate(time);
         readingDataRealm.setTimestamp(calendar.getTimeInMillis());
         readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
+        readingDataRealm.setUnit(sensorData.getUnit());
 
         if(uploadedImage){
             readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);

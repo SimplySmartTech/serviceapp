@@ -46,7 +46,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity{
 
     private ExpandableListView matrixList;
     private MatrixListAdapter matrixListAdapter;
@@ -71,10 +71,10 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
 
-        if(NetworkUtilities.isInternet(this)) {
+        if (NetworkUtilities.isInternet(this)) {
             getMatrixRequest(GlobalData.getInstance().getUnits().get(0).getId(), GlobalData.getInstance().getSubDomain());
-        }else {
-            setDataInList(Realm.getDefaultInstance());
+        } else {
+            setOfflineData(Realm.getDefaultInstance());
         }
 
         matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -134,35 +134,19 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.submit:
+                //do this
+                Intent intent = new Intent(this,SummaryActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.logout:
+                logout();
+                break;
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     //Do network call to fetch matrix data
@@ -211,14 +195,14 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                 RealmList<SensorDataRealm> sensorDataRealmList = new RealmList<>();
                 for (int j = 0; j < matrixData.getSensors().size(); j++) {
                     SensorDataRealm data;
-                    if(!SensorDataRealm.alreadyExists(matrixData.getSensors().get(j).getSensor_name())) {
+                    if (!SensorDataRealm.alreadyExists(matrixData.getSensors().get(j).getSensor_name())) {
                         realm.beginTransaction();
                         data = realm.createObject(SensorDataRealm.class);
                         data.setData(matrixData.getSensors().get(j));
                         realm.commitTransaction();
-                    }else{
+                    } else {
                         realm.beginTransaction();
-                        data = realm.where(SensorDataRealm.class).equalTo("sensor_name",matrixData.getSensors().get(j).getSensor_name()).findFirst();
+                        data = realm.where(SensorDataRealm.class).equalTo("sensor_name", matrixData.getSensors().get(j).getSensor_name()).findFirst();
                         data.setData(matrixData.getSensors().get(j));
                         realm.commitTransaction();
                     }
@@ -228,13 +212,13 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
 
                 matrixDataRealm.setSensors(sensorDataRealmList);
                 MatrixDataRealm dataRealm;
-                if(!MatrixDataRealm.alreadyExists(matrixData.getUtility_id())) {
+                if (!MatrixDataRealm.alreadyExists(matrixData.getUtility_id())) {
                     realm.beginTransaction();
                     dataRealm = realm.copyToRealm(matrixDataRealm);
                     realm.commitTransaction();
-                }else{
+                } else {
                     realm.beginTransaction();
-                    dataRealm = realm.where(MatrixDataRealm.class).equalTo("utility_id",matrixData.getUtility_id()).findFirst();
+                    dataRealm = realm.where(MatrixDataRealm.class).equalTo("utility_id", matrixData.getUtility_id()).findFirst();
                     dataRealm = matrixDataRealm;
                     realm.commitTransaction();
                 }
@@ -242,50 +226,25 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
             savedToDisk = true;
             setDataInList(realm);
 
-        }catch (RealmException e){
+        } catch (RealmException e) {
             savedToDisk = false;
             e.printStackTrace();
         }
 
-//        for(MatrixData data:matrixDataArrayList){
-//            final MatrixData currentData = data;
-//            final MatrixDataRealm matrixDataRealm = new MatrixDataRealm(data);
-//
-//            realm.executeTransactionAsync(new Realm.Transaction(){
-//                @Override
-//                public void execute(Realm realm) {
-//                    showActivitySpinner();
-//                    realm.copyToRealm(matrixDataRealm);
-//                }
-//            },new Realm.Transaction.OnSuccess(){
-//                @Override
-//                public void onSuccess() {
-//                    savedToDisk = true;
-//                    setDataInList(realm);
-//                }
-//            },new Realm.Transaction.OnError(){
-//                @Override
-//                public void onError(Throwable error) {
-//                    savedToDisk = false;
-//                    dismissActivitySpinner();
-//                }
-//            });
-//        }
-
     }
 
-    private void setDataInList(Realm realm){
+    private void setDataInList(Realm realm) {
         adapterData = new ArrayList<>();
-        if(savedToDisk){
+        if (savedToDisk) {
             RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
-            if(result.size()>0){
-                for(int i=0;i<result.size();i++){
+            if (result.size() > 0) {
+                for (int i = 0; i < result.size(); i++) {
                     MatrixData matrixData = new MatrixData();
                     matrixData.setIcon(result.get(i).getIcon());
                     matrixData.setType(result.get(i).getType());
                     matrixData.setUtility_id(result.get(i).getUtility_id());
                     ArrayList<SensorData> sensors = new ArrayList<>();
-                    for(int j=0;j<result.get(i).getSensors().size();j++){
+                    for (int j = 0; j < result.get(i).getSensors().size(); j++) {
                         SensorData sensorData = new SensorData(result.get(i).getSensors().get(j));
                         sensors.add(sensorData);
                     }
@@ -293,12 +252,39 @@ public class MainActivity extends BaseActivity implements NavigationView.OnNavig
                     adapterData.add(matrixData);
                 }
             }
-            matrixListAdapter = new MatrixListAdapter(this,adapterData);
+            matrixListAdapter = new MatrixListAdapter(this, adapterData);
         }
 
 
         String text = new Gson().toJson(adapterData);
-        Log.d("Data saved:",text);
+        Log.d("Data saved:", text);
+        matrixList.setAdapter(matrixListAdapter);
+        dismissActivitySpinner();
+    }
+
+    private void setOfflineData(Realm realm) {
+        adapterData = new ArrayList<>();
+
+        RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
+        if (result.size() > 0) {
+            for (int i = 0; i < result.size(); i++) {
+                MatrixData matrixData = new MatrixData();
+                matrixData.setIcon(result.get(i).getIcon());
+                matrixData.setType(result.get(i).getType());
+                matrixData.setUtility_id(result.get(i).getUtility_id());
+                ArrayList<SensorData> sensors = new ArrayList<>();
+                for (int j = 0; j < result.get(i).getSensors().size(); j++) {
+                    SensorData sensorData = new SensorData(result.get(i).getSensors().get(j));
+                    sensors.add(sensorData);
+                }
+                matrixData.setSensors(sensors);
+                adapterData.add(matrixData);
+            }
+        }
+        matrixListAdapter = new MatrixListAdapter(this, adapterData);
+
+        String text = new Gson().toJson(adapterData);
+        Log.d("Data saved:", text);
         matrixList.setAdapter(matrixListAdapter);
         dismissActivitySpinner();
     }

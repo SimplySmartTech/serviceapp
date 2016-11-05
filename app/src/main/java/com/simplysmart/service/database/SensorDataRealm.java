@@ -2,7 +2,10 @@ package com.simplysmart.service.database;
 
 import com.simplysmart.service.model.matrix.SensorData;
 
+import java.util.ArrayList;
+
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
@@ -58,6 +61,23 @@ public class SensorDataRealm extends RealmObject{
         }else {
             return false;
         }
+    }
+
+    public static RealmList<SensorDataRealm> getForUtilityId(String utility_id){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<SensorDataRealm> results = realm
+                .where(SensorDataRealm.class)
+                .equalTo("utility_identifier",utility_id)
+                .findAll();
+
+        RealmList<SensorDataRealm> list = new RealmList<>();
+
+        if(results.size()>0){
+            for(int i=0;i<results.size();i++){
+                list.add(results.get(i));
+            }
+        }
+        return list;
     }
 
     public String getSite_name() {

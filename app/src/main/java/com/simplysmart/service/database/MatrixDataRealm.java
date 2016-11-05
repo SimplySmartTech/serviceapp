@@ -20,7 +20,9 @@ public class MatrixDataRealm extends RealmObject {
     private String icon;
     private RealmList<SensorDataRealm> sensors;
 
-    public MatrixDataRealm(){}
+    public MatrixDataRealm(){
+        super();
+    }
 
 
     public MatrixDataRealm(MatrixData matrixData) {
@@ -41,6 +43,21 @@ public class MatrixDataRealm extends RealmObject {
         }else {
             return false;
         }
+    }
+
+    public static RealmList<MatrixDataRealm> getAll(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<MatrixDataRealm> results = realm
+                .where(MatrixDataRealm.class)
+                .findAll();
+
+        RealmList<MatrixDataRealm> list = new RealmList<>();
+        if(results.size()>0){
+            for(int i =0;i<results.size();i++){
+                list.add(results.get(i));
+            }
+        }
+        return list;
     }
 
     public String getType() {

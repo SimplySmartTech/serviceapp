@@ -62,7 +62,8 @@ public class ReadingListAdapter extends BaseAdapter {
             holder = (Holder)convertView.getTag();
         }
 
-        holder.reading.setText(readingsList.get(position).getValue());
+        String value = readingsList.get(position).getValue()+"_"+readingsList.get(position).getUnit();
+        holder.reading.setText(value);
         holder.time.setText(readingsList.get(position).getDate());
         setPic(holder.photo,readingsList.get(position).getLocal_photo_url());
 

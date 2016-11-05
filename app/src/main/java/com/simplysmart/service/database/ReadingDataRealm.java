@@ -31,7 +31,7 @@ public class ReadingDataRealm extends RealmObject {
         super();
     }
 
-    public ReadingDataRealm(ReadingData readingData){
+    public ReadingDataRealm(ReadingData readingData) {
         super();
         setData(readingData);
     }
@@ -43,24 +43,42 @@ public class ReadingDataRealm extends RealmObject {
         this.photographic_evidence_url = readingData.getPhotographic_evidence_url();
     }
 
-    public static RealmList<ReadingDataRealm> findExistingReading(String utility_id, String sensor_name){
+    public static RealmList<ReadingDataRealm> findExistingReading(String utility_id, String sensor_name) {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<ReadingDataRealm> results = realm
                 .where(ReadingDataRealm.class)
-                .equalTo("utility_id",utility_id)
-                .equalTo("sensor_name",sensor_name)
+                .equalTo("utility_id", utility_id)
+                .equalTo("sensor_name", sensor_name)
                 .findAll();
 
-        if(results.size()>0){
+
+        RealmList<ReadingDataRealm> realmList = new RealmList<>();
+        for (int i = 0; i < results.size(); i++) {
+            realmList.add(results.get(i));
+        }
+        return realmList;
+
+    }
+
+    public static RealmList<ReadingDataRealm> findAllForThisSensor(String utility_id, String sensor_name) {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<ReadingDataRealm> results = realm
+                .where(ReadingDataRealm.class)
+                .equalTo("utility_id", utility_id)
+                .equalTo("sensor_name", sensor_name)
+                .findAll();
+
+        if (results.size() > 0) {
             RealmList<ReadingDataRealm> realmList = new RealmList<>();
-            for(int i=0;i<results.size();i++){
+            for (int i = 0; i < results.size(); i++) {
                 realmList.add(results.get(i));
             }
             return realmList;
-        }else {
+        } else {
             return null;
         }
     }
+
 
     public String getUtility_id() {
         return utility_id;
