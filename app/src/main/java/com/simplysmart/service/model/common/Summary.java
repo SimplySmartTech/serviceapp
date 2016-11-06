@@ -5,8 +5,17 @@ package com.simplysmart.service.model.common;
  */
 
 public class Summary {
+    private String name;
     private String value;
-    private int tab;
+    private String time;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public String getValue() {
         return value;
@@ -16,11 +25,11 @@ public class Summary {
         this.value = value;
     }
 
-    public int getTab() {
-        return tab;
+    public String getTime() {
+        return time;
     }
 
-    public void setTab(int tab) {
-        this.tab = tab;
+    public void setTime(String time) {
+        this.time = time;
     }
 }

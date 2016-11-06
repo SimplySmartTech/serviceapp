@@ -11,6 +11,7 @@ import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.model.common.Summary;
+import com.simplysmart.service.model.matrix.MatrixData;
 
 import java.util.ArrayList;
 
@@ -46,43 +47,13 @@ public class SummaryActivity extends BaseActivity {
     }
 
     private void setDataForSummary() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmList<MatrixDataRealm> matrixDataList = new RealmList<>();
-        matrixDataList=MatrixDataRealm.getAll();
-        if(matrixDataList.size()>0){
-            for(int i=0;i<matrixDataList.size();i++){
-                MatrixDataRealm mdr = matrixDataList.get(i);
-                Summary s = new Summary();
-                s.setValue(mdr.getType());
-                s.setTab(1);
-                data.add(s);
-
-                RealmList<SensorDataRealm> sensorList = new RealmList<>();
-                sensorList = SensorDataRealm.getForUtilityId(mdr.getUtility_id());
-                for(int j=0;j<sensorList.size();j++){
-                    SensorDataRealm sdr = sensorList.get(j);
-                    Summary s2 = new Summary();
-                    s2.setValue(sdr.getSensor_name());
-                    s2.setTab(2);
-                    data.add(s2);
-
-                    RealmList<ReadingDataRealm> readingList = new RealmList<>();
-                    readingList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(),sdr.getSensor_name());
-                    if(readingList!=null) {
-                        for (int k = 0; k < readingList.size(); k++) {
-                            ReadingDataRealm rdr = readingList.get(k);
-                            Summary s3 = new Summary();
-                            s3.setValue(rdr.getValue() + " " + rdr.getUnit());
-                            s3.setTab(3);
-                            data.add(s3);
-                        }
-                    }
-                }
+        ArrayList<MatrixData> matrixList = MatrixDataRealm.getAll();
+        if(matrixList!=null && matrixList.size()>0){
+            for(int i=0;i<matrixList.size();i++){
+                MatrixData data = matrixList.get(i);
 
             }
         }
-
-
     }
 
     @Override

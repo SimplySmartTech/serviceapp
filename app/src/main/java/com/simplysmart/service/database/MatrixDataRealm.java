@@ -45,16 +45,24 @@ public class MatrixDataRealm extends RealmObject {
         }
     }
 
-    public static RealmList<MatrixDataRealm> getAll(){
+    public static ArrayList<MatrixData> getAll(){
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<MatrixDataRealm> results = realm
-                .where(MatrixDataRealm.class)
-                .findAll();
+        ArrayList<MatrixData> list = new ArrayList<>();
 
-        RealmList<MatrixDataRealm> list = new RealmList<>();
-        if(results.size()>0){
-            for(int i =0;i<results.size();i++){
-                list.add(results.get(i));
+        RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
+        if (result.size() > 0) {
+            for (int i = 0; i < result.size(); i++) {
+                MatrixData matrixData = new MatrixData();
+                matrixData.setIcon(result.get(i).getIcon());
+                matrixData.setType(result.get(i).getType());
+                matrixData.setUtility_id(result.get(i).getUtility_id());
+                ArrayList<SensorData> sensors = new ArrayList<>();
+                for (int j = 0; j < result.get(i).getSensors().size(); j++) {
+                    SensorData sensorData = new SensorData(result.get(i).getSensors().get(j));
+                    sensors.add(sensorData);
+                }
+                matrixData.setSensors(sensors);
+                list.add(matrixData);
             }
         }
         return list;
