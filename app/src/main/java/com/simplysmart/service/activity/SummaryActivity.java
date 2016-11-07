@@ -152,13 +152,15 @@ public class SummaryActivity extends BaseActivity {
         int id = item.getItemId();
 
         switch (id) {
+            case android.R.id.home:
+                supportFinishAfterTransition();
+                return true;
             case R.id.submit:
                 submitData();
-                break;
+                return true;
             default:
-                break;
+                return false;
         }
-        return super.onOptionsItemSelected(item);
     }
 
     private void submitData() {
