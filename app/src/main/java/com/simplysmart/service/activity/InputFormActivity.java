@@ -86,6 +86,7 @@ public class InputFormActivity extends BaseActivity {
     private int groupPosition;
     private int childPosition;
 
+    private ReadingData readingData;
     private boolean imageTaken = false;
     private boolean uploadedImage = false;
 
@@ -187,14 +188,13 @@ public class InputFormActivity extends BaseActivity {
                 if(sensorData.getPhotographic_evidence().contains("true")) {
                     if(imageTaken){
                         if(!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
-                            ReadingData readingData = new ReadingData();
+
+                            readingData = new ReadingData();
                             readingData.setUtility_id(sensorData.getUtility_identifier());
                             readingData.setValue(mInputReadingValue.getText().toString());
                             readingData.setPhotographic_evidence_url(uploadedReadingUrl);
                             readingData.setSensor_name(sensorData.getSensor_name());
-
                             saveToDisk(readingData);
-
 //                            postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                         }else{
                             showSnackBar(mParentLayout, "Please enter reading before submit.");
@@ -244,6 +244,9 @@ public class InputFormActivity extends BaseActivity {
         readingList.setAdapter(readingListAdapter);
     }
 
+    private void saveData(ReadingData readingData){
+        saveToDisk(readingData);
+    }
 
     private void saveToDisk(ReadingData readingData) {
 
@@ -295,6 +298,9 @@ public class InputFormActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
+                mCurrentPhotoPath = "";
+                uploadedReadingUrl = "";
+
                 dispatchTakePictureIntent();
                 dialog.dismiss();
             }
@@ -304,6 +310,8 @@ public class InputFormActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
+                mCurrentPhotoPath = "";
+                uploadedReadingUrl = "";
 
                 Intent pickPhoto = new Intent();
                 if (Build.VERSION.SDK_INT >= 19) {
@@ -378,7 +386,6 @@ public class InputFormActivity extends BaseActivity {
                         showActivitySpinner();
                         beginUpload(compressImage(mCurrentPhotoPath));
                         photoDone.setVisibility(View.VISIBLE);
-                        dismissActivitySpinner();
 //                        setPic();
                     } else {
                         photoDone.setVisibility(View.INVISIBLE);
@@ -401,7 +408,6 @@ public class InputFormActivity extends BaseActivity {
                         showActivitySpinner();
                         beginUpload(compressImage(path));
                         photoDone.setVisibility(View.VISIBLE);
-                        dismissActivitySpinner();
 //                        setPic();
                     } else {
                         photoDone.setVisibility(View.INVISIBLE);
@@ -453,6 +459,7 @@ public class InputFormActivity extends BaseActivity {
 //            mSubmitForm.setEnabled(true);
 //            mSubmitForm.setText("SUBMIT FORM");
             uploadedImage = false;
+            dismissActivitySpinner();
             Log.e(TAG, "Error during upload: " + id, e);
         }
 
@@ -475,6 +482,8 @@ public class InputFormActivity extends BaseActivity {
                 DebugLog.d("URL :::: " + url);
                 uploadedReadingUrl = url;
                 uploadedImage = true;
+                dismissActivitySpinner();
+
 //                uploadImage.setText("CHANGE IMAGE");
 //                mSubmitForm.setEnabled(true);
 //                mSubmitForm.setText("SUBMIT FORM");

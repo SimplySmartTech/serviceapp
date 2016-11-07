@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -367,7 +368,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void logout(){
-        clearApplicationData();
+        handleAuthorizationFailed();
     }
 
     public void clearApplicationData() {
@@ -400,7 +401,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void handleAuthorizationFailed(){
-
+        clearApplicationData();
+        Intent i = new Intent(this,LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 }
 
