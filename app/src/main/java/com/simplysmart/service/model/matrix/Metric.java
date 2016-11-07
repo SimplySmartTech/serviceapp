@@ -8,8 +8,9 @@ import java.util.ArrayList;
 
 public class Metric {
     private String type;
+    private String sensor_name;
     private String utility_id;
-    private ArrayList<Sensor> sensors;
+    private ArrayList<Reading> readings;
 
     public String getUtility_id() {
         return utility_id;
@@ -27,11 +28,19 @@ public class Metric {
         this.type = type;
     }
 
-    public ArrayList<Sensor> getSensors() {
-        return sensors;
+    public ArrayList<Reading> getReadings() {
+        return readings;
     }
 
-    public void setSensors(ArrayList<Sensor> sensors) {
-        this.sensors = sensors;
+    public void setReadings(ArrayList<Reading> readings) {
+        this.readings = readings;
+    }
+
+    public String getSensor_name() {
+        return sensor_name;
+    }
+
+    public void setSensor_name(String sensor_name) {
+        this.sensor_name = sensor_name;
     }
 }

@@ -254,7 +254,6 @@ public class InputFormActivity extends BaseActivity {
         Realm realm = Realm.getDefaultInstance();
         ReadingDataRealm readingDataRealm;
 
-
         realm.beginTransaction();
         readingDataRealm = realm.createObject(ReadingDataRealm.class);
         readingDataRealm.setData(readingData);

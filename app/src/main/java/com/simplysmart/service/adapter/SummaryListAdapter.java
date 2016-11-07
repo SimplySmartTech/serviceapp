@@ -45,7 +45,7 @@ public class SummaryListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Holder holder;
         if(convertView==null){
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.summary_list_item,parent);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.summary_list_item,parent,false);
             holder = new Holder();
             holder.name = (TextView)convertView.findViewById(R.id.name);
             holder.value = (TextView)convertView.findViewById(R.id.value);

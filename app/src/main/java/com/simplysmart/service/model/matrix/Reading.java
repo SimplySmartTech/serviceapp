@@ -7,7 +7,7 @@ package com.simplysmart.service.model.matrix;
 public class Reading {
     private String value;
     private String photographic_evidence_url;
-    private String timestamp;
+    private long timestamp;
 
     public String getValue() {
         return value;
@@ -25,11 +25,11 @@ public class Reading {
         this.photographic_evidence_url = photographic_evidence_url;
     }
 
-    public String getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 }
