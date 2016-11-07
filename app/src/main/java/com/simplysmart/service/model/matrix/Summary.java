@@ -1,4 +1,4 @@
-package com.simplysmart.service.model.common;
+package com.simplysmart.service.model.matrix;
 
 /**
  * Created by shailendrapsp on 4/11/16.

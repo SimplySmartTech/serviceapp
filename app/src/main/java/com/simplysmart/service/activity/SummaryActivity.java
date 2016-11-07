@@ -1,9 +1,7 @@
 package com.simplysmart.service.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -21,7 +19,7 @@ import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
-import com.simplysmart.service.model.common.Summary;
+import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.Metric;
@@ -29,7 +27,6 @@ import com.simplysmart.service.model.matrix.Reading;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
 import io.realm.RealmList;
 import retrofit2.Call;
 import retrofit2.Callback;

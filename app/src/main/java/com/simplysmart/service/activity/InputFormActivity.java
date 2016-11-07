@@ -375,8 +375,10 @@ public class InputFormActivity extends BaseActivity {
                 if (mCurrentPhotoPath != null) {
                     imageTaken = true;
                     if (NetworkUtilities.isInternet(this)) {
+                        showActivitySpinner();
                         beginUpload(compressImage(mCurrentPhotoPath));
                         photoDone.setVisibility(View.VISIBLE);
+                        dismissActivitySpinner();
 //                        setPic();
                     } else {
                         photoDone.setVisibility(View.INVISIBLE);
@@ -396,8 +398,10 @@ public class InputFormActivity extends BaseActivity {
                     mCurrentPhotoPath = path;
                     imageTaken = true;
                     if (NetworkUtilities.isInternet(this)) {
+                        showActivitySpinner();
                         beginUpload(compressImage(path));
                         photoDone.setVisibility(View.VISIBLE);
+                        dismissActivitySpinner();
 //                        setPic();
                     } else {
                         photoDone.setVisibility(View.INVISIBLE);

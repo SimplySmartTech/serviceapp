@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.model.common.Summary;
+import com.simplysmart.service.model.matrix.Summary;
 
 import java.util.ArrayList;
 
