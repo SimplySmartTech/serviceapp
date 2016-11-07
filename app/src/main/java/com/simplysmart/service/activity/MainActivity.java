@@ -185,6 +185,7 @@ public class MainActivity extends BaseActivity{
 
     //Set matrix data to list
     private void setMatrixData(MatrixResponse response) {
+        showActivitySpinner();
 
         ArrayList<MatrixData> matrixDataArrayList = response.getData();
         try {
@@ -225,8 +226,10 @@ public class MainActivity extends BaseActivity{
             }
             savedToDisk = true;
             setDataInList(realm);
+            dismissActivitySpinner();
 
         } catch (RealmException e) {
+            dismissActivitySpinner();
             savedToDisk = false;
             e.printStackTrace();
         }
@@ -234,6 +237,7 @@ public class MainActivity extends BaseActivity{
     }
 
     private void setDataInList(Realm realm) {
+        showActivitySpinner();
         adapterData = new ArrayList<>();
         if (savedToDisk) {
             RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
@@ -263,6 +267,7 @@ public class MainActivity extends BaseActivity{
     }
 
     private void setOfflineData(Realm realm) {
+        showActivitySpinner();
         adapterData = new ArrayList<>();
 
         RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
