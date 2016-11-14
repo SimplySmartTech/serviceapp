@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -33,6 +34,7 @@ import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.matrix.SensorData;
 import com.simplysmart.service.model.user.AccessPolicy;
+import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
 
 import java.util.ArrayList;
@@ -56,6 +58,8 @@ public class MainActivity extends BaseActivity {
     private boolean savedToDisk = false;
     private ArrayList<MatrixData> adapterData;
 
+    private ArrayList<Unit> units;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,11 +72,24 @@ public class MainActivity extends BaseActivity {
 
         getSupportActionBar().setTitle("Service");
 
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        Menu menu = navigationView.getMenu();
+        units = GlobalData.getInstance().getUnits();
+        for(int i=0;i<units.size();i++){
+            menu.add(i,i,i,units.get(i).getName().toUpperCase());
+        }
+
 
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
 
         if (NetworkUtilities.isInternet(this)) {
-            getMatrixRequest(GlobalData.getInstance().getUnits().get(0).getId(), GlobalData.getInstance().getSubDomain());
+            getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
         } else {
             setOfflineData(Realm.getDefaultInstance());
         }
@@ -99,6 +116,23 @@ public class MainActivity extends BaseActivity {
                 lastExpandedPosition = groupPosition;
             }
         });
+
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                drawer.closeDrawers();
+                int id = item.getItemId();
+                Unit unit = units.get(id);
+                GlobalData.getInstance().setSelectedUnitId(unit.getId());
+                if(NetworkUtilities.isInternet(MainActivity.this)) {
+                    getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+                }else{
+                    setOfflineData(Realm.getDefaultInstance());
+                }return true;
+            }
+        });
+
 
     }
 
@@ -242,7 +276,10 @@ public class MainActivity extends BaseActivity {
         showActivitySpinner();
         adapterData = new ArrayList<>();
         if (savedToDisk) {
-            RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
+            RealmResults<MatrixDataRealm> result = realm
+                    .where(MatrixDataRealm.class)
+                    .equalTo("unit_id",GlobalData.getInstance().getSelectedUnitId())
+                    .findAll();
             if (result.size() > 0) {
                 for (int i = 0; i < result.size(); i++) {
                     MatrixData matrixData = new MatrixData();
@@ -272,7 +309,10 @@ public class MainActivity extends BaseActivity {
         showActivitySpinner();
         adapterData = new ArrayList<>();
 
-        RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
+        RealmResults<MatrixDataRealm> result = realm
+                .where(MatrixDataRealm.class)
+                .equalTo("unit_id",GlobalData.getInstance().getSelectedUnitId())
+                .findAll();
         if (result.size() > 0) {
             for (int i = 0; i < result.size(); i++) {
                 MatrixData matrixData = new MatrixData();

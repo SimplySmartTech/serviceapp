@@ -1,6 +1,8 @@
 package com.simplysmart.service.database;
 
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.model.matrix.MatrixData;
+import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.SensorData;
 
 import java.util.ArrayList;
@@ -32,12 +34,14 @@ public class MatrixDataRealm extends RealmObject {
         this.type = matrixData.getType();
         this.utility_id = matrixData.getUtility_id();
         this.icon = matrixData.getIcon();
+        this.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
     }
 
     public static boolean alreadyExists(String utility_id){
         Realm realm = Realm.getDefaultInstance();
         RealmResults<MatrixDataRealm> results = realm
                 .where(MatrixDataRealm.class)
+                .equalTo("unit_id",GlobalData.getInstance().getSelectedUnitId())
                 .equalTo("utility_id",utility_id)
                 .findAll();
         if(results.size()>0){
@@ -51,7 +55,10 @@ public class MatrixDataRealm extends RealmObject {
         Realm realm = Realm.getDefaultInstance();
         ArrayList<MatrixData> list = new ArrayList<>();
 
-        RealmResults<MatrixDataRealm> result = realm.where(MatrixDataRealm.class).findAll();
+        RealmResults<MatrixDataRealm> result = realm
+                .where(MatrixDataRealm.class)
+                .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
+                .findAll();
         if (result.size() > 0) {
             for (int i = 0; i < result.size(); i++) {
                 MatrixData matrixData = new MatrixData();
@@ -81,46 +88,64 @@ public class MatrixDataRealm extends RealmObject {
         for (MatrixDataRealm data:results) {
             RealmList<SensorDataRealm> sensorList = SensorDataRealm.getForUtilityId(data.getUtility_id());
             for (SensorDataRealm sensor: sensorList) {
-                RealmList<ReadingDataRealm> readingList = ReadingDataRealm.findAllForThisSensor(sensor.getUtility_identifier(),sensor.getSensor_name());
-                deleteReadings(readingList);
+                deleteReadings(sensor.getUtility_identifier(),sensor.getSensor_name());
             }
-            deleteSensors(sensorList);
+            deleteSensors(data.getUtility_id());
         }
 
-        deleteMatrix(results);
+        deleteMatrix(GlobalData.getInstance().getSelectedUnitId());
 
         return true;
     }
 
-
-    private static void deleteReadings(final RealmList<ReadingDataRealm> readingList) {
+    private static void deleteReadings(final String utility_identifier, final String sensor_name) {
         Realm realm = Realm.getDefaultInstance();
+
         realm.executeTransaction(new Realm.Transaction(){
             @Override
             public void execute(Realm realm) {
-                readingList.deleteAllFromRealm();
+                RealmResults<ReadingDataRealm> results = realm
+                        .where(ReadingDataRealm.class)
+                        .equalTo("utility_identifier",utility_identifier)
+                        .equalTo("sensor_name",sensor_name)
+                        .findAll();
+                results.deleteAllFromRealm();
             }
         });
+
     }
 
-    private static void deleteSensors(final RealmList<SensorDataRealm> sensorList){
+
+    private static void deleteSensors(final String utility_id){
         Realm realm = Realm.getDefaultInstance();
+
         realm.executeTransaction(new Realm.Transaction(){
             @Override
             public void execute(Realm realm) {
-                sensorList.deleteAllFromRealm();
+                RealmResults<SensorDataRealm> results = realm
+                        .where(SensorDataRealm.class)
+                        .equalTo("utility_identifier",utility_id)
+                        .findAll();
+                results.deleteAllFromRealm();
             }
         });
+
     }
 
-    private static void deleteMatrix(final RealmResults<MatrixDataRealm> matrixList){
+    private static void deleteMatrix(final String unit_id){
         Realm realm = Realm.getDefaultInstance();
+
         realm.executeTransaction(new Realm.Transaction(){
             @Override
             public void execute(Realm realm) {
-                matrixList.deleteAllFromRealm();
+                RealmResults<MatrixDataRealm> results = realm
+                        .where(MatrixDataRealm.class)
+                        .equalTo("unit_id",unit_id)
+                        .findAll();
+                results.deleteAllFromRealm();
             }
         });
+
     }
 
     public String getType() {
@@ -153,5 +178,13 @@ public class MatrixDataRealm extends RealmObject {
 
     public void setSensors(RealmList<SensorDataRealm> sensors) {
         this.sensors = sensors;
+    }
+
+    public String getUnit_id() {
+        return unit_id;
+    }
+
+    public void setUnit_id(String unit_id) {
+        this.unit_id = unit_id;
     }
 }
