@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -18,6 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
@@ -36,7 +39,9 @@ import com.simplysmart.service.model.matrix.SensorData;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -59,6 +64,7 @@ public class MainActivity extends BaseActivity {
     private ArrayList<MatrixData> adapterData;
 
     private ArrayList<Unit> units;
+    private User residentData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +84,13 @@ public class MainActivity extends BaseActivity {
         toggle.syncState();
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        setDataInHeader(navigationView);
 
         Menu menu = navigationView.getMenu();
         units = GlobalData.getInstance().getUnits();
         for(int i=0;i<units.size();i++){
             menu.add(i,i,i,units.get(i).getName().toUpperCase());
         }
-
 
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
 
@@ -135,6 +141,20 @@ public class MainActivity extends BaseActivity {
 
 
     }
+
+    private void setDataInHeader(NavigationView navigationView) {
+        navigationView.inflateHeaderView(R.layout.nav_header_main);
+        View view = navigationView.getHeaderView(0);
+        ImageView companyLogo =(ImageView)view.findViewById(R.id.companyLogo);
+        TextView companyName = (TextView)view.findViewById(R.id.companyName);
+        TextView userName = (TextView)view.findViewById(R.id.userName);
+
+        setPic(companyLogo,residentData.getCompany().getLogo_url());
+        companyName.setText(residentData.getCompany().getName());
+        userName.setText(residentData.getName());
+    }
+
+
 
     @Override
     protected void onStart() {
@@ -363,7 +383,7 @@ public class MainActivity extends BaseActivity {
 
         Gson gson = new Gson();
         String jsonUnitInfo = UserInfo.getString("unit_info", "");
-        User residentData = gson.fromJson(jsonUnitInfo, User.class);
+        residentData = gson.fromJson(jsonUnitInfo, User.class);
 
         String jsonAccessPolicy = UserInfo.getString("access_policy", "");
         AccessPolicy policy = gson.fromJson(jsonAccessPolicy, AccessPolicy.class);
@@ -371,4 +391,15 @@ public class MainActivity extends BaseActivity {
         GlobalData.getInstance().setUnits(residentData.getUnits());
         GlobalData.getInstance().setAccessPolicy(policy);
     }
+
+    private void setPic(ImageView view,String image) {
+        view.setVisibility(View.VISIBLE);
+        Picasso.with(this).load(image)
+                .placeholder(R.drawable.ic_menu_slideshow)
+                .noFade()
+                .resize(64,64)
+                .error(R.drawable.ic_menu_slideshow).into(view);
+
+    }
+
 }

@@ -107,11 +107,6 @@ public class ReadingListAdapter extends BaseAdapter {
                 .resize(64,64)
                 .error(R.drawable.ic_menu_slideshow).into(view);
 
-//        view.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//        view.setImageBitmap(BitmapFactory.decodeFile(uri));
     }
-
-
-
 
 }
