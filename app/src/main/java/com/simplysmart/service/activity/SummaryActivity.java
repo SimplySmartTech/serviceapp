@@ -1,5 +1,6 @@
 package com.simplysmart.service.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -173,7 +174,8 @@ public class SummaryActivity extends BaseActivity {
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
                         showSnackBar(mParentLayout, "Data successfully submitted.", true);
-//                        removeLocalData(GlobalData.getInstance().getSelectedUnitId());
+                        removeLocalData(GlobalData.getInstance().getSelectedUnitId());
+                        exitScreen();
                         dismissActivitySpinner();
                     } else if (response.code() == 401) {
                         handleAuthorizationFailed();
@@ -194,6 +196,12 @@ public class SummaryActivity extends BaseActivity {
         } else {
             showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
         }
+    }
+
+    private void exitScreen() {
+        Intent i = new Intent(this,MainActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 
 
