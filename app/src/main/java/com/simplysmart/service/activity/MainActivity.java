@@ -5,10 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -130,16 +134,35 @@ public class MainActivity extends BaseActivity {
                 drawer.closeDrawers();
                 int id = item.getItemId();
                 Unit unit = units.get(id);
+                uncheckAllMenuItems(navigationView);
+                item.setChecked(true);
                 GlobalData.getInstance().setSelectedUnitId(unit.getId());
                 if(NetworkUtilities.isInternet(MainActivity.this)) {
                     getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
                 }else{
                     setOfflineData(Realm.getDefaultInstance());
-                }return true;
+                }
+                return true;
             }
         });
 
 
+    }
+
+    private void uncheckAllMenuItems(NavigationView navigationView) {
+        final Menu menu = navigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.hasSubMenu()) {
+                SubMenu subMenu = item.getSubMenu();
+                for (int j = 0; j < subMenu.size(); j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setChecked(false);
+                }
+            } else {
+                item.setChecked(false);
+            }
+        }
     }
 
     private void setDataInHeader(NavigationView navigationView) {
@@ -152,6 +175,8 @@ public class MainActivity extends BaseActivity {
         setPic(companyLogo,residentData.getCompany().getLogo_url());
         companyName.setText(residentData.getCompany().getName());
         userName.setText(residentData.getName());
+
+        navigationView.setBackgroundResource(R.drawable.list_drawer_item_activity_bg_selector);
     }
 
 
