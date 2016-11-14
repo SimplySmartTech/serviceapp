@@ -174,6 +174,7 @@ public class SummaryActivity extends BaseActivity {
                     dismissActivitySpinner();
                     if(response.isSuccessful()) {
                         showSnackBar(mParentLayout, "Data successfully submitted.", true);
+                        removeLocalData();
                     }else if(response.code()==401){
                         handleAuthorizationFailed();
                     }else{
@@ -192,6 +193,8 @@ public class SummaryActivity extends BaseActivity {
             showSnackBar(mParentLayout,getString(R.string.error_no_internet_connection),false);
         }
     }
+
+
 
     @Override
     protected int getStatusBarColor() {

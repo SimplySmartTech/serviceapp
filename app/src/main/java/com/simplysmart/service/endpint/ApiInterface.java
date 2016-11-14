@@ -34,7 +34,7 @@ public interface ApiInterface {
     Call<JsonObject> submitReading(@Query("subdomain") String subDomain,
                                    @Body ReadingData readingData);
 
-    @POST("/api/metrics/")
+    @POST("/api/metrics")
     Call<JsonObject> submitAllReadings(@Query("subdomain") String subDomain,
                                        @Body AllReadingsData allReadingsData);
 }

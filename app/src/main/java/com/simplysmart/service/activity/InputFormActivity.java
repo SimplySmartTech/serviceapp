@@ -514,7 +514,9 @@ public class InputFormActivity extends BaseActivity {
                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
                         finish();
 
-                    } else {
+                    } else if(response.code()==401){
+                        handleAuthorizationFailed();
+                    }else{
                         APIError error = ErrorUtils.parseError(response);
                         displayMessage(error.message());
                     }

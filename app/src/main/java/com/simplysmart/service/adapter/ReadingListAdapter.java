@@ -2,6 +2,7 @@ package com.simplysmart.service.adapter;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -65,7 +67,17 @@ public class ReadingListAdapter extends BaseAdapter {
         String value = readingsList.get(position).getValue()+"_"+readingsList.get(position).getUnit();
         holder.reading.setText(value);
         holder.time.setText(readingsList.get(position).getDate());
-        setPic(holder.photo,readingsList.get(position).getLocal_photo_url());
+        boolean imageFound = true;
+        File image = null;
+        try {
+            image = new File(readingsList.get(position).getLocal_photo_url());
+        }catch (Exception e){
+            imageFound = false;
+        }
+
+        if(imageFound) {
+            setPic(holder.photo, image);
+        }
 
         holder.edit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,8 +99,16 @@ public class ReadingListAdapter extends BaseAdapter {
         public TextView time,reading;
     }
 
-    private void setPic(ImageView view,String uri) {
-        view.setImageBitmap(BitmapFactory.decodeFile(uri));
+    private void setPic(ImageView view,File image) {
+        view.setVisibility(View.VISIBLE);
+        Picasso.with(mContext).load(image)
+                .placeholder(R.drawable.ic_menu_slideshow)
+                .noFade()
+                .resize(64,64)
+                .error(R.drawable.ic_menu_slideshow).into(view);
+
+//        view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//        view.setImageBitmap(BitmapFactory.decodeFile(uri));
     }
 
 
