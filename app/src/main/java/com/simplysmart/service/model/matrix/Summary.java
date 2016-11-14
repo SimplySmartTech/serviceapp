@@ -5,6 +5,8 @@ package com.simplysmart.service.model.matrix;
  */
 
 public class Summary {
+    private String type;
+    private String localPhotoUrl;
     private String name;
     private String value;
     private String time;
@@ -31,5 +33,21 @@ public class Summary {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getLocalPhotoUrl() {
+        return localPhotoUrl;
+    }
+
+    public void setLocalPhotoUrl(String localPhotoUrl) {
+        this.localPhotoUrl = localPhotoUrl;
     }
 }

@@ -2,86 +2,67 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:background="@color/bw_color_white">
+
+    <View
+        android:id="@+id/topLine"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/inverse_gradient" />
+
+    <RelativeLayout
+        android:padding="16dp"
+        android:layout_below="@id/topLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_centerInParent="true"
-        android:layout_marginStart="20dp"
-        android:weightSum="1.0">
+        android:id="@+id/readingLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:paddingEnd="16dp"
+        >
 
-        <ImageButton
-            android:id="@+id/edit"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="0.2"
-            android:alpha="0.4"
-            android:background="@color/transparent"
-            android:contentDescription="@string/edit"
-            android:src="@drawable/ic_mode_edit_black_48dp" />
+        <TextView
+            android:id="@+id/reading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="5894 kg"
+            android:textSize="19sp" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.6"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingTop="4dp"
-                android:text="12th Dec 2016,12:00 pm"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/reading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="5894 kg"
-                android:textSize="19sp" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/photo"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="0.2"
-            android:alpha="0.4"
-            android:contentDescription="@string/reading_image"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_photo_black_48dp" />
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="12th Dec 2016,12:00 pm"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
-
-    <View
-        android:id="@+id/ref_line"
-        android:layout_width="8dp"
-        android:layout_height="72dp"
-        android:layout_alignParentStart="true"
-        android:background="@color/accent" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_alignParentTop="true"
-        android:background="@color/accent" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/ref_line"
-        android:background="@color/accent" />
-
-    <View
-        android:layout_width="1dp"
-        android:layout_height="72dp"
+    <ImageButton
+        android:id="@+id/edit"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_alignParentEnd="true"
-        android:background="@color/accent" />
+        android:layout_marginTop="16dp"
+        android:alpha="0.5"
+        android:contentDescription="@string/edit"
+        android:src="@drawable/ic_mode_edit_black_48dp" />
 
+    <ImageView
+        android:id="@+id/photo"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:layout_toStartOf="@id/edit"
+        android:alpha="0.4"
+        android:src="@drawable/ic_photo_black_48dp" />
+
+    </RelativeLayout>
 </RelativeLayout>

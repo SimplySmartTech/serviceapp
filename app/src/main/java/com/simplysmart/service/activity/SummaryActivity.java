@@ -3,6 +3,8 @@ package com.simplysmart.service.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,7 +44,7 @@ import retrofit2.Response;
 
 public class SummaryActivity extends BaseActivity {
 
-    private ListView summary;
+    private RecyclerView summary;
     private ArrayList<Summary> summaryList;
     private SummaryListAdapter adapter;
     private AllReadingsData allReadingData;
@@ -62,7 +64,7 @@ public class SummaryActivity extends BaseActivity {
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
 
-        summary = (ListView) findViewById(R.id.summary);
+        summary = (RecyclerView) findViewById(R.id.summary);
         summaryList = new ArrayList<>();
         showActivitySpinner();
         setDataForSummary();
@@ -92,6 +94,7 @@ public class SummaryActivity extends BaseActivity {
                         ArrayList<Reading> readings = new ArrayList<>();
 
                         RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(), sdr.getSensor_name());
+
                         if (readingsList != null && readingsList.size() > 0) {
                             for (int k = 0; k < readingsList.size(); k++) {
                                 ReadingDataRealm rdr = readingsList.get(k);
@@ -100,6 +103,8 @@ public class SummaryActivity extends BaseActivity {
                                 summary.setName(rdr.getSensor_name());
                                 summary.setValue(rdr.getValue() + " " + rdr.getUnit());
                                 summary.setTime(rdr.getDate());
+                                summary.setType(data.getType());
+                                summary.setLocalPhotoUrl(rdr.getLocal_photo_url());
 
                                 Reading reading = new Reading();
                                 reading.setValue(rdr.getValue());
@@ -110,18 +115,22 @@ public class SummaryActivity extends BaseActivity {
                                 summaryList.add(summary);
                             }
                         }
+
                         metric.setReadings(readings);
                         metrics.add(metric);
                     }
                 }
             }
         }
+
         allReadingData.setMetrics(metrics);
         setDataInList();
     }
 
     private void setDataInList() {
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         adapter = new SummaryListAdapter(summaryList, this);
+        summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
     }
 

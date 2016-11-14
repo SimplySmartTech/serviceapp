@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -79,7 +81,7 @@ public class InputFormActivity extends BaseActivity {
     private ImageButton submitForm;
     private ProgressBar mHorizontalBar;
 
-    private ListView readingList;
+    private RecyclerView readingList;
 
     private String uploadedReadingUrl = "";
 
@@ -161,7 +163,7 @@ public class InputFormActivity extends BaseActivity {
         photoDone = (ImageView) findViewById(R.id.photo_done);
         submitForm = (ImageButton) findViewById(R.id.submitForm);
         mHorizontalBar = (ProgressBar) findViewById(R.id.horizontalBar);
-        readingList = (ListView) findViewById(R.id.readingList);
+        readingList = (RecyclerView) findViewById(R.id.readingList);
 
         unit.setText(sensorData.getUnit());
 
@@ -226,10 +228,14 @@ public class InputFormActivity extends BaseActivity {
     }
 
     private void setList(ReadingDataRealm dataRealm) {
+
         ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
         readingsList.add(dataRealm);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         readingListAdapter = new ReadingListAdapter(readingsList, this);
+        readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
+
     }
 
     private void setList(RealmList<ReadingDataRealm> localDataList) {
@@ -239,8 +245,9 @@ public class InputFormActivity extends BaseActivity {
         for (int i = 0; i < list.size(); i++) {
             readingsList.add(list.get(i));
         }
-
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         readingListAdapter = new ReadingListAdapter(readingsList, this);
+        readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
     }
 
@@ -279,6 +286,8 @@ public class InputFormActivity extends BaseActivity {
     private void updateList(ReadingDataRealm dataRealm) {
         if (readingListAdapter != null) {
             readingListAdapter.addElement(dataRealm);
+            readingListAdapter.notifyItemInserted(0);
+            readingList.scrollToPosition(0);
         } else {
             setList(dataRealm);
         }
