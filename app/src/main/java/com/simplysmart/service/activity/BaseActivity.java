@@ -32,6 +32,7 @@ import android.view.WindowManager;
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.custom.CustomProgressDialog;
+import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 
 import org.json.JSONException;
@@ -407,8 +408,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         startActivity(i);
     }
 
-    protected void removeLocalData() {
-
+    protected void removeLocalData(String unit_id) {
+        MatrixDataRealm.removeUnitData(unit_id);
     }
 }
 

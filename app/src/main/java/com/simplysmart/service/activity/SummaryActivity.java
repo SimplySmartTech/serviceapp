@@ -55,10 +55,10 @@ public class SummaryActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        mParentLayout = (RelativeLayout)findViewById(R.id.parentLayout);
+        mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
 
-        summary = (ListView)findViewById(R.id.summary);
+        summary = (ListView) findViewById(R.id.summary);
         summaryList = new ArrayList<>();
         showActivitySpinner();
         setDataForSummary();
@@ -69,15 +69,15 @@ public class SummaryActivity extends BaseActivity {
     private void setDataForSummary() {
         ArrayList<Metric> metrics = new ArrayList<>();
         ArrayList<MatrixData> matrixList = MatrixDataRealm.getAll();
-        if(matrixList!=null && matrixList.size()>0){
-            for(int i=0;i<matrixList.size();i++){
+        if (matrixList != null && matrixList.size() > 0) {
+            for (int i = 0; i < matrixList.size(); i++) {
                 MatrixData data = matrixList.get(i);
 
                 RealmList<SensorDataRealm> sensorList = SensorDataRealm.getForUtilityId(data.getUtility_id());
 
-                if(sensorList!=null && sensorList.size()>0) {
+                if (sensorList != null && sensorList.size() > 0) {
 
-                    for (int j = 0; j < sensorList.size();j++){
+                    for (int j = 0; j < sensorList.size(); j++) {
                         SensorDataRealm sdr = sensorList.get(j);
 
                         Metric metric = new Metric();
@@ -87,9 +87,9 @@ public class SummaryActivity extends BaseActivity {
 
                         ArrayList<Reading> readings = new ArrayList<>();
 
-                        RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(),sdr.getSensor_name());
-                        if(readingsList!=null && readingsList.size()>0){
-                            for(int k=0;k<readingsList.size();k++) {
+                        RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(), sdr.getSensor_name());
+                        if (readingsList != null && readingsList.size() > 0) {
+                            for (int k = 0; k < readingsList.size(); k++) {
                                 ReadingDataRealm rdr = readingsList.get(k);
                                 Summary summary = new Summary();
 
@@ -117,7 +117,7 @@ public class SummaryActivity extends BaseActivity {
     }
 
     private void setDataInList() {
-        adapter = new SummaryListAdapter(summaryList,this);
+        adapter = new SummaryListAdapter(summaryList, this);
         summary.setAdapter(adapter);
     }
 
@@ -164,36 +164,37 @@ public class SummaryActivity extends BaseActivity {
     }
 
     private void submitData() {
-        if(NetworkUtilities.isInternet(this)) {
+        if (NetworkUtilities.isInternet(this)) {
             showActivitySpinner();
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-            Call<JsonObject> submitAllReadings = apiInterface.submitAllReadings(GlobalData.getInstance().getSubDomain(),allReadingData);
+            Call<JsonObject> submitAllReadings = apiInterface.submitAllReadings(GlobalData.getInstance().getSubDomain(), allReadingData);
             submitAllReadings.enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    dismissActivitySpinner();
-                    if(response.isSuccessful()) {
+                    if (response.isSuccessful()) {
                         showSnackBar(mParentLayout, "Data successfully submitted.", true);
-                        removeLocalData();
-                    }else if(response.code()==401){
+//                        removeLocalData(GlobalData.getInstance().getSelectedUnitId());
+                        dismissActivitySpinner();
+                    } else if (response.code() == 401) {
                         handleAuthorizationFailed();
-                    }else{
+                        dismissActivitySpinner();
+                    } else {
                         APIError error = ErrorUtils.parseError(response);
-                        showSnackBar(mParentLayout,error.message(),false);
+                        showSnackBar(mParentLayout, error.message(), false);
+                        dismissActivitySpinner();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
                     dismissActivitySpinner();
-                    showSnackBar(mParentLayout,getString(R.string.error_in_network),false);
+                    showSnackBar(mParentLayout, getString(R.string.error_in_network), false);
                 }
             });
-        }else{
-            showSnackBar(mParentLayout,getString(R.string.error_no_internet_connection),false);
+        } else {
+            showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
         }
     }
-
 
 
     @Override

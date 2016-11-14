@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.RealmObjectSchema;
 import io.realm.RealmResults;
 
 /**
@@ -15,6 +16,7 @@ import io.realm.RealmResults;
  */
 
 public class MatrixDataRealm extends RealmObject {
+    private String unit_id;
     private String type;
     private String utility_id;
     private String icon;
@@ -66,6 +68,59 @@ public class MatrixDataRealm extends RealmObject {
             }
         }
         return list;
+    }
+
+    public static boolean removeUnitData(String unit_id){
+        Realm realm = Realm.getDefaultInstance();
+
+        RealmResults<MatrixDataRealm> results = realm
+                .where(MatrixDataRealm.class)
+                .equalTo("unit_id",unit_id)
+                .findAll();
+
+        for (MatrixDataRealm data:results) {
+            RealmList<SensorDataRealm> sensorList = SensorDataRealm.getForUtilityId(data.getUtility_id());
+            for (SensorDataRealm sensor: sensorList) {
+                RealmList<ReadingDataRealm> readingList = ReadingDataRealm.findAllForThisSensor(sensor.getUtility_identifier(),sensor.getSensor_name());
+                deleteReadings(readingList);
+            }
+            deleteSensors(sensorList);
+        }
+
+        deleteMatrix(results);
+
+        return true;
+    }
+
+
+    private static void deleteReadings(final RealmList<ReadingDataRealm> readingList) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction(){
+            @Override
+            public void execute(Realm realm) {
+                readingList.deleteAllFromRealm();
+            }
+        });
+    }
+
+    private static void deleteSensors(final RealmList<SensorDataRealm> sensorList){
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction(){
+            @Override
+            public void execute(Realm realm) {
+                sensorList.deleteAllFromRealm();
+            }
+        });
+    }
+
+    private static void deleteMatrix(final RealmResults<MatrixDataRealm> matrixList){
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction(){
+            @Override
+            public void execute(Realm realm) {
+                matrixList.deleteAllFromRealm();
+            }
+        });
     }
 
     public String getType() {

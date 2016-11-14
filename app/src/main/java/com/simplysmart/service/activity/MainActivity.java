@@ -46,7 +46,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends BaseActivity{
+public class MainActivity extends BaseActivity {
 
     private ExpandableListView matrixList;
     private MatrixListAdapter matrixListAdapter;
@@ -137,7 +137,7 @@ public class MainActivity extends BaseActivity{
         switch (id) {
             case R.id.submit:
                 //do this
-                Intent intent = new Intent(this,SummaryActivity.class);
+                Intent intent = new Intent(this, SummaryActivity.class);
                 startActivity(intent);
                 break;
             case R.id.logout:
@@ -165,6 +165,8 @@ public class MainActivity extends BaseActivity{
 
                     if (response.isSuccessful()) {
                         setMatrixData(response.body());
+                    } else if (response.code() == 401) {
+                        handleAuthorizationFailed();
                     } else {
                         APIError error = ErrorUtils.parseError(response);
                         displayMessage(error.message());
