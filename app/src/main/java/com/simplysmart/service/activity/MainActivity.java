@@ -92,8 +92,8 @@ public class MainActivity extends BaseActivity {
 
         Menu menu = navigationView.getMenu();
         units = GlobalData.getInstance().getUnits();
-        for(int i=0;i<units.size();i++){
-            menu.add(i,i,i,units.get(i).getName().toUpperCase());
+        for (int i = 0; i < units.size(); i++) {
+            menu.add(i, i, i, units.get(i).getName().toUpperCase());
         }
 
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
@@ -137,9 +137,9 @@ public class MainActivity extends BaseActivity {
                 uncheckAllMenuItems(navigationView);
                 item.setChecked(true);
                 GlobalData.getInstance().setSelectedUnitId(unit.getId());
-                if(NetworkUtilities.isInternet(MainActivity.this)) {
+                if (NetworkUtilities.isInternet(MainActivity.this)) {
                     getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
-                }else{
+                } else {
                     setOfflineData(Realm.getDefaultInstance());
                 }
                 return true;
@@ -168,17 +168,16 @@ public class MainActivity extends BaseActivity {
     private void setDataInHeader(NavigationView navigationView) {
         navigationView.inflateHeaderView(R.layout.nav_header_main);
         View view = navigationView.getHeaderView(0);
-        ImageView companyLogo =(ImageView)view.findViewById(R.id.companyLogo);
-        TextView companyName = (TextView)view.findViewById(R.id.companyName);
-        TextView userName = (TextView)view.findViewById(R.id.userName);
+        ImageView companyLogo = (ImageView) view.findViewById(R.id.companyLogo);
+        TextView companyName = (TextView) view.findViewById(R.id.companyName);
+        TextView userName = (TextView) view.findViewById(R.id.userName);
 
-        setPic(companyLogo,residentData.getCompany().getLogo_url());
+        setPic(companyLogo, residentData.getCompany().getLogo_url());
         companyName.setText(residentData.getCompany().getName());
         userName.setText(residentData.getName());
 
         navigationView.setBackgroundResource(R.drawable.list_drawer_item_activity_bg_selector);
     }
-
 
 
     @Override
@@ -323,7 +322,7 @@ public class MainActivity extends BaseActivity {
         if (savedToDisk) {
             RealmResults<MatrixDataRealm> result = realm
                     .where(MatrixDataRealm.class)
-                    .equalTo("unit_id",GlobalData.getInstance().getSelectedUnitId())
+                    .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
                     .findAll();
             if (result.size() > 0) {
                 for (int i = 0; i < result.size(); i++) {
@@ -356,7 +355,7 @@ public class MainActivity extends BaseActivity {
 
         RealmResults<MatrixDataRealm> result = realm
                 .where(MatrixDataRealm.class)
-                .equalTo("unit_id",GlobalData.getInstance().getSelectedUnitId())
+                .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
                 .findAll();
         if (result.size() > 0) {
             for (int i = 0; i < result.size(); i++) {
@@ -414,15 +413,16 @@ public class MainActivity extends BaseActivity {
         AccessPolicy policy = gson.fromJson(jsonAccessPolicy, AccessPolicy.class);
 
         GlobalData.getInstance().setUnits(residentData.getUnits());
+        GlobalData.getInstance().setSelectedUnitId(residentData.getUnits().get(0).getId());
         GlobalData.getInstance().setAccessPolicy(policy);
     }
 
-    private void setPic(ImageView view,String image) {
+    private void setPic(ImageView view, String image) {
         view.setVisibility(View.VISIBLE);
         Picasso.with(this).load(image)
                 .placeholder(R.drawable.ic_menu_slideshow)
                 .noFade()
-                .resize(64,64)
+                .resize(64, 64)
                 .error(R.drawable.ic_menu_slideshow).into(view);
 
     }

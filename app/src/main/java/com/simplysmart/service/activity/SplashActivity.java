@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Window;
 
 import com.google.gson.Gson;
@@ -43,11 +44,7 @@ public class SplashActivity extends Activity {
     private void switchToNextActivity() {
         SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", MODE_PRIVATE);
         isLogin = UserInfo.getBoolean("isLogin", false);
-        Gson gson = new Gson();
-        String jsonUnitInfo = UserInfo.getString("unit_info", "");
-        final User residentData = gson.fromJson(jsonUnitInfo, User.class);
 
-        GlobalData.getInstance().setUnits(residentData.getUnits());
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -55,8 +52,6 @@ public class SplashActivity extends Activity {
 
                 Intent i;
                 if (isLogin) {
-                    GlobalData.getInstance().setUnits(residentData.getUnits());
-                    GlobalData.getInstance().setSelectedUnitId(residentData.getUnits().get(0).getId());
                     i = new Intent(SplashActivity.this, MainActivity.class);
                 } else {
                     i = new Intent(SplashActivity.this, LoginActivity.class);

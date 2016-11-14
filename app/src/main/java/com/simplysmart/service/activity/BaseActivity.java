@@ -31,6 +31,7 @@ import android.view.WindowManager;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
+import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
@@ -383,6 +384,8 @@ public abstract class BaseActivity extends AppCompatActivity {
                 }
             }
         }
+
+        deleteFile(Environment.getExternalStorageDirectory()+"/"+ StringConstants.STORAGE_DIRECTORY);
     }
 
     public static boolean deleteFile(File file) {

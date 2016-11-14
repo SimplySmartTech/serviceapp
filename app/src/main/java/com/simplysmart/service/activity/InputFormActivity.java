@@ -40,6 +40,7 @@ import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
+import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
@@ -117,10 +118,10 @@ public class InputFormActivity extends BaseActivity {
 
         bindViews();
 
-        RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(),sensorData.getSensor_name());
-        if(localDataList==null || localDataList.size()==0){
+        RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
+        if (localDataList == null || localDataList.size() == 0) {
             //do nothing.
-        }else{
+        } else {
             setList(localDataList);
         }
 
@@ -151,16 +152,16 @@ public class InputFormActivity extends BaseActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-    
-    private void bindViews(){
+
+    private void bindViews() {
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
-        unit = (TextView)findViewById(R.id.unit);
-        uploadImage = (RelativeLayout)findViewById(R.id.uploadImage);
-        photoDone = (ImageView)findViewById(R.id.photo_done);
-        submitForm = (ImageButton)findViewById(R.id.submitForm);
-        mHorizontalBar = (ProgressBar)findViewById(R.id.horizontalBar);
-        readingList = (ListView)findViewById(R.id.readingList);
+        unit = (TextView) findViewById(R.id.unit);
+        uploadImage = (RelativeLayout) findViewById(R.id.uploadImage);
+        photoDone = (ImageView) findViewById(R.id.photo_done);
+        submitForm = (ImageButton) findViewById(R.id.submitForm);
+        mHorizontalBar = (ProgressBar) findViewById(R.id.horizontalBar);
+        readingList = (ListView) findViewById(R.id.readingList);
 
         unit.setText(sensorData.getUnit());
 
@@ -185,9 +186,9 @@ public class InputFormActivity extends BaseActivity {
         submitForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(sensorData.getPhotographic_evidence().contains("true")) {
-                    if(imageTaken){
-                        if(!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
+                if (sensorData.getPhotographic_evidence().contains("true")) {
+                    if (imageTaken) {
+                        if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
 
                             readingData = new ReadingData();
                             readingData.setUtility_id(sensorData.getUtility_identifier());
@@ -196,13 +197,13 @@ public class InputFormActivity extends BaseActivity {
                             readingData.setSensor_name(sensorData.getSensor_name());
                             saveToDisk(readingData);
 //                            postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                        }else{
+                        } else {
                             showSnackBar(mParentLayout, "Please enter reading before submit.");
                         }
-                    }else{
-                        showSnackBar(mParentLayout,"Please take photo of reading.");
+                    } else {
+                        showSnackBar(mParentLayout, "Please take photo of reading.");
                     }
-                }else{
+                } else {
                     if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
                         ReadingData readingData = new ReadingData();
                         readingData.setUtility_id(sensorData.getUtility_identifier());
@@ -215,8 +216,7 @@ public class InputFormActivity extends BaseActivity {
 //                        postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                         //TODO : Why make same api call twice.?
 //                        postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                    }
-                    else {
+                    } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
                 }
@@ -228,23 +228,23 @@ public class InputFormActivity extends BaseActivity {
     private void setList(ReadingDataRealm dataRealm) {
         ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
         readingsList.add(dataRealm);
-        readingListAdapter = new ReadingListAdapter(readingsList,this);
+        readingListAdapter = new ReadingListAdapter(readingsList, this);
         readingList.setAdapter(readingListAdapter);
     }
 
     private void setList(RealmList<ReadingDataRealm> localDataList) {
-        RealmList<ReadingDataRealm> list =ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(),sensorData.getSensor_name());
+        RealmList<ReadingDataRealm> list = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
         ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
 
-        for(int i =0;i<list.size();i++){
+        for (int i = 0; i < list.size(); i++) {
             readingsList.add(list.get(i));
         }
 
-        readingListAdapter = new ReadingListAdapter(readingsList,this);
+        readingListAdapter = new ReadingListAdapter(readingsList, this);
         readingList.setAdapter(readingListAdapter);
     }
 
-    private void saveData(ReadingData readingData){
+    private void saveData(ReadingData readingData) {
         saveToDisk(readingData);
     }
 
@@ -265,10 +265,10 @@ public class InputFormActivity extends BaseActivity {
         readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
         readingDataRealm.setUnit(sensorData.getUnit());
 
-        if(uploadedImage){
+        if (uploadedImage) {
             readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);
             readingDataRealm.setUploadedImage(true);
-        }else{
+        } else {
             readingDataRealm.setUploadedImage(false);
         }
         realm.commitTransaction();
@@ -277,9 +277,9 @@ public class InputFormActivity extends BaseActivity {
     }
 
     private void updateList(ReadingDataRealm dataRealm) {
-        if(readingListAdapter!=null) {
+        if (readingListAdapter != null) {
             readingListAdapter.addElement(dataRealm);
-        }else{
+        } else {
             setList(dataRealm);
         }
     }
@@ -355,13 +355,17 @@ public class InputFormActivity extends BaseActivity {
     }
 
     private File createImageFile() throws IOException {
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-            File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-            image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStorageDirectory(), StringConstants.STORAGE_DIRECTORY);
 
-            mCurrentPhotoPath = image.getAbsolutePath();
-            return image;
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+
+        image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     public File getTempFile(Context context, String url) {
@@ -514,9 +518,9 @@ public class InputFormActivity extends BaseActivity {
                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
                         finish();
 
-                    } else if(response.code()==401){
+                    } else if (response.code() == 401) {
                         handleAuthorizationFailed();
-                    }else{
+                    } else {
                         APIError error = ErrorUtils.parseError(response);
                         displayMessage(error.message());
                     }

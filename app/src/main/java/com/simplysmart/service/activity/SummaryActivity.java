@@ -2,6 +2,7 @@ package com.simplysmart.service.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +16,7 @@ import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
+import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
@@ -26,6 +28,7 @@ import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.Metric;
 import com.simplysmart.service.model.matrix.Reading;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.RealmList;

@@ -3,6 +3,7 @@ package com.simplysmart.service.database;
 import com.amazonaws.services.dynamodbv2.model.Select;
 import com.simplysmart.service.model.matrix.ReadingData;
 
+import java.io.File;
 import java.util.List;
 
 import io.realm.Realm;

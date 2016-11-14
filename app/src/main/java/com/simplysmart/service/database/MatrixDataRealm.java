@@ -5,6 +5,7 @@ import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.SensorData;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.realm.Realm;
@@ -106,6 +107,16 @@ public class MatrixDataRealm extends RealmObject {
                 .equalTo("utility_id",utility_id)
                 .equalTo("sensor_name", sensor_name)
                 .findAll();
+        for (ReadingDataRealm dataRealm:results) {
+            File file = new File(dataRealm.getLocal_photo_url());
+            if(file.exists()){
+                try {
+                    file.delete();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
         results.deleteAllFromRealm();
         realm.commitTransaction();
     }

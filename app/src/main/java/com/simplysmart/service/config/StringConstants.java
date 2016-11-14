@@ -1,5 +1,7 @@
 package com.simplysmart.service.config;
 
+import com.simplysmart.service.model.matrix.SensorData;
+
 /**
  * Created by shailendrapsp on 7/11/16.
  */
@@ -9,5 +11,5 @@ public class StringConstants {
     public static String LOCAL_IMAGE_URL = "LOCAL_IMAGE_URL";
     public static String TIMESTAMP = "TIMESTAMP";
     public static String SENSOR_NAME = "SENSOR_NAME";
-
+    public static String STORAGE_DIRECTORY = "SERVICE_APP_IMAGES";
 }
