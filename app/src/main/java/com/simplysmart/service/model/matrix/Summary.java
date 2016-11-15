@@ -10,6 +10,7 @@ public class Summary {
     private String name;
     private String value;
     private String time;
+    private boolean header;
 
     public String getName() {
         return name;
@@ -49,5 +50,13 @@ public class Summary {
 
     public void setLocalPhotoUrl(String localPhotoUrl) {
         this.localPhotoUrl = localPhotoUrl;
+    }
+
+    public boolean isHeader() {
+        return header;
+    }
+
+    public void setHeader(boolean header) {
+        this.header = header;
     }
 }

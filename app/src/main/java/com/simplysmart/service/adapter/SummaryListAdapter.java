@@ -1,7 +1,9 @@
 package com.simplysmart.service.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.model.matrix.Summary;
+import com.simplysmart.service.viewholder.ReadingViewHolder;
+import com.simplysmart.service.viewholder.SummaryHeaderViewHolder;
 import com.simplysmart.service.viewholder.SummaryViewHolder;
 import com.squareup.picasso.Picasso;
 
@@ -21,48 +25,77 @@ import java.util.ArrayList;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryListAdapter extends RecyclerView.Adapter<SummaryViewHolder> {
+public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private final int TYPE_HEADER = 1;
+    private final int TYPE_ITEM = 2;
     private ArrayList<Summary> data;
     private Context mContext;
+    private Typeface textTypeface;
 
     public SummaryListAdapter(ArrayList<Summary> data, Context mContext) {
         this.data = data;
         this.mContext = mContext;
+        textTypeface = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
     }
 
     @Override
-    public SummaryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(mContext).inflate(R.layout.summary_list_item,parent,false);
-        return new SummaryViewHolder(itemView);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView;
+        if(viewType==TYPE_ITEM) {
+            itemView = LayoutInflater.from(mContext).inflate(R.layout.summary_list_item, parent, false);
+            return new SummaryViewHolder(itemView);
+        }else {
+            itemView = LayoutInflater.from(mContext).inflate(R.layout.summary_list_header, parent, false);
+            return new SummaryHeaderViewHolder(itemView);
+        }
+
     }
 
     @Override
-    public void onBindViewHolder(SummaryViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         Summary summary = data.get(position);
-        String reading = summary.getName()+"  "+summary.getValue();
-        boolean imageFound = true;
-        File image = null;
-        try {
-            image = new File(summary.getLocalPhotoUrl());
-        }catch (Exception e){
-            imageFound = false;
-        }
+        if(summary.isHeader()){
 
-        holder.sensorType.setText(summary.getType());
-        holder.sensorNameAndValue.setText(reading);
-        holder.time.setText(summary.getTime());
+            SummaryHeaderViewHolder viewHolder = (SummaryHeaderViewHolder)holder;
+            String logo = "&#x" + data.get(position).getValue() + ";";
+            String type = summary.getName();
+            type = type.toUpperCase();
 
-        if(imageFound){
-            setPic(holder.photo,image);
-        }
-
-        holder.edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
+            viewHolder.logo.setText(Html.fromHtml(logo));
+            viewHolder.logo.setTypeface(textTypeface);
+            viewHolder.type.setText(type);
+            if(position==0){
+                viewHolder.line.setVisibility(View.GONE);
             }
-        });
+
+        }else{
+            SummaryViewHolder viewHolder = (SummaryViewHolder) holder;
+            boolean imageFound = true;
+            File image = null;
+            try {
+                image = new File(summary.getLocalPhotoUrl());
+            }catch (Exception e){
+                imageFound = false;
+            }
+
+            viewHolder.sensorName.setText(summary.getName().toUpperCase());
+            viewHolder.sensorValue.setText(summary.getValue().toUpperCase());
+            viewHolder.time.setText(summary.getTime());
+
+            if(imageFound){
+                setPic(viewHolder.photo,image);
+                viewHolder.photo.setAlpha(1.0f);
+            }
+
+            viewHolder.edit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+        }
     }
 
     @Override
@@ -75,8 +108,18 @@ public class SummaryListAdapter extends RecyclerView.Adapter<SummaryViewHolder> 
         Picasso.with(mContext).load(image)
                 .placeholder(R.drawable.ic_menu_slideshow)
                 .noFade()
-                .resize(64,64)
+                .resize(32,32)
                 .error(R.drawable.ic_menu_slideshow).into(view);
+
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (data.get(position).isHeader()) {
+            return TYPE_HEADER;
+        } else {
+            return TYPE_ITEM;
+        }
 
     }
 }

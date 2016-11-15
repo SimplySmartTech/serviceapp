@@ -97,6 +97,13 @@ public class SummaryActivity extends BaseActivity {
                         RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(), sdr.getSensor_name());
 
                         if (readingsList != null && readingsList.size() > 0) {
+
+                            Summary header = new Summary();
+                            header.setName(data.getType());
+                            header.setValue(data.getIcon());
+                            header.setHeader(true);
+                            summaryList.add(header);
+
                             for (int k = 0; k < readingsList.size(); k++) {
                                 ReadingDataRealm rdr = readingsList.get(k);
                                 Summary summary = new Summary();
@@ -115,6 +122,7 @@ public class SummaryActivity extends BaseActivity {
 
                                 summaryList.add(summary);
                             }
+
                             metric.setReadings(readings);
                             metrics.add(metric);
                         }

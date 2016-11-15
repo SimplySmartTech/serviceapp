@@ -108,13 +108,17 @@ public class MatrixDataRealm extends RealmObject {
                 .equalTo("sensor_name", sensor_name)
                 .findAll();
         for (ReadingDataRealm dataRealm:results) {
-            File file = new File(dataRealm.getLocal_photo_url());
-            if(file.exists()){
-                try {
-                    file.delete();
-                }catch (Exception e){
-                    e.printStackTrace();
+            try {
+                File file = new File(dataRealm.getLocal_photo_url());
+                if (file.exists()) {
+                    try {
+                        file.delete();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
         results.deleteAllFromRealm();

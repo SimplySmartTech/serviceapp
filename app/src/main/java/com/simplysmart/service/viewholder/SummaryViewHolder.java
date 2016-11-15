@@ -14,17 +14,16 @@ import com.simplysmart.service.R;
 
 public class SummaryViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView sensorType, sensorNameAndValue, time;
-    public ImageButton edit;
+    public TextView sensorValue,sensorName, time,edit;
     public ImageView photo;
 
     public SummaryViewHolder(View itemView) {
         super(itemView);
 
-        sensorType = (TextView) itemView.findViewById(R.id.type);
-        sensorNameAndValue = (TextView) itemView.findViewById(R.id.name);
+        sensorName = (TextView) itemView.findViewById(R.id.sensorName);
+        sensorValue = (TextView) itemView.findViewById(R.id.sensorValue);
         time = (TextView) itemView.findViewById(R.id.time);
-        edit = (ImageButton) itemView.findViewById(R.id.edit);
+        edit = (TextView) itemView.findViewById(R.id.edit);
         photo = (ImageView) itemView.findViewById(R.id.photo);
 
     }
