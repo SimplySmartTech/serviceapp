@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -48,6 +49,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.RunnableFuture;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -61,8 +63,8 @@ import retrofit2.Response;
 public class MainActivity extends BaseActivity {
 
     private TextView no_data_found;
-    private RelativeLayout errorLayout;
     private ExpandableListView matrixList;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private MatrixListAdapter matrixListAdapter;
     private MatrixResponse matrixResponse;
     private int lastExpandedPosition = -1;
@@ -99,14 +101,29 @@ public class MainActivity extends BaseActivity {
             menu.add(i, i, i, units.get(i).getName().toUpperCase());
         }
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+
         no_data_found = (TextView) findViewById(R.id.no_data_found);
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
 
         if (NetworkUtilities.isInternet(this)) {
-            getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+            swipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(true);
+                    getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+                }
+            });
         } else {
             setOfflineData(Realm.getDefaultInstance());
         }
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout();
+            }
+        });
 
         matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
@@ -141,8 +158,14 @@ public class MainActivity extends BaseActivity {
                 uncheckAllMenuItems(navigationView);
                 item.setChecked(true);
                 GlobalData.getInstance().setSelectedUnitId(unit.getId());
-                if (NetworkUtilities.isInternet(MainActivity.this)) {
-                    getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+                if (NetworkUtilities.isInternet(getApplicationContext())) {
+                    swipeRefreshLayout.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(true);
+                            getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+                        }
+                    });
                 } else {
                     setOfflineData(Realm.getDefaultInstance());
                 }
@@ -151,36 +174,6 @@ public class MainActivity extends BaseActivity {
         });
 
 
-    }
-
-    private void uncheckAllMenuItems(NavigationView navigationView) {
-        final Menu menu = navigationView.getMenu();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item.hasSubMenu()) {
-                SubMenu subMenu = item.getSubMenu();
-                for (int j = 0; j < subMenu.size(); j++) {
-                    MenuItem subMenuItem = subMenu.getItem(j);
-                    subMenuItem.setChecked(false);
-                }
-            } else {
-                item.setChecked(false);
-            }
-        }
-    }
-
-    private void setDataInHeader(NavigationView navigationView) {
-        navigationView.inflateHeaderView(R.layout.nav_header_main);
-        View view = navigationView.getHeaderView(0);
-        ImageView companyLogo = (ImageView) view.findViewById(R.id.companyLogo);
-        TextView companyName = (TextView) view.findViewById(R.id.companyName);
-        TextView userName = (TextView) view.findViewById(R.id.userName);
-
-        setPic(companyLogo, residentData.getCompany().getLogo_url());
-        companyName.setText(residentData.getCompany().getName());
-        userName.setText(residentData.getName());
-
-        navigationView.setBackgroundResource(R.drawable.list_drawer_item_activity_bg_selector);
     }
 
 
@@ -231,13 +224,50 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void refreshLayout(){
+        if(NetworkUtilities.isInternet(this)) {
+            swipeRefreshLayout.setRefreshing(true);
+            getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+        }else {
+            swipeRefreshLayout.setRefreshing(true);
+            setOfflineData(Realm.getDefaultInstance());
+        }
+    }
+
+    private void uncheckAllMenuItems(NavigationView navigationView) {
+        final Menu menu = navigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.hasSubMenu()) {
+                SubMenu subMenu = item.getSubMenu();
+                for (int j = 0; j < subMenu.size(); j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    subMenuItem.setChecked(false);
+                }
+            } else {
+                item.setChecked(false);
+            }
+        }
+    }
+
+    private void setDataInHeader(NavigationView navigationView) {
+        navigationView.inflateHeaderView(R.layout.nav_header_main);
+        View view = navigationView.getHeaderView(0);
+        ImageView companyLogo = (ImageView) view.findViewById(R.id.companyLogo);
+        TextView companyName = (TextView) view.findViewById(R.id.companyName);
+        TextView userName = (TextView) view.findViewById(R.id.userName);
+
+        setPic(companyLogo, residentData.getCompany().getLogo_url());
+        companyName.setText(residentData.getCompany().getName());
+        userName.setText(residentData.getName());
+
+        navigationView.setBackgroundResource(R.drawable.list_drawer_item_activity_bg_selector);
+    }
+
     //Do network call to fetch matrix data
     private void getMatrixRequest(String unitId, String subDomain) {
 
         if (NetworkUtilities.isInternet(MainActivity.this)) {
-
-            showActivitySpinner();
-
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
             Call<MatrixResponse> call = apiInterface.getMetrics(unitId, subDomain);
             call.enqueue(new Callback<MatrixResponse>() {
@@ -255,18 +285,19 @@ public class MainActivity extends BaseActivity {
                         no_data_found.setText(getResources().getString(R.string.error_in_network));
                         no_data_found.setVisibility(View.VISIBLE);
                     }
-                    dismissActivitySpinner();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
                 public void onFailure(Call<MatrixResponse> call, Throwable t) {
-                    dismissActivitySpinner();
+                    swipeRefreshLayout.setRefreshing(false);
                     displayMessage(getResources().getString(R.string.error_in_network));
                     no_data_found.setText(getResources().getString(R.string.error_in_network));
                     no_data_found.setVisibility(View.VISIBLE);
                 }
             });
         } else {
+            swipeRefreshLayout.setRefreshing(false);
             displayMessage(getString(R.string.error_no_internet_connection));
             no_data_found.setText(getString(R.string.error_no_internet_connection));
             no_data_found.setVisibility(View.VISIBLE);
@@ -275,8 +306,6 @@ public class MainActivity extends BaseActivity {
 
     //Set matrix data to list
     private void setMatrixData(MatrixResponse response) {
-        showActivitySpinner();
-
         ArrayList<MatrixData> matrixDataArrayList = response.getData();
         try {
             Realm realm = Realm.getDefaultInstance();
@@ -316,18 +345,14 @@ public class MainActivity extends BaseActivity {
             }
             savedToDisk = true;
             setDataInList(realm);
-            dismissActivitySpinner();
 
         } catch (RealmException e) {
-            dismissActivitySpinner();
             savedToDisk = false;
             e.printStackTrace();
         }
-
     }
 
     private void setDataInList(Realm realm) {
-        showActivitySpinner();
         boolean sgtz = true;
         adapterData = new ArrayList<>();
         if (savedToDisk) {
@@ -369,11 +394,9 @@ public class MainActivity extends BaseActivity {
             matrixList.setVisibility(View.GONE);
             no_data_found.setVisibility(View.VISIBLE);
         }
-        dismissActivitySpinner();
     }
 
     private void setOfflineData(Realm realm) {
-        showActivitySpinner();
         adapterData = new ArrayList<>();
         boolean sgtz = true;
 
@@ -414,7 +437,7 @@ public class MainActivity extends BaseActivity {
             no_data_found.setVisibility(View.VISIBLE);
         }
 
-        dismissActivitySpinner();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private BroadcastReceiver UPDATE_METRIC_SENSOR_LIST_ROW = new BroadcastReceiver() {
