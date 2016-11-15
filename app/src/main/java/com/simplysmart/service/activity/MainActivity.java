@@ -24,6 +24,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -59,6 +60,8 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity {
 
+    private TextView no_data_found;
+    private RelativeLayout errorLayout;
     private ExpandableListView matrixList;
     private MatrixListAdapter matrixListAdapter;
     private MatrixResponse matrixResponse;
@@ -96,6 +99,7 @@ public class MainActivity extends BaseActivity {
             menu.add(i, i, i, units.get(i).getName().toUpperCase());
         }
 
+        no_data_found = (TextView) findViewById(R.id.no_data_found);
         matrixList = (ExpandableListView) findViewById(R.id.matrixList);
 
         if (NetworkUtilities.isInternet(this)) {
@@ -248,6 +252,8 @@ public class MainActivity extends BaseActivity {
                     } else {
                         APIError error = ErrorUtils.parseError(response);
                         displayMessage(error.message());
+                        no_data_found.setText(getResources().getString(R.string.error_in_network));
+                        no_data_found.setVisibility(View.VISIBLE);
                     }
                     dismissActivitySpinner();
                 }
@@ -256,10 +262,14 @@ public class MainActivity extends BaseActivity {
                 public void onFailure(Call<MatrixResponse> call, Throwable t) {
                     dismissActivitySpinner();
                     displayMessage(getResources().getString(R.string.error_in_network));
+                    no_data_found.setText(getResources().getString(R.string.error_in_network));
+                    no_data_found.setVisibility(View.VISIBLE);
                 }
             });
         } else {
             displayMessage(getString(R.string.error_no_internet_connection));
+            no_data_found.setText(getString(R.string.error_no_internet_connection));
+            no_data_found.setVisibility(View.VISIBLE);
         }
     }
 
@@ -318,6 +328,7 @@ public class MainActivity extends BaseActivity {
 
     private void setDataInList(Realm realm) {
         showActivitySpinner();
+        boolean sgtz = true;
         adapterData = new ArrayList<>();
         if (savedToDisk) {
             RealmResults<MatrixDataRealm> result = realm
@@ -325,6 +336,7 @@ public class MainActivity extends BaseActivity {
                     .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
                     .findAll();
             if (result.size() > 0) {
+                no_data_found.setVisibility(View.GONE);
                 for (int i = 0; i < result.size(); i++) {
                     MatrixData matrixData = new MatrixData();
                     matrixData.setIcon(result.get(i).getIcon());
@@ -338,6 +350,10 @@ public class MainActivity extends BaseActivity {
                     matrixData.setSensors(sensors);
                     adapterData.add(matrixData);
                 }
+            } else {
+                sgtz = false;
+                no_data_found.setText("No data found");
+
             }
             matrixListAdapter = new MatrixListAdapter(this, adapterData);
         }
@@ -346,18 +362,27 @@ public class MainActivity extends BaseActivity {
         String text = new Gson().toJson(adapterData);
         Log.d("Data saved:", text);
         matrixList.setAdapter(matrixListAdapter);
+        if (sgtz) {
+            matrixList.setVisibility(View.VISIBLE);
+            no_data_found.setVisibility(View.GONE);
+        } else {
+            matrixList.setVisibility(View.GONE);
+            no_data_found.setVisibility(View.VISIBLE);
+        }
         dismissActivitySpinner();
     }
 
     private void setOfflineData(Realm realm) {
         showActivitySpinner();
         adapterData = new ArrayList<>();
+        boolean sgtz = true;
 
         RealmResults<MatrixDataRealm> result = realm
                 .where(MatrixDataRealm.class)
                 .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
                 .findAll();
         if (result.size() > 0) {
+            no_data_found.setVisibility(View.GONE);
             for (int i = 0; i < result.size(); i++) {
                 MatrixData matrixData = new MatrixData();
                 matrixData.setIcon(result.get(i).getIcon());
@@ -371,12 +396,24 @@ public class MainActivity extends BaseActivity {
                 matrixData.setSensors(sensors);
                 adapterData.add(matrixData);
             }
+        } else {
+            sgtz = false;
+            no_data_found.setText("No data found.");
         }
         matrixListAdapter = new MatrixListAdapter(this, adapterData);
 
         String text = new Gson().toJson(adapterData);
         Log.d("Data saved:", text);
         matrixList.setAdapter(matrixListAdapter);
+
+        if (sgtz) {
+            matrixList.setVisibility(View.VISIBLE);
+            no_data_found.setVisibility(View.GONE);
+        } else {
+            matrixList.setVisibility(View.GONE);
+            no_data_found.setVisibility(View.VISIBLE);
+        }
+
         dismissActivitySpinner();
     }
 

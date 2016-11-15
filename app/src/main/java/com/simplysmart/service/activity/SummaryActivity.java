@@ -8,8 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
@@ -132,6 +134,16 @@ public class SummaryActivity extends BaseActivity {
         adapter = new SummaryListAdapter(summaryList, this);
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
+
+        TextView no_data_found = (TextView)findViewById(R.id.no_data_found);
+        if(summaryList.size()>0){
+            summary.setVisibility(View.VISIBLE);
+            no_data_found.setVisibility(View.GONE);
+        }else{
+            summary.setVisibility(View.GONE);
+            no_data_found.setText("No data found.");
+            no_data_found.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
