@@ -15,15 +15,14 @@ import com.simplysmart.service.R;
 
 public class ReadingViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView reading,time;
-    public ImageButton edit;
+    public TextView reading,time,edit;
     public ImageView photo;
 
     public ReadingViewHolder(View itemView) {
         super(itemView);
         reading = (TextView)itemView.findViewById(R.id.reading);
         time = (TextView)itemView.findViewById(R.id.time);
-        edit = (ImageButton) itemView.findViewById(R.id.edit);
+        edit = (TextView) itemView.findViewById(R.id.edit);
         photo = (ImageView) itemView.findViewById(R.id.photo);
     }
 }

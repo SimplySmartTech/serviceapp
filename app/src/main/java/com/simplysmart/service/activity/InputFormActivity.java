@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -198,6 +200,9 @@ public class InputFormActivity extends BaseActivity {
                             readingData.setPhotographic_evidence_url(uploadedReadingUrl);
                             readingData.setSensor_name(sensorData.getSensor_name());
                             saveToDisk(readingData);
+
+                            mInputReadingValue.setText("");
+                            photoDone.setVisibility(View.INVISIBLE);
 //                            postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                         } else {
                             showSnackBar(mParentLayout, "Please enter reading before submit.");
@@ -214,10 +219,6 @@ public class InputFormActivity extends BaseActivity {
                         readingData.setSensor_name(sensorData.getSensor_name());
 
                         saveToDisk(readingData);
-
-//                        postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                        //TODO : Why make same api call twice.?
-//                        postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }

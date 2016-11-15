@@ -31,6 +31,7 @@ import android.view.WindowManager;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
 import com.simplysmart.service.database.MatrixDataRealm;
@@ -370,6 +371,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void logout(){
+        for(int i =0; i< GlobalData.getInstance().getUnits().size();i++){
+            removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
+        }
         handleAuthorizationFailed();
     }
 

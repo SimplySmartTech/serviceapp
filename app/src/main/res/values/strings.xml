@@ -22,5 +22,6 @@
     <string name="logout">Logout</string>
     <string name="save_reading">Save Reading</string>
     <string name="error_no_data_found">No data found.</string>
+    <string name="edit_value">EDIT</string>
 
 </resources>
