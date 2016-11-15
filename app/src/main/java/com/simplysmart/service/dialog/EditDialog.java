@@ -91,11 +91,11 @@ public class EditDialog extends DialogFragment {
                         e.printStackTrace();
                     }
                     EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                    editDialogListener.updateResult(true,pos);
+                    editDialogListener.updateResult(true,pos,string+" "+readingDataRealm.getUnit());
                     dismiss();
                 }else{
                     EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                    editDialogListener.updateResult(false,pos);
+                    editDialogListener.updateResult(false,pos,"");
                     dismiss();
                 }
             }
@@ -112,7 +112,7 @@ public class EditDialog extends DialogFragment {
     }
 
     public interface EditDialogListener {
-        void updateResult(boolean done,int position);
+        void updateResult(boolean done,int position,String value);
     }
 
 }

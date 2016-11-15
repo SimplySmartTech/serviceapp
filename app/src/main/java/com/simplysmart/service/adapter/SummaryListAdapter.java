@@ -1,5 +1,6 @@
 package com.simplysmart.service.adapter;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.viewholder.ReadingViewHolder;
 import com.simplysmart.service.viewholder.SummaryHeaderViewHolder;
@@ -20,6 +23,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import io.realm.Realm;
 
 /**
  * Created by shailendrapsp on 4/11/16.
@@ -32,11 +37,13 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private ArrayList<Summary> data;
     private Context mContext;
     private Typeface textTypeface;
+    private FragmentManager fragmentManager;
 
-    public SummaryListAdapter(ArrayList<Summary> data, Context mContext) {
+    public SummaryListAdapter(ArrayList<Summary> data, Context mContext,FragmentManager fragmentManager) {
         this.data = data;
         this.mContext = mContext;
-        textTypeface = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
+        this.textTypeface = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
+        this.fragmentManager = fragmentManager;
     }
 
     @Override
@@ -53,7 +60,7 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         Summary summary = data.get(position);
         if(summary.isHeader()){
 
@@ -82,6 +89,7 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.sensorName.setText(summary.getName().toUpperCase());
             viewHolder.sensorValue.setText(summary.getValue().toUpperCase());
             viewHolder.time.setText(summary.getTime());
+            final long time = summary.getTimestamp();
 
             if(imageFound){
                 setPic(viewHolder.photo,image);
@@ -91,7 +99,12 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Realm realm = Realm.getDefaultInstance();
+                    ReadingDataRealm readingDataRealm = realm
+                            .where(ReadingDataRealm.class)
+                            .equalTo("timestamp",time)
+                            .findFirst();
+                    showEditDialog(readingDataRealm,holder.getAdapterPosition());
                 }
             });
 
@@ -121,5 +134,10 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return TYPE_ITEM;
         }
 
+    }
+
+    private void showEditDialog(ReadingDataRealm readingDataRealm, int position){
+        EditDialog newDialog = EditDialog.newInstance(readingDataRealm,position);
+        newDialog.show(fragmentManager, "show dialog");
     }
 }

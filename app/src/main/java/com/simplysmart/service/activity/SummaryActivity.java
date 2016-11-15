@@ -24,6 +24,7 @@ import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
+import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.Summary;
@@ -44,12 +45,13 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity {
+public class SummaryActivity extends BaseActivity implements EditDialog.EditDialogListener{
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
     private AllReadingsData allReadingData;
     private RelativeLayout mParentLayout;
+    private SummaryListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +115,7 @@ public class SummaryActivity extends BaseActivity {
                                 summary.setTime(rdr.getDate());
                                 summary.setType(data.getType());
                                 summary.setLocalPhotoUrl(rdr.getLocal_photo_url());
+                                summary.setTimestamp(rdr.getTimestamp());
 
                                 Reading reading = new Reading();
                                 reading.setValue(rdr.getValue());
@@ -137,7 +140,7 @@ public class SummaryActivity extends BaseActivity {
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        SummaryListAdapter adapter = new SummaryListAdapter(summaryList, this);
+        adapter = new SummaryListAdapter(summaryList, this,getFragmentManager());
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
@@ -191,6 +194,14 @@ public class SummaryActivity extends BaseActivity {
                 return true;
             default:
                 return false;
+        }
+    }
+
+    @Override
+    public void updateResult(boolean done, int position,String value) {
+        if(done){
+            summaryList.get(position).setValue(value);
+            adapter.notifyItemChanged(position);
         }
     }
 

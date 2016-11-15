@@ -159,7 +159,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     @Override
-    public void updateResult(boolean newValue,int position) {
+    public void updateResult(boolean newValue,int position,String value) {
         if(newValue){
             readingListAdapter.notifyItemChanged(position);
         }

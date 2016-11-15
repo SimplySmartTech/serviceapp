@@ -10,6 +10,7 @@ public class Summary {
     private String name;
     private String value;
     private String time;
+    private long timestamp;
     private boolean header;
 
     public String getName() {
@@ -58,5 +59,13 @@ public class Summary {
 
     public void setHeader(boolean header) {
         this.header = header;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }
