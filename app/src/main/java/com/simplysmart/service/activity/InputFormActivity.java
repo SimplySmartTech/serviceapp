@@ -190,25 +190,21 @@ public class InputFormActivity extends BaseActivity {
         submitForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (sensorData.getPhotographic_evidence().contains("true")) {
-                    if (imageTaken) {
-                        if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
+                if (imageTaken) {
+                    if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
 
-                            readingData = new ReadingData();
-                            readingData.setUtility_id(sensorData.getUtility_identifier());
-                            readingData.setValue(mInputReadingValue.getText().toString());
-                            readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-                            readingData.setSensor_name(sensorData.getSensor_name());
-                            saveToDisk(readingData);
+                        readingData = new ReadingData();
+                        readingData.setUtility_id(sensorData.getUtility_identifier());
+                        readingData.setValue(mInputReadingValue.getText().toString());
+                        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
+                        readingData.setSensor_name(sensorData.getSensor_name());
+                        saveToDisk(readingData);
 
-                            mInputReadingValue.setText("");
-                            photoDone.setVisibility(View.INVISIBLE);
+                        mInputReadingValue.setText("");
+                        photoDone.setVisibility(View.INVISIBLE);
 //                            postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
-                        } else {
-                            showSnackBar(mParentLayout, "Please enter reading before submit.");
-                        }
                     } else {
-                        showSnackBar(mParentLayout, "Please take photo of reading.");
+                        showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
                 } else {
                     if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {

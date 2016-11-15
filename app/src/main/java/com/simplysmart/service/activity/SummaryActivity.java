@@ -48,7 +48,6 @@ public class SummaryActivity extends BaseActivity {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
-    private SummaryListAdapter adapter;
     private AllReadingsData allReadingData;
     private RelativeLayout mParentLayout;
 
@@ -116,10 +115,9 @@ public class SummaryActivity extends BaseActivity {
 
                                 summaryList.add(summary);
                             }
+                            metric.setReadings(readings);
+                            metrics.add(metric);
                         }
-
-                        metric.setReadings(readings);
-                        metrics.add(metric);
                     }
                 }
             }
@@ -131,7 +129,7 @@ public class SummaryActivity extends BaseActivity {
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        adapter = new SummaryListAdapter(summaryList, this);
+        SummaryListAdapter adapter = new SummaryListAdapter(summaryList, this);
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
