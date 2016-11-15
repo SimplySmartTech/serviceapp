@@ -8,6 +8,4 @@
         android:id="@+id/action_all_read"
         app:showAsAction="ifRoom"/>
 
-
-
 </menu>
