@@ -46,6 +46,7 @@ import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
@@ -67,7 +68,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class InputFormActivity extends BaseActivity {
+public class InputFormActivity extends BaseActivity implements EditDialog.EditDialogListener {
 
     private static final String TAG = "InputFormActivity";
     private final int REQUEST_TAKE_PHOTO = 1;
@@ -157,6 +158,13 @@ public class InputFormActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void updateResult(boolean newValue,int position) {
+        if(newValue){
+            readingListAdapter.notifyItemChanged(position);
+        }
+    }
+
     private void bindViews() {
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
@@ -229,7 +237,7 @@ public class InputFormActivity extends BaseActivity {
         ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
         readingsList.add(dataRealm);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        readingListAdapter = new ReadingListAdapter(readingsList, this);
+        readingListAdapter = new ReadingListAdapter(readingsList, this , getFragmentManager());
         readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
 
@@ -243,7 +251,7 @@ public class InputFormActivity extends BaseActivity {
             readingsList.add(list.get(i));
         }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        readingListAdapter = new ReadingListAdapter(readingsList, this);
+        readingListAdapter = new ReadingListAdapter(readingsList, this , getFragmentManager());
         readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
     }
