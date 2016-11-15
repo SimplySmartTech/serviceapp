@@ -385,7 +385,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
 
-        deleteFile(Environment.getExternalStorageDirectory()+"/"+ StringConstants.STORAGE_DIRECTORY);
+        deleteFile(new File(Environment.getExternalStorageDirectory()+"/"+ StringConstants.STORAGE_DIRECTORY));
     }
 
     public static boolean deleteFile(File file) {
