@@ -23,7 +23,6 @@ import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ImageUploadObjectRealm;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 
@@ -58,7 +57,7 @@ public class PhotoUploadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        Toast.makeText(getApplicationContext(), "Network Available : UploadingPhoto", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), "Network Available : UploadingPhoto", Toast.LENGTH_LONG).show();
         Log.d("TAG","Reached photo upload service.");
         transferUtility = Util.getTransferUtility(getApplicationContext());
         uploadImage();
@@ -70,10 +69,13 @@ public class PhotoUploadService extends Service {
     private void uploadImage() {
         Toast.makeText(getApplicationContext(), "Network Available : uploadImage", Toast.LENGTH_LONG).show();
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<ReadingDataRealm> readingsList = realm.where(ReadingDataRealm.class).findAll();
+        RealmResults<ReadingDataRealm> readingsList = realm
+                .where(ReadingDataRealm.class)
+                .equalTo("uploadedImage",false)
+                .findAll();
 
         for (ReadingDataRealm reading : readingsList) {
-            if (!reading.isUploadedImage() && !reading.getLocal_photo_url().equals("") && reading.getLocal_photo_url()!=null) {
+            if (reading.getLocal_photo_url()!=null && !reading.getLocal_photo_url().equals("")) {
                 beginUpload(reading);
             }
         }
@@ -94,7 +96,7 @@ public class PhotoUploadService extends Service {
 
             observer.setTransferListener(new UploadListener(readingDataRealm.getTimestamp(), file.getName()));
             count++;
-            Toast.makeText(getApplicationContext(), "Network Available : Set for uploading"+filePath, Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "Network Available : Set for uploading"+filePath, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
         }

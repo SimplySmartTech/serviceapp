@@ -77,13 +77,13 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private String mCurrentPhotoPath;
     private File image;
     private TransferUtility transferUtility;
-    private RelativeLayout mParentLayout;
+    private LinearLayout mParentLayout;
     private EditText mInputReadingValue;
     private TextView unit;
-    private RelativeLayout uploadImage;
-    private ImageView photoDone;
-    private ImageButton submitForm;
-    private ProgressBar mHorizontalBar;
+    private ImageView uploadImage;
+//    private ImageView photoDone;
+    private TextView submitForm;
+    private View middleLine;
 
     private RecyclerView readingList;
 
@@ -187,26 +187,24 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     private void bindViews() {
-        mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
-        mInputReadingValue = (EditText) findViewById(R.id.inputReadingValue);
+        mParentLayout = (LinearLayout) findViewById(R.id.parentLayout);
+        mInputReadingValue = (EditText) findViewById(R.id.reading);
         unit = (TextView) findViewById(R.id.unit);
-        uploadImage = (RelativeLayout) findViewById(R.id.uploadImage);
-        photoDone = (ImageView) findViewById(R.id.photo_done);
-        submitForm = (ImageButton) findViewById(R.id.submitForm);
-        mHorizontalBar = (ProgressBar) findViewById(R.id.horizontalBar);
+        uploadImage = (ImageView) findViewById(R.id.photo);
+        submitForm = (TextView) findViewById(R.id.submit);
         readingList = (RecyclerView) findViewById(R.id.readingList);
-
+        middleLine = findViewById(R.id.middleSeparator);
         unit.setText(sensorData.getUnit());
 
     }
 
     private void initialiseViews() {
         if (sensorData != null && sensorData.getPhotographic_evidence() != null && sensorData.getPhotographic_evidence().equalsIgnoreCase("true")) {
-            mHorizontalBar.setVisibility(View.INVISIBLE);
             uploadImage.setVisibility(View.VISIBLE);
+            middleLine.setVisibility(View.VISIBLE);
         } else {
-            mHorizontalBar.setVisibility(View.INVISIBLE);
             uploadImage.setVisibility(View.GONE);
+            middleLine.setVisibility(View.GONE);
         }
 
         uploadImage.setOnClickListener(new View.OnClickListener() {
@@ -234,7 +232,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         uploadedReadingUrl = "";
                         imageTaken = false;
                         uploadedImage = false;
-                        photoDone.setVisibility(View.INVISIBLE);
+//                        photoDone.setVisibility(View.INVISIBLE);
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
@@ -250,7 +248,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
                         mInputReadingValue.setText("");
                         imageTaken = false;
-                        photoDone.setVisibility(View.INVISIBLE);
+//                        photoDone.setVisibility(View.INVISIBLE);
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
@@ -436,10 +434,10 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                     if (NetworkUtilities.isInternet(this)) {
                         showActivitySpinner();
                         beginUpload(compressImage(mCurrentPhotoPath));
-                        photoDone.setVisibility(View.VISIBLE);
+//                        photoDone.setVisibility(View.VISIBLE);
 //                        setPic();
                     } else {
-                        photoDone.setVisibility(View.INVISIBLE);
+//                        photoDone.setVisibility(View.INVISIBLE);
                         //do nothing.
                     }
                 } else {
@@ -458,10 +456,10 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                     if (NetworkUtilities.isInternet(this)) {
                         showActivitySpinner();
                         beginUpload(compressImage(path));
-                        photoDone.setVisibility(View.VISIBLE);
+//                        photoDone.setVisibility(View.VISIBLE);
 //                        setPic();
                     } else {
-                        photoDone.setVisibility(View.INVISIBLE);
+//                        photoDone.setVisibility(View.INVISIBLE);
 //                        showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
                     }
                 } else {
@@ -492,7 +490,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         File file = new File(filePath);
         image = file;
 
-        mHorizontalBar.setVisibility(View.VISIBLE);
 
         TransferObserver observer = transferUtility.upload(
                 AWSConstants.BUCKET_NAME,
@@ -506,7 +503,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
         @Override
         public void onError(int id, Exception e) {
-            mHorizontalBar.setVisibility(View.INVISIBLE);
 //            mSubmitForm.setEnabled(true);
 //            mSubmitForm.setText("SUBMIT FORM");
             uploadedImage = false;
@@ -539,7 +535,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 //                mSubmitForm.setEnabled(true);
 //                mSubmitForm.setText("SUBMIT FORM");
 
-                mHorizontalBar.setVisibility(View.INVISIBLE);
             }
         }
     }
