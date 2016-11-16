@@ -47,6 +47,7 @@ import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.dialog.EditDialog;
+import com.simplysmart.service.dialog.SubmitReadingDialog;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
@@ -122,6 +123,18 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         getSupportActionBar().setTitle("Input Reading");
 
         bindViews();
+        Realm realm = Realm.getDefaultInstance();
+        ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
+        if(readingDataRealm!=null) {
+            String oldDate = getDate(readingDataRealm.getTimestamp(), "dd-MM-yyyy");
+            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
+
+            if (!oldDate.equals(newDate)) {
+                SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
+                dialog.show(getFragmentManager(), "submitDialog");
+            }
+        }
+
 
         RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
         if (localDataList == null || localDataList.size() == 0) {
@@ -131,8 +144,16 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
 
         initialiseViews();
+    }
 
-
+    public static String getDate(long milliSeconds, String dateFormat)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
     }
 
     @Override
@@ -228,10 +249,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         saveToDisk(readingData);
 
                         mInputReadingValue.setText("");
-                        mCurrentPhotoPath = "";
-                        uploadedReadingUrl = "";
                         imageTaken = false;
-                        uploadedImage = false;
                         photoDone.setVisibility(View.INVISIBLE);
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
