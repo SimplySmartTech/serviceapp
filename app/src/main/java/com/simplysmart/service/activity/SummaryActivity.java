@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -122,6 +123,8 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                                 reading.setPhotographic_evidence_url(rdr.getPhotographic_evidence_url());
                                 reading.setTimestamp(rdr.getTimestamp());
                                 readings.add(reading);
+
+                                Log.d("TAG",rdr.getPhotographic_evidence_url());
 
                                 summaryList.add(summary);
                             }

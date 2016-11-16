@@ -12,4 +12,5 @@ public class StringConstants {
     public static String TIMESTAMP = "TIMESTAMP";
     public static String SENSOR_NAME = "SENSOR_NAME";
     public static String STORAGE_DIRECTORY = "SERVICE_APP_IMAGES";
+    public static String UPLOAD_IMAGE = "UPLOAD_IMAGE";
 }

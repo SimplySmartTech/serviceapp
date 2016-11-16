@@ -209,8 +209,11 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         saveToDisk(readingData);
 
                         mInputReadingValue.setText("");
+                        mCurrentPhotoPath = "";
+                        uploadedReadingUrl = "";
+                        imageTaken = false;
+                        uploadedImage = false;
                         photoDone.setVisibility(View.INVISIBLE);
-//                            postReadingRequest(readingData, GlobalData.getInstance().getSubDomain());
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
@@ -223,6 +226,13 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         readingData.setSensor_name(sensorData.getSensor_name());
 
                         saveToDisk(readingData);
+
+                        mInputReadingValue.setText("");
+                        mCurrentPhotoPath = "";
+                        uploadedReadingUrl = "";
+                        imageTaken = false;
+                        uploadedImage = false;
+                        photoDone.setVisibility(View.INVISIBLE);
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
@@ -281,6 +291,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);
             readingDataRealm.setUploadedImage(true);
         } else {
+            readingDataRealm.setPhotographic_evidence_url("");
             readingDataRealm.setUploadedImage(false);
         }
         realm.commitTransaction();
@@ -314,6 +325,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             public void onClick(View v) {
                 mCurrentPhotoPath = "";
                 uploadedReadingUrl = "";
+                imageTaken = false;
+                uploadedImage = false;
 
                 dispatchTakePictureIntent();
                 dialog.dismiss();
@@ -326,6 +339,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             public void onClick(View v) {
                 mCurrentPhotoPath = "";
                 uploadedReadingUrl = "";
+                imageTaken = false;
+                uploadedImage = false;
 
                 Intent pickPhoto = new Intent();
                 if (Build.VERSION.SDK_INT >= 19) {
