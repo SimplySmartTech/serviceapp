@@ -20,7 +20,6 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
         if (checkInternet(context)) {
             Toast.makeText(context, "Network Available : Broadcast recieved from OS", Toast.LENGTH_LONG).show();
             Intent i = new Intent(context, PhotoUploadService.class);
-            i.putExtra(StringConstants.UPLOAD_IMAGE,true);
             context.startService(i);
         }
     }

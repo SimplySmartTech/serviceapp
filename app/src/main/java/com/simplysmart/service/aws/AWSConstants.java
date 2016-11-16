@@ -12,6 +12,7 @@ public class AWSConstants {
     public static final Regions COGNITO_REGION = Regions.US_EAST_1;
     public static final String BUCKET_NAME = "simplysmart";
     public static final int SOCKET_TIMEOUT = 60000;
+    public static final int RETRIES = 3;
 
     public static final String S3_URL = "https://s3.amazonaws.com/";
     public static final String PATH_FOLDER = "service/";

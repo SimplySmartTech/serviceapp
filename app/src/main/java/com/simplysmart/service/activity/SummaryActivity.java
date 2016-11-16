@@ -1,8 +1,13 @@
 package com.simplysmart.service.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +38,7 @@ import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.Metric;
 import com.simplysmart.service.model.matrix.Reading;
+import com.simplysmart.service.service.PhotoUploadService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,6 +59,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     private AllReadingsData allReadingData;
     private RelativeLayout mParentLayout;
     private SummaryListAdapter adapter;
+    private boolean allDone = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,9 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+        Intent i = new Intent(this, PhotoUploadService.class);
+        startService(i);
+
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
 
@@ -73,10 +83,10 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         showActivitySpinner();
         setDataForSummary();
         dismissActivitySpinner();
-
     }
 
     private void setDataForSummary() {
+        int count = 0;
         ArrayList<Metric> metrics = new ArrayList<>();
         ArrayList<MatrixData> matrixList = MatrixDataRealm.getAll();
         if (matrixList != null && matrixList.size() > 0) {
@@ -123,6 +133,9 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                                 reading.setPhotographic_evidence_url(rdr.getPhotographic_evidence_url());
                                 reading.setTimestamp(rdr.getTimestamp());
                                 readings.add(reading);
+                                if(!rdr.isUploadedImage()){
+                                    count++;
+                                }
 
                                 Log.d("TAG",rdr.getPhotographic_evidence_url());
 
@@ -135,6 +148,10 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                     }
                 }
             }
+        }
+
+        if(count==0){
+            allDone = true;
         }
 
         allReadingData.setMetrics(metrics);
@@ -161,11 +178,13 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     @Override
     protected void onStart() {
         super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(uploadComplete, new IntentFilter("uploadComplete"));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(uploadComplete);
     }
 
     @Override
@@ -193,10 +212,19 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                 supportFinishAfterTransition();
                 return true;
             case R.id.submit:
-                submitData();
+                checkAndSubmitData();
                 return true;
             default:
                 return false;
+        }
+    }
+
+    private void checkAndSubmitData() {
+        if(!allDone) {
+            showActivitySpinner("Uploading images . . .");
+        }else{
+            showActivitySpinner("Submitting readings . . .");
+            submitData();
         }
     }
 
@@ -210,7 +238,6 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
 
     private void submitData() {
         if (NetworkUtilities.isInternet(this)) {
-            showActivitySpinner();
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
             Call<JsonObject> submitAllReadings = apiInterface.submitAllReadings(GlobalData.getInstance().getSubDomain(), allReadingData);
             submitAllReadings.enqueue(new Callback<JsonObject>() {
@@ -253,4 +280,15 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     protected int getStatusBarColor() {
         return 0;
     }
+
+
+    private BroadcastReceiver uploadComplete = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            allDone= true;
+            dismissActivitySpinner();
+            showActivitySpinner("Submitting readings . . .");
+            submitData();
+        }
+    };
 }

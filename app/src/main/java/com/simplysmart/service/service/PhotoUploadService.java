@@ -2,10 +2,13 @@ package com.simplysmart.service.service;
 
 import android.app.IntentService;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -40,13 +43,7 @@ import static android.content.ContentValues.TAG;
 public class PhotoUploadService extends Service {
 
     private TransferUtility transferUtility;
-
-    private String utility_id;
-    private String sensor_name;
-    private String localUrl;
-    private long timeStamp;
-
-    RealmList<ImageUploadObjectRealm> uploadList;
+    private int count = 0;
 
     public PhotoUploadService() {
         super();
@@ -55,7 +52,6 @@ public class PhotoUploadService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-
         return null;
     }
 
@@ -97,56 +93,71 @@ public class PhotoUploadService extends Service {
                     file, CannedAccessControlList.PublicRead);
 
             observer.setTransferListener(new UploadListener(readingDataRealm.getTimestamp(), file.getName()));
+            count++;
             Toast.makeText(getApplicationContext(), "Network Available : Set for uploading"+filePath, Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-}
-
-class UploadListener implements TransferListener {
-
-    private String fileName;
-    private long timestamp;
-
-    UploadListener(long timestamp, String fileName) {
-        this.fileName = fileName;
-        this.timestamp = timestamp;
+    private void sendUploadCompleteBroadcast() {
+        Intent i = new Intent("uploadComplete");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
     }
 
-    @Override
-    public void onError(int id, Exception e) {
-        Log.e(TAG, "Error during upload: " + id, e);
-    }
+    class UploadListener implements TransferListener {
 
-    @Override
-    public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-        Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d", id, bytesTotal, bytesCurrent));
-    }
+        private String fileName;
+        private long timestamp;
 
-    @Override
-    public void onStateChanged(int id, TransferState newState) {
-        Log.d(TAG, "onStateChanged: " + id + ", " + newState);
+        UploadListener(long timestamp, String fileName) {
+            this.fileName = fileName;
+            this.timestamp = timestamp;
+        }
 
-        if (newState == TransferState.COMPLETED) {
+        @Override
+        public void onError(int id, Exception e) {
+            Log.e(TAG, "Error during upload: " + id, e);
+            count--;
+            if(count==0){
+                sendUploadCompleteBroadcast();
+            }
+        }
 
-            String url = AWSConstants.S3_URL
-                    + AWSConstants.BUCKET_NAME + "/"
-                    + AWSConstants.PATH_FOLDER
-                    + fileName;
+        @Override
+        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d", id, bytesTotal, bytesCurrent));
+        }
 
-            DebugLog.d("URL :::: " + url);
+        @Override
+        public void onStateChanged(int id, TransferState newState) {
+            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
 
-            Realm realm = Realm.getDefaultInstance();
-            ReadingDataRealm reading = realm.where(ReadingDataRealm.class).equalTo("timestamp",timestamp).findFirst();
+            if (newState == TransferState.COMPLETED) {
 
-            realm.beginTransaction();
-            reading.setUploadedImage(true);
-            reading.setPhotographic_evidence_url(url);
-            realm.commitTransaction();
+                String url = AWSConstants.S3_URL
+                        + AWSConstants.BUCKET_NAME + "/"
+                        + AWSConstants.PATH_FOLDER
+                        + fileName;
 
+                DebugLog.d("URL :::: " + url);
+
+                Realm realm = Realm.getDefaultInstance();
+                ReadingDataRealm reading = realm.where(ReadingDataRealm.class).equalTo("timestamp",timestamp).findFirst();
+
+                realm.beginTransaction();
+                reading.setUploadedImage(true);
+                reading.setPhotographic_evidence_url(url);
+                realm.commitTransaction();
+
+                count --;
+                Log.d("COUNT : ", count+"");
+                if(count==0){
+                    sendUploadCompleteBroadcast();
+                }
+
+            }
         }
     }
-
 }
+
