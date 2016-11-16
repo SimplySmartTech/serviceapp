@@ -76,9 +76,7 @@ public class SubmitReadingDialog extends DialogFragment implements View.OnClickL
     public void onClick(View v) {
 
         if (v.getId() == R.id.dialogButtonNegative) {
-            Intent i = new Intent(getActivity(), MainActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            getActivity().startActivity(i);
+            getActivity().finish();
             dismiss();
         }
 
