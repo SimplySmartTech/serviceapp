@@ -25,7 +25,7 @@ public class ReadingDataRealm extends RealmObject {
     private String date;
     private String unit;
     private long timestamp;
-    private int id;
+    private String unit_id;
     private boolean uploadedImage;
 
     public ReadingDataRealm() {
@@ -129,12 +129,12 @@ public class ReadingDataRealm extends RealmObject {
         this.timestamp = timestamp;
     }
 
-    public int getId() {
-        return id;
+    public String getUnit_id() {
+        return unit_id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUnit_id(String unit_id) {
+        this.unit_id = unit_id;
     }
 
     public String getLocal_photo_url() {

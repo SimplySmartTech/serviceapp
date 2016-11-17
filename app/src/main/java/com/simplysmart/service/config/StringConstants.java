@@ -14,5 +14,6 @@ public class StringConstants {
     public static String STORAGE_DIRECTORY = "SERVICE_APP_IMAGES";
     public static String UPLOAD_IMAGE = "UPLOAD_IMAGE";
     public static String ALL_DONE = "ALL_DONE";
-
+    public static String USE_UNIT = "USE_UNIT";
+    public static String UNIT_ID = "UNIT_ID";
 }

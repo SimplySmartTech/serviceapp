@@ -3,14 +3,13 @@ package com.simplysmart.service.activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,14 +17,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +46,7 @@ import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.SensorData;
+import com.simplysmart.service.service.PhotoUploadService;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -60,6 +55,8 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
@@ -79,10 +76,9 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private TransferUtility transferUtility;
     private LinearLayout mParentLayout;
     private EditText mInputReadingValue;
-    private TextView unit;
+    private TextView unit, submitForm, titleList;
     private ImageView uploadImage;
-//    private ImageView photoDone;
-    private TextView submitForm;
+    //    private ImageView photoDone;
     private View middleLine;
 
     private RecyclerView readingList;
@@ -115,6 +111,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
 
         transferUtility = Util.getTransferUtility(this);
+        titleList = (TextView) findViewById(R.id.title_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -125,7 +122,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         bindViews();
         Realm realm = Realm.getDefaultInstance();
         ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
-        if(readingDataRealm!=null) {
+        if (readingDataRealm != null) {
             String oldDate = getDate(readingDataRealm.getTimestamp(), "dd-MM-yyyy");
             String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
 
@@ -138,16 +135,16 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
         RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
         if (localDataList == null || localDataList.size() == 0) {
-            //do nothing.
+            titleList.setVisibility(View.INVISIBLE);
         } else {
+            titleList.setVisibility(View.VISIBLE);
             setList(localDataList);
         }
 
         initialiseViews();
     }
 
-    public static String getDate(long milliSeconds, String dateFormat)
-    {
+    public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
         // Create a calendar object that will convert the date and time value in milliseconds to date.
@@ -180,8 +177,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     @Override
-    public void updateResult(boolean newValue,int position,String value) {
-        if(newValue){
+    public void updateResult(boolean newValue, int position, String value) {
+        if (newValue) {
             readingListAdapter.notifyItemChanged(position);
         }
     }
@@ -217,6 +214,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         submitForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mInputReadingValue.clearFocus();
+
                 if (imageTaken) {
                     if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
 
@@ -232,13 +231,18 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         uploadedReadingUrl = "";
                         imageTaken = false;
                         uploadedImage = false;
-//                        photoDone.setVisibility(View.INVISIBLE);
+                        if(NetworkUtilities.isInternet(InputFormActivity.this)) {
+                            Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
+                            i.putExtra(StringConstants.USE_UNIT, false);
+                            startService(i);
+                        }
+
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
                 } else {
                     if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
-                        ReadingData readingData = new ReadingData();
+                        readingData = new ReadingData();
                         readingData.setUtility_id(sensorData.getUtility_identifier());
                         readingData.setValue(mInputReadingValue.getText().toString());
                         readingData.setPhotographic_evidence_url(uploadedReadingUrl);
@@ -247,8 +251,10 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         saveToDisk(readingData);
 
                         mInputReadingValue.setText("");
+                        mCurrentPhotoPath = "";
+                        uploadedReadingUrl = "";
                         imageTaken = false;
-//                        photoDone.setVisibility(View.INVISIBLE);
+                        uploadedImage = false;
                     } else {
                         showSnackBar(mParentLayout, "Please enter reading before submit.");
                     }
@@ -259,11 +265,12 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     private void setList(ReadingDataRealm dataRealm) {
+        titleList.setVisibility(View.VISIBLE);
 
         ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
         readingsList.add(dataRealm);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        readingListAdapter = new ReadingListAdapter(readingsList, this , getFragmentManager());
+        readingListAdapter = new ReadingListAdapter(readingsList, this, getFragmentManager());
         readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
 
@@ -276,14 +283,18 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         for (int i = 0; i < list.size(); i++) {
             readingsList.add(list.get(i));
         }
+
+        Collections.sort(readingsList, new Comparator<ReadingDataRealm>() {
+            @Override
+            public int compare(ReadingDataRealm o1, ReadingDataRealm o2) {
+                return (int) (o2.getTimestamp() - o1.getTimestamp());
+            }
+        });
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        readingListAdapter = new ReadingListAdapter(readingsList, this , getFragmentManager());
+        readingListAdapter = new ReadingListAdapter(readingsList, this, getFragmentManager());
         readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
-    }
-
-    private void saveData(ReadingData readingData) {
-        saveToDisk(readingData);
     }
 
     private void saveToDisk(ReadingData readingData) {
@@ -302,6 +313,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         readingDataRealm.setTimestamp(calendar.getTimeInMillis());
         readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
         readingDataRealm.setUnit(sensorData.getUnit());
+        readingDataRealm.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
 
         if (uploadedImage) {
             readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);
@@ -318,7 +330,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private void updateList(ReadingDataRealm dataRealm) {
         if (readingListAdapter != null) {
             readingListAdapter.addElement(dataRealm);
-            readingListAdapter.notifyItemInserted(0);
             readingList.scrollToPosition(0);
         } else {
             setList(dataRealm);
@@ -339,11 +350,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
             @Override
             public void onClick(View v) {
-                mCurrentPhotoPath = "";
-                uploadedReadingUrl = "";
-                imageTaken = false;
-                uploadedImage = false;
-
                 dispatchTakePictureIntent();
                 dialog.dismiss();
             }
@@ -353,10 +359,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
             @Override
             public void onClick(View v) {
-                mCurrentPhotoPath = "";
-                uploadedReadingUrl = "";
-                imageTaken = false;
-                uploadedImage = false;
 
                 Intent pickPhoto = new Intent();
                 if (Build.VERSION.SDK_INT >= 19) {
@@ -431,15 +433,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             try {
                 if (mCurrentPhotoPath != null) {
                     imageTaken = true;
-                    if (NetworkUtilities.isInternet(this)) {
-                        showActivitySpinner();
-                        beginUpload(compressImage(mCurrentPhotoPath));
-//                        photoDone.setVisibility(View.VISIBLE);
-//                        setPic();
-                    } else {
-//                        photoDone.setVisibility(View.INVISIBLE);
-                        //do nothing.
-                    }
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
                 }
@@ -453,15 +446,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 if (path != null) {
                     mCurrentPhotoPath = path;
                     imageTaken = true;
-                    if (NetworkUtilities.isInternet(this)) {
-                        showActivitySpinner();
-                        beginUpload(compressImage(path));
-//                        photoDone.setVisibility(View.VISIBLE);
-//                        setPic();
-                    } else {
-//                        photoDone.setVisibility(View.INVISIBLE);
-//                        showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
-                    }
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
                 }

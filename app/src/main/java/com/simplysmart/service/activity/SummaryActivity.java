@@ -43,6 +43,8 @@ import com.simplysmart.service.service.PhotoUploadService;
 import java.io.File;
 import java.util.ArrayList;
 
+import javax.microedition.khronos.opengles.GL;
+
 import io.realm.RealmList;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,6 +62,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     private RelativeLayout mParentLayout;
     private SummaryListAdapter adapter;
     private boolean allDone = false;
+    private boolean initializeUpload = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +75,12 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        Intent i = new Intent(this, PhotoUploadService.class);
-        startService(i);
+        if(NetworkUtilities.isInternet(this)) {
+            Intent i = new Intent(this, PhotoUploadService.class);
+            i.putExtra(StringConstants.USE_UNIT, true);
+            i.putExtra(StringConstants.UNIT_ID, GlobalData.getInstance().getSelectedUnitId());
+            startService(i);
+        }
 
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
@@ -212,6 +219,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                 supportFinishAfterTransition();
                 return true;
             case R.id.submit:
+                initializeUpload = true;
                 checkAndSubmitData();
                 return true;
             default:
@@ -287,8 +295,10 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         public void onReceive(Context context, Intent intent) {
             allDone= true;
             dismissActivitySpinner();
-            showActivitySpinner("Submitting readings . . .");
-            submitData();
+            if(initializeUpload) {
+                showActivitySpinner("Submitting readings . . .");
+                submitData();
+            }
         }
     };
 }

@@ -73,7 +73,7 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.logo.setTypeface(textTypeface);
             viewHolder.type.setText(type);
             if(position==0){
-                viewHolder.line.setVisibility(View.GONE);
+//                viewHolder.line.setVisibility(View.GONE);
             }
 
         }else{
@@ -94,6 +94,9 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if(imageFound){
                 setPic(viewHolder.photo,image);
                 viewHolder.photo.setAlpha(1.0f);
+            }else {
+                setPic(viewHolder.photo, null);
+                viewHolder.photo.setAlpha(0.4f);
             }
 
             viewHolder.edit.setOnClickListener(new View.OnClickListener() {
@@ -119,10 +122,10 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private void setPic(ImageView view, File image) {
         view.setVisibility(View.VISIBLE);
         Picasso.with(mContext).load(image)
-                .placeholder(R.drawable.ic_menu_slideshow)
+                .placeholder(R.drawable.photo_default)
                 .noFade()
                 .resize(32,32)
-                .error(R.drawable.ic_menu_slideshow).into(view);
+                .error(R.drawable.photo_default).into(view);
 
     }
 

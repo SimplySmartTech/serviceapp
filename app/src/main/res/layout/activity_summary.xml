@@ -2,10 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/parentLayout"
-    android:orientation="vertical"
-    android:background="@color/bw_color_white"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/toolbar_Layout"
@@ -24,12 +23,11 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/summary"
-        android:layout_below="@id/toolbar_Layout"
-        android:divider="@color/bw_color_light_gray"
-        android:dividerHeight="1dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_Layout"
+        android:layout_marginBottom="8dp" />
 
-    <include layout="@layout/custom_error_layout"/>
+    <include layout="@layout/custom_error_layout" />
 
 </RelativeLayout>
