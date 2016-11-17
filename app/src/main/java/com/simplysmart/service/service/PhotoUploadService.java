@@ -75,11 +75,13 @@ public class PhotoUploadService extends Service {
 //        Log.d("TAG","Reached photo upload service.");
         transferUtility = Util.getTransferUtility(getApplicationContext());
         try {
-            boolean useUnitId = intent.getBooleanExtra(StringConstants.USE_UNIT, false);
-            if (useUnitId) {
-                uploadImage(intent.getStringExtra(StringConstants.UNIT_ID));
-            } else {
-                uploadImage();
+            if(intent!=null && intent.getExtras()!=null) {
+                boolean useUnitId = intent.getBooleanExtra(StringConstants.USE_UNIT, false);
+                if (useUnitId) {
+                    uploadImage(intent.getStringExtra(StringConstants.UNIT_ID));
+                } else {
+                    uploadImage();
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -118,6 +120,8 @@ public class PhotoUploadService extends Service {
         for (ReadingDataRealm reading : readingsList) {
             if (reading.getLocal_photo_url()!=null && !reading.getLocal_photo_url().equals("")) {
                 beginUpload(reading);
+            }else{
+                sendUploadCompleteBroadcast();
             }
         }
     }

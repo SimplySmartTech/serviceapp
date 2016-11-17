@@ -1,14 +1,18 @@
 package com.simplysmart.service.activity;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -46,6 +50,7 @@ import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.SensorData;
+import com.simplysmart.service.permission.MarshmallowPermission;
 import com.simplysmart.service.service.PhotoUploadService;
 import com.squareup.picasso.Picasso;
 
@@ -67,6 +72,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class InputFormActivity extends BaseActivity implements EditDialog.EditDialogListener {
+
+    private static final int PERMISSION_REQUEST_INTERNET = 0;
+    private static final int PERMISSION_EXTERNAL_STORAGE = 1;
+    private static final int PERMISSION_CAMERA = 2;
 
     private static final String TAG = "InputFormActivity";
     private final int REQUEST_TAKE_PHOTO = 1;
@@ -182,6 +191,43 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             readingListAdapter.notifyItemChanged(position);
         }
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        if (requestCode == PERMISSION_CAMERA) {
+            // Request for Internet permission.
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission has been granted. Start Internet preview Activity.
+                Snackbar.make(mParentLayout, "Camera permission was granted.",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+                dispatchTakePictureIntent();
+            } else {
+                // Permission request was denied.
+                Snackbar.make(mParentLayout, "Camera permission request was denied.",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+        }
+
+        if (requestCode == PERMISSION_EXTERNAL_STORAGE) {
+            // Request for Internet permission.
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission has been granted. Start Internet preview Activity.
+                Snackbar.make(mParentLayout, "External storage permission was granted.",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            } else {
+                // Permission request was denied.
+                Snackbar.make(mParentLayout, "External Storage permission request was denied.",
+                        Snackbar.LENGTH_SHORT)
+                        .show();
+            }
+        }
+
+    }
+
 
     private void bindViews() {
         mParentLayout = (LinearLayout) findViewById(R.id.parentLayout);
@@ -350,7 +396,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
             @Override
             public void onClick(View v) {
-                dispatchTakePictureIntent();
+                checkCamera();
+//                dispatchTakePictureIntent();
                 dialog.dismiss();
             }
         });
@@ -384,6 +431,34 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         dialog.show();
     }
 
+    private void checkCamera() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is already available, start Internet preview
+            Snackbar.make(mParentLayout,
+                    "Camera permission is available.",
+                    Snackbar.LENGTH_SHORT).show();
+            dispatchTakePictureIntent();
+        } else {
+            new MarshmallowPermission(InputFormActivity.this, mParentLayout).checkPermissionForCamera();
+        }
+    }
+
+    private void checkExternalStorage() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is already available, start Internet preview
+            Snackbar.make(mParentLayout,
+                    "WRITE_EXTERNAL_STORAGE permission is available.",
+                    Snackbar.LENGTH_SHORT).show();
+
+        } else {
+            new MarshmallowPermission(InputFormActivity.this, mParentLayout).checkPermissionForExternalStorage();
+        }
+    }
+
     private void dispatchTakePictureIntent() {
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -404,12 +479,14 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
+
+        checkExternalStorage();
+
         File storageDir = new File(Environment.getExternalStorageDirectory(), StringConstants.STORAGE_DIRECTORY);
 
         if (!storageDir.exists()) {
             storageDir.mkdirs();
         }
-
         image = File.createTempFile(imageFileName, ".jpg", storageDir);
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
