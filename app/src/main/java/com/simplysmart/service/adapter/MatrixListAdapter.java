@@ -139,7 +139,8 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder.sensorName.setText("");
         }
 
-        if(groupPosition==matrixData.size() && isLastChild){
+
+        if(isLastChild){
             holder.bottomSeparator.setVisibility(View.VISIBLE);
         }else {
             holder.bottomSeparator.setVisibility(View.GONE);
@@ -167,6 +168,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
     }
 
     private static class GroupHolder {
+        private View separator;
         private TextView typeName;
         private TextView iconLabel;
         private ImageView clickArrow;

@@ -11,17 +11,6 @@
     <!--android:layout_height=".5dp"-->
     <!--android:background="@color/bw_color_dark_gray" />-->
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:background="@color/bw_color_white"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:paddingStart="0dp"
-        android:paddingTop="0dp">
 
         <!--<ImageView-->
         <!--android:id="@+id/checkDoneImage"-->
@@ -32,22 +21,34 @@
         <!--android:visibility="gone"-->
         <!--android:src="@drawable/tick_grey" />-->
 
+    <LinearLayout
+        android:background="@color/bw_color_white"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/sensorName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             android:ellipsize="end"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:gravity="start|center_vertical"
             android:maxLines="1"
             android:text="Weight Sensor"
             android:textSize="16sp" />
+
+        <View
+            android:visibility="gone"
+            android:id="@+id/bottomSeparator"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"/>
+
     </LinearLayout>
 
-    <View
-        android:id="@+id/bottomSeparator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="16dp"
-        android:visibility="visible" />
+
 </LinearLayout>

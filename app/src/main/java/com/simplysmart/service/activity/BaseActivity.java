@@ -397,15 +397,19 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public static boolean deleteFile(File file) {
         boolean deletedAll = true;
-        if (file != null) {
-            if (file.isDirectory()) {
-                String[] children = file.list();
-                for (int i = 0; i < children.length; i++) {
-                    deletedAll = deleteFile(new File(file, children[i])) && deletedAll;
+        try {
+            if (file != null) {
+                if (file.isDirectory()) {
+                    String[] children = file.list();
+                    for (int i = 0; i < children.length; i++) {
+                        deletedAll = deleteFile(new File(file, children[i])) && deletedAll;
+                    }
+                } else {
+                    deletedAll = file.delete();
                 }
-            } else {
-                deletedAll = file.delete();
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
         return deletedAll;
