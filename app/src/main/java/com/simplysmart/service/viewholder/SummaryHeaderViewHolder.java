@@ -13,11 +13,9 @@ import com.simplysmart.service.R;
 public class SummaryHeaderViewHolder extends RecyclerView.ViewHolder {
 
     public TextView logo,type;
-    public View line;
     public SummaryHeaderViewHolder(View itemView) {
         super(itemView);
         logo = (TextView)itemView.findViewById(R.id.logo);
         type = (TextView)itemView.findViewById(R.id.type);
-        line = itemView.findViewById(R.id.topSeparator);
     }
 }

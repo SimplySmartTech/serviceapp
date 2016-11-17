@@ -6,6 +6,7 @@
 
     <color name="bw_color_white">#FFFFFF</color>
     <color name="bw_color_black">#303030</color>
+    <color name="bw_color_very_light_grey">#FFE0DFDF</color>
     <color name="bw_color_light_gray">#d0d0d0</color>
     <color name="bw_color_dark_red">#FF3300</color>
     <color name="bw_color_red">#FF3333</color>

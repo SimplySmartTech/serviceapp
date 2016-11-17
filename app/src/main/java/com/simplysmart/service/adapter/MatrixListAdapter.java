@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -77,9 +78,9 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder = new GroupHolder();
             convertView = inflater.inflate(R.layout.matrix_list_row_parent, parent, false);
             holder.typeName = (TextView) convertView.findViewById(R.id.typeName);
-            holder.iconLabel = (TextView) convertView.findViewById(R.id.iconLabel);
-            holder.clickArrow = (ImageView) convertView.findViewById(R.id.clickArrow);
-            holder.topSeparator = (View)convertView.findViewById(R.id.topSeparator);
+//            holder.iconLabel = (TextView) convertView.findViewById(R.id.iconLabel);
+//            holder.clickArrow = (ImageView) convertView.findViewById(R.id.clickArrow);
+//            holder.topSeparator = (View)convertView.findViewById(R.id.topSeparator);
             convertView.setTag(holder);
         } else {
             holder = (GroupHolder) convertView.getTag();
@@ -91,25 +92,28 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder.typeName.setText("");
         }
 
-        if (isExpanded) {
-            holder.clickArrow.setImageResource(R.drawable.gal_ic_arrow_up);
-            holder.iconLabel.setTextColor(mContext.getResources().getColor(R.color.accent));
-            holder.typeName.setTextColor(mContext.getResources().getColor(R.color.accent));
-            holder.topSeparator.setVisibility(View.VISIBLE);
-        } else {
-            holder.clickArrow.setImageResource(R.drawable.gal_ic_arrow_down);
-            holder.iconLabel.setTextColor(mContext.getResources().getColor(R.color.bw_color_black));
-            holder.typeName.setTextColor(mContext.getResources().getColor(R.color.bw_color_black));
-            holder.topSeparator.setVisibility(View.GONE);
-        }
+        ExpandableListView mExpandableListView = (ExpandableListView) parent;
+        mExpandableListView.expandGroup(groupPosition);
 
-        if (matrixData.get(groupPosition).getIcon() != null && !matrixData.get(groupPosition).getIcon().equalsIgnoreCase("")) {
-            String unicode = "&#x" + matrixData.get(groupPosition).getIcon() + ";";
-            holder.iconLabel.setText(Html.fromHtml(unicode));
-            holder.iconLabel.setTypeface(textTypeface);
-        } else {
-            holder.iconLabel.setText("");
-        }
+//        if (isExpanded) {
+//            holder.clickArrow.setImageResource(R.drawable.gal_ic_arrow_up);
+//            holder.iconLabel.setTextColor(mContext.getResources().getColor(R.color.accent));
+//            holder.typeName.setTextColor(mContext.getResources().getColor(R.color.accent));
+//            holder.topSeparator.setVisibility(View.VISIBLE);
+//        } else {
+//            holder.clickArrow.setImageResource(R.drawable.gal_ic_arrow_down);
+//            holder.iconLabel.setTextColor(mContext.getResources().getColor(R.color.bw_color_black));
+//            holder.typeName.setTextColor(mContext.getResources().getColor(R.color.bw_color_black));
+//            holder.topSeparator.setVisibility(View.GONE);
+//        }
+
+//        if (matrixData.get(groupPosition).getIcon() != null && !matrixData.get(groupPosition).getIcon().equalsIgnoreCase("")) {
+//            String unicode = "&#x" + matrixData.get(groupPosition).getIcon() + ";";
+//            holder.iconLabel.setText(Html.fromHtml(unicode));
+//            holder.iconLabel.setTypeface(textTypeface);
+//        } else {
+//            holder.iconLabel.setText("");
+//        }
 
         return convertView;
     }
@@ -122,7 +126,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder = new ChildHolder();
             convertView = inflater.inflate(R.layout.matrix_list_row_child, parent, false);
             holder.sensorName = (TextView) convertView.findViewById(R.id.sensorName);
-            holder.checkDoneImage = (ImageView) convertView.findViewById(R.id.checkDoneImage);
+//            holder.checkDoneImage = (ImageView) convertView.findViewById(R.id.checkDoneImage);
             holder.bottomSeparator = (View) convertView.findViewById(R.id.bottomSeparator);
             convertView.setTag(holder);
         } else {
@@ -135,17 +139,17 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder.sensorName.setText("");
         }
 
-        if(isLastChild){
+        if(groupPosition==matrixData.size() && isLastChild){
             holder.bottomSeparator.setVisibility(View.VISIBLE);
         }else {
             holder.bottomSeparator.setVisibility(View.GONE);
         }
 
-        if (matrixData.get(groupPosition).getSensors().get(childPosition).isChecked()) {
-            holder.checkDoneImage.setImageResource(R.drawable.tick_green);
-        } else {
-            holder.checkDoneImage.setImageResource(R.drawable.tick_grey);
-        }
+//        if (matrixData.get(groupPosition).getSensors().get(childPosition).isChecked()) {
+//            holder.checkDoneImage.setImageResource(R.drawable.tick_green);
+//        } else {
+//            holder.checkDoneImage.setImageResource(R.drawable.tick_grey);
+//        }
 
         return convertView;
     }

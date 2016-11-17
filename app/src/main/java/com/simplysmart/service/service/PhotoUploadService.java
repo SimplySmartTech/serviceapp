@@ -72,7 +72,7 @@ public class PhotoUploadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
 //        Toast.makeText(getApplicationContext(), "Network Available : UploadingPhoto", Toast.LENGTH_LONG).show();
-        Log.d("TAG","Reached photo upload service.");
+//        Log.d("TAG","Reached photo upload service.");
         transferUtility = Util.getTransferUtility(getApplicationContext());
         try {
             boolean useUnitId = intent.getBooleanExtra(StringConstants.USE_UNIT, false);
@@ -91,7 +91,7 @@ public class PhotoUploadService extends Service {
 
     private void uploadImage() {
         //TODO : Remove toast.
-        Toast.makeText(getApplicationContext(), "Network Available : uploadImage", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), "Network Available : uploadImage", Toast.LENGTH_LONG).show();
         Realm realm = Realm.getDefaultInstance();
         RealmResults<ReadingDataRealm> readingsList = realm
                 .where(ReadingDataRealm.class)
@@ -107,7 +107,7 @@ public class PhotoUploadService extends Service {
 
     private void uploadImage(String unit_id) {
         //TODO : Remove toast.
-        Toast.makeText(getApplicationContext(), "Network Available : uploadImage", Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), "Network Available : uploadImage", Toast.LENGTH_LONG).show();
         Realm realm = Realm.getDefaultInstance();
         RealmResults<ReadingDataRealm> readingsList = realm
                 .where(ReadingDataRealm.class)

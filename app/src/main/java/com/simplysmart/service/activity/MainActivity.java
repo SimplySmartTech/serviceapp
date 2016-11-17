@@ -439,15 +439,22 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+        matrixList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
-            public void onGroupExpand(int groupPosition) {
-                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
-                    matrixList.collapseGroup(lastExpandedPosition);
-                }
-                lastExpandedPosition = groupPosition;
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                return true;
             }
         });
+
+//        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+//            @Override
+//            public void onGroupExpand(int groupPosition) {
+//                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
+//                    matrixList.collapseGroup(lastExpandedPosition);
+//                }
+//                lastExpandedPosition = groupPosition;
+//            }
+//        });
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
