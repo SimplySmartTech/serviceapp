@@ -86,7 +86,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
         }
 
         if (matrixData.get(groupPosition).getType() != null) {
-            holder.typeName.setText(matrixData.get(groupPosition).getType().toUpperCase());
+            holder.typeName.setText(matrixData.get(groupPosition).getType());
         } else {
             holder.typeName.setText("");
         }

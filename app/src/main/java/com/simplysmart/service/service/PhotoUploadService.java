@@ -74,11 +74,15 @@ public class PhotoUploadService extends Service {
 //        Toast.makeText(getApplicationContext(), "Network Available : UploadingPhoto", Toast.LENGTH_LONG).show();
         Log.d("TAG","Reached photo upload service.");
         transferUtility = Util.getTransferUtility(getApplicationContext());
-        boolean useUnitId = intent.getBooleanExtra(StringConstants.USE_UNIT,false);
-        if(useUnitId) {
-            uploadImage(intent.getStringExtra(StringConstants.UNIT_ID));
-        }else{
-            uploadImage();
+        try {
+            boolean useUnitId = intent.getBooleanExtra(StringConstants.USE_UNIT, false);
+            if (useUnitId) {
+                uploadImage(intent.getStringExtra(StringConstants.UNIT_ID));
+            } else {
+                uploadImage();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
         return super.onStartCommand(intent, flags, startId);

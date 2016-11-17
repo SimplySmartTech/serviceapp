@@ -86,8 +86,8 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 imageFound = false;
             }
 
-            viewHolder.sensorName.setText(summary.getName().toUpperCase());
-            viewHolder.sensorValue.setText(summary.getValue().toUpperCase());
+            viewHolder.sensorName.setText(summary.getName());
+            viewHolder.sensorValue.setText(summary.getValue());
             viewHolder.time.setText(summary.getTime());
             final long time = summary.getTimestamp();
 

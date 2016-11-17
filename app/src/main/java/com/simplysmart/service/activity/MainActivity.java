@@ -5,15 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -25,7 +20,6 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -37,6 +31,7 @@ import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
+import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.MatrixData;
@@ -47,15 +42,12 @@ import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.RunnableFuture;
 
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
-import io.realm.internal.IOException;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -68,6 +60,9 @@ public class MainActivity extends BaseActivity {
     private MatrixListAdapter matrixListAdapter;
     private MatrixResponse matrixResponse;
     private int lastExpandedPosition = -1;
+    private NavigationView navigationView;
+    private DrawerLayout drawer;
+    private Toolbar toolbar;
 
     private boolean savedToDisk = false;
     private ArrayList<MatrixData> adapterData;
@@ -82,24 +77,11 @@ public class MainActivity extends BaseActivity {
 
         getUserInfo();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setTitle("Service");
 
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        setDataInHeader(navigationView);
-
-        Menu menu = navigationView.getMenu();
-        units = GlobalData.getInstance().getUnits();
-        for (int i = 0; i < units.size(); i++) {
-            menu.add(i, i, i, units.get(i).getName().toUpperCase());
-        }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 
@@ -148,30 +130,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                drawer.closeDrawers();
-                int id = item.getItemId();
-                Unit unit = units.get(id);
-                uncheckAllMenuItems(navigationView);
-                item.setChecked(true);
-                GlobalData.getInstance().setSelectedUnitId(unit.getId());
-                if (NetworkUtilities.isInternet(getApplicationContext())) {
-                    swipeRefreshLayout.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            swipeRefreshLayout.setRefreshing(true);
-                            getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
-                        }
-                    });
-                } else {
-                    setOfflineData(Realm.getDefaultInstance());
-                }
-                return true;
-            }
-        });
 
 
     }
@@ -224,11 +182,11 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void refreshLayout(){
-        if(NetworkUtilities.isInternet(this)) {
+    public void refreshLayout() {
+        if (NetworkUtilities.isInternet(this)) {
             swipeRefreshLayout.setRefreshing(true);
             getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
-        }else {
+        } else {
             swipeRefreshLayout.setRefreshing(true);
             setOfflineData(Realm.getDefaultInstance());
         }
@@ -472,9 +430,56 @@ public class MainActivity extends BaseActivity {
         String jsonAccessPolicy = UserInfo.getString("access_policy", "");
         AccessPolicy policy = gson.fromJson(jsonAccessPolicy, AccessPolicy.class);
 
-        GlobalData.getInstance().setUnits(residentData.getUnits());
-        GlobalData.getInstance().setSelectedUnitId(residentData.getUnits().get(0).getId());
+        if (residentData.getUnits() != null && residentData.getUnits().size() > 0) {
+            GlobalData.getInstance().setUnits(residentData.getUnits());
+            GlobalData.getInstance().setSelectedUnitId(residentData.getUnits().get(0).getId());
+            setDataInNavigationView();
+        } else {
+            AlertDialogStandard.newInstance(getString(R.string.app_name), "No data found for this user.", "", "CLOSE")
+                    .show(getFragmentManager(), "noDataFound");
+        }
         GlobalData.getInstance().setAccessPolicy(policy);
+    }
+
+    private void setDataInNavigationView() {
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        setDataInHeader(navigationView);
+
+        Menu menu = navigationView.getMenu();
+        units = GlobalData.getInstance().getUnits();
+        for (int i = 0; i < units.size(); i++) {
+            menu.add(i, i, i, units.get(i).getName().toUpperCase());
+        }
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                drawer.closeDrawers();
+                int id = item.getItemId();
+                Unit unit = units.get(id);
+                uncheckAllMenuItems(navigationView);
+                item.setChecked(true);
+                GlobalData.getInstance().setSelectedUnitId(unit.getId());
+                if (NetworkUtilities.isInternet(getApplicationContext())) {
+                    swipeRefreshLayout.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(true);
+                            getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+                        }
+                    });
+                } else {
+                    setOfflineData(Realm.getDefaultInstance());
+                }
+                return true;
+            }
+        });
+
     }
 
     private void setPic(ImageView view, String image) {

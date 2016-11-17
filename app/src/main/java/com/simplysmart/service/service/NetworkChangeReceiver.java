@@ -19,6 +19,7 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
         if (checkInternet(context)) {
             Intent i = new Intent(context, PhotoUploadService.class);
+            i.putExtra(StringConstants.USE_UNIT,false);
             context.startService(i);
         }
     }
