@@ -371,9 +371,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void logout(){
-        for(int i =0; i< GlobalData.getInstance().getUnits().size();i++){
-            removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
+        if(GlobalData.getInstance().getUnits()!=null && GlobalData.getInstance().getUnits().size()>0) {
+            for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
+                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
+            }
         }
+
         handleAuthorizationFailed();
     }
 

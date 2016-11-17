@@ -60,9 +60,6 @@ public class MainActivity extends BaseActivity {
     private MatrixListAdapter matrixListAdapter;
     private MatrixResponse matrixResponse;
     private int lastExpandedPosition = -1;
-    private NavigationView navigationView;
-    private DrawerLayout drawer;
-    private Toolbar toolbar;
 
     private boolean savedToDisk = false;
     private ArrayList<MatrixData> adapterData;
@@ -76,62 +73,6 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         getUserInfo();
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setTitle("Service");
-
-
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-
-        no_data_found = (TextView) findViewById(R.id.no_data_found);
-        matrixList = (ExpandableListView) findViewById(R.id.matrixList);
-
-        if (NetworkUtilities.isInternet(this)) {
-            swipeRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipeRefreshLayout.setRefreshing(true);
-                    getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
-                }
-            });
-        } else {
-            setOfflineData(Realm.getDefaultInstance());
-        }
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshLayout();
-            }
-        });
-
-        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
-                intent.putExtra("SENSOR_DATA", adapterData.get(groupPosition).getSensors().get(childPosition));
-                intent.putExtra("groupPosition", groupPosition);
-                intent.putExtra("childPosition", childPosition);
-                startActivity(intent);
-                return true;
-            }
-        });
-
-        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
-                    matrixList.collapseGroup(lastExpandedPosition);
-                }
-                lastExpandedPosition = groupPosition;
-            }
-        });
-
-
-
     }
 
 
@@ -433,7 +374,7 @@ public class MainActivity extends BaseActivity {
         if (residentData.getUnits() != null && residentData.getUnits().size() > 0) {
             GlobalData.getInstance().setUnits(residentData.getUnits());
             GlobalData.getInstance().setSelectedUnitId(residentData.getUnits().get(0).getId());
-            setDataInNavigationView();
+            initializeRemainingStuff();
         } else {
             AlertDialogStandard.newInstance(getString(R.string.app_name), "No data found for this user.", "", "CLOSE")
                     .show(getFragmentManager(), "noDataFound");
@@ -441,7 +382,17 @@ public class MainActivity extends BaseActivity {
         GlobalData.getInstance().setAccessPolicy(policy);
     }
 
-    private void setDataInNavigationView() {
+    private void initializeRemainingStuff() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setTitle("Service");
+
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         setDataInHeader(navigationView);
 
@@ -451,10 +402,53 @@ public class MainActivity extends BaseActivity {
             menu.add(i, i, i, units.get(i).getName().toUpperCase());
         }
 
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
+
+        no_data_found = (TextView) findViewById(R.id.no_data_found);
+        matrixList = (ExpandableListView) findViewById(R.id.matrixList);
+
+        if (NetworkUtilities.isInternet(this)) {
+            swipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(true);
+                    getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+                }
+            });
+        } else {
+            setOfflineData(Realm.getDefaultInstance());
+        }
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshLayout();
+            }
+        });
+
+        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+
+                Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
+                intent.putExtra("SENSOR_DATA", adapterData.get(groupPosition).getSensors().get(childPosition));
+                intent.putExtra("groupPosition", groupPosition);
+                intent.putExtra("childPosition", childPosition);
+                startActivity(intent);
+                return true;
+            }
+        });
+
+        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
+                    matrixList.collapseGroup(lastExpandedPosition);
+                }
+                lastExpandedPosition = groupPosition;
+            }
+        });
+
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -479,6 +473,7 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
+
 
     }
 

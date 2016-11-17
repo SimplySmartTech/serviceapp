@@ -11,15 +11,16 @@ import java.util.ArrayList;
 
 public class MatrixResponse implements Parcelable {
 
-    private ArrayList<MatrixData> data;
+    private ArrayList<MatrixData> metrics;
+    private ArrayList<TareWeight> tare_weights;
 
     protected MatrixResponse(Parcel in) {
-        data = in.createTypedArrayList(MatrixData.CREATOR);
+        metrics = in.createTypedArrayList(MatrixData.CREATOR);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(data);
+        dest.writeTypedList(metrics);
     }
 
     @Override
@@ -40,10 +41,10 @@ public class MatrixResponse implements Parcelable {
     };
 
     public ArrayList<MatrixData> getData() {
-        return data;
+        return metrics;
     }
 
     public void setData(ArrayList<MatrixData> data) {
-        this.data = data;
+        this.metrics = data;
     }
 }
