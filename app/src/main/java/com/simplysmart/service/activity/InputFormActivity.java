@@ -546,6 +546,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             try {
                 if (mCurrentPhotoPath != null) {
+                    Log.d("CameraPhoto",mCurrentPhotoPath);
                     imageTaken = true;
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
