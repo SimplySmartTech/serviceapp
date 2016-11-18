@@ -408,7 +408,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private void saveToDisk(ReadingData readingData) {
 
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh-mm aa");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm aa",Locale.getDefault());
         String time = simpleDateFormat.format(calendar.getTimeInMillis());
 
         Realm realm = Realm.getDefaultInstance();
