@@ -22,9 +22,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +48,7 @@ import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingDialog;
 import com.simplysmart.service.endpint.ApiInterface;
@@ -68,9 +72,12 @@ import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static android.view.View.GONE;
 
 public class InputFormActivity extends BaseActivity implements EditDialog.EditDialogListener {
 
@@ -84,12 +91,14 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private EditText mInputReadingValue;
     private TextView unit, submitForm, titleList;
     private ImageView uploadImage;
+    private Spinner tareWeightSpinner;
     //    private ImageView photoDone;
     private View middleLine;
 
     private RecyclerView readingList;
 
     private String uploadedReadingUrl = "";
+    private String tare_weight="";
 
     private SensorData sensorData;
     private int groupPosition;
@@ -100,6 +109,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private boolean uploadedImage = false;
 
     private ReadingListAdapter readingListAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +208,9 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         submitForm = (TextView) findViewById(R.id.submit);
         readingList = (RecyclerView) findViewById(R.id.readingList);
         middleLine = findViewById(R.id.middleSeparator);
+        tareWeightSpinner = (Spinner)findViewById(R.id.tare_weight_spinner);
         unit.setText(sensorData.getUnit());
+
 
     }
 
@@ -264,8 +276,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             uploadImage.setVisibility(View.VISIBLE);
             middleLine.setVisibility(View.VISIBLE);
         } else {
-            uploadImage.setVisibility(View.GONE);
-            middleLine.setVisibility(View.GONE);
+            uploadImage.setVisibility(GONE);
+            middleLine.setVisibility(GONE);
         }
 
         uploadImage.setOnClickListener(new View.OnClickListener() {
@@ -274,6 +286,38 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 customImagePicker();
             }
         });
+
+        ArrayList<String> tareWeights = new ArrayList<>();
+        final RealmResults<TareWeightRealm> tareWeightsList = TareWeightRealm.getTareWeights(GlobalData.getInstance().getSelectedUnitId());
+        if(tareWeightsList.size()>0) {
+            for (int i = 0; i < tareWeightsList.size(); i++) {
+                TareWeightRealm item = tareWeightsList.get(i);
+                tareWeights.add(item.getName()+ " ("+item.getValue()+")");
+            }
+        }
+
+        if(sensorData.getSensor_name().trim().equalsIgnoreCase("net weight")) {
+
+            ArrayAdapter<String> tareWeightAdapter = new ArrayAdapter<String>(InputFormActivity.this, android.R.layout.simple_spinner_item, tareWeights);
+            tareWeightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            tareWeightSpinner.setAdapter(tareWeightAdapter);
+
+            tareWeightSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    tare_weight = tareWeightsList.get(position).getValue();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    tare_weight = tareWeightsList.get(0).getValue();
+                }
+            });
+
+        }else{
+            tareWeightSpinner.setVisibility(View.GONE);
+            tare_weight = "";
+        }
 
         submitForm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -288,6 +332,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         readingData.setValue(mInputReadingValue.getText().toString());
                         readingData.setPhotographic_evidence_url(uploadedReadingUrl);
                         readingData.setSensor_name(sensorData.getSensor_name());
+                        readingData.setTare_weight(tare_weight);
                         saveToDisk(readingData);
 
                         mInputReadingValue.setText("");
@@ -311,7 +356,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         readingData.setValue(mInputReadingValue.getText().toString());
                         readingData.setPhotographic_evidence_url(uploadedReadingUrl);
                         readingData.setSensor_name(sensorData.getSensor_name());
-
                         saveToDisk(readingData);
 
                         mInputReadingValue.setText("");
@@ -378,6 +422,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
         readingDataRealm.setUnit(sensorData.getUnit());
         readingDataRealm.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
+        readingDataRealm.setTare_weight(tare_weight);
 
         if (uploadedImage) {
             readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);

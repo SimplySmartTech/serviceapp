@@ -1,14 +1,52 @@
 package com.simplysmart.service.model.matrix;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.RequiresPermission;
+
 /**
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class Reading {
+public class Reading implements Parcelable{
     private String tare_weight;
     private String value;
     private String photographic_evidence_url;
     private long timestamp;
+
+    public Reading(){}
+
+    protected Reading(Parcel in) {
+        tare_weight = in.readString();
+        value = in.readString();
+        photographic_evidence_url = in.readString();
+        timestamp = in.readLong();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(tare_weight);
+        dest.writeString(value);
+        dest.writeString(photographic_evidence_url);
+        dest.writeLong(timestamp);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Reading> CREATOR = new Creator<Reading>() {
+        @Override
+        public Reading createFromParcel(Parcel in) {
+            return new Reading(in);
+        }
+
+        @Override
+        public Reading[] newArray(int size) {
+            return new Reading[size];
+        }
+    };
 
     public String getValue() {
         return value;
@@ -32,5 +70,13 @@ public class Reading {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getTare_weight() {
+        return tare_weight;
+    }
+
+    public void setTare_weight(String tare_weight) {
+        this.tare_weight = tare_weight;
     }
 }

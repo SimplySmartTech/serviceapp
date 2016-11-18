@@ -24,6 +24,7 @@ public class ReadingDataRealm extends RealmObject {
     private String local_photo_url;
     private String date;
     private String unit;
+    private String tare_weight;
     private long timestamp;
     private String unit_id;
     private boolean uploadedImage;
@@ -159,5 +160,13 @@ public class ReadingDataRealm extends RealmObject {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public String getTare_weight() {
+        return tare_weight;
+    }
+
+    public void setTare_weight(String tare_weight) {
+        this.tare_weight = tare_weight;
     }
 }

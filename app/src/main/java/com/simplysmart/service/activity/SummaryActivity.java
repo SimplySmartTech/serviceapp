@@ -139,6 +139,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                                 reading.setValue(rdr.getValue());
                                 reading.setPhotographic_evidence_url(rdr.getPhotographic_evidence_url());
                                 reading.setTimestamp(rdr.getTimestamp());
+                                reading.setTare_weight(rdr.getTare_weight());
                                 readings.add(reading);
                                 if(!rdr.isUploadedImage()){
                                     count++;

@@ -14,13 +14,16 @@ public class MatrixResponse implements Parcelable {
     private ArrayList<MatrixData> metrics;
     private ArrayList<TareWeight> tare_weights;
 
+
     protected MatrixResponse(Parcel in) {
         metrics = in.createTypedArrayList(MatrixData.CREATOR);
+        tare_weights = in.createTypedArrayList(TareWeight.CREATOR);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(metrics);
+        dest.writeTypedList(tare_weights);
     }
 
     @Override
@@ -47,4 +50,13 @@ public class MatrixResponse implements Parcelable {
     public void setData(ArrayList<MatrixData> data) {
         this.metrics = data;
     }
+
+    public ArrayList<TareWeight> getTare_weights() {
+        return tare_weights;
+    }
+
+    public void setTare_weights(ArrayList<TareWeight> tare_weights) {
+        this.tare_weights = tare_weights;
+    }
+
 }

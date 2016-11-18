@@ -24,6 +24,7 @@ public class GlobalData extends Application {
     private String userId;
     private String role_code;
     private String selectedUnitId;
+    private String selectedUnit;
 
     private ArrayList<Unit> units;
     private AccessPolicy accessPolicy;
@@ -106,6 +107,14 @@ public class GlobalData extends Application {
 
     public void setSelectedUnitId(String selectedUnitId) {
         this.selectedUnitId = selectedUnitId;
+    }
+
+    public String getSelectedUnit() {
+        return selectedUnit;
+    }
+
+    public void setSelectedUnit(String selectedUnit) {
+        this.selectedUnit = selectedUnit;
     }
 
     public static GlobalData getInstance() {

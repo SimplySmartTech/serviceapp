@@ -1,17 +1,13 @@
 package com.simplysmart.service.activity;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -35,6 +31,7 @@ import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
+import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.endpint.ApiInterface;
@@ -43,10 +40,10 @@ import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.matrix.SensorData;
+import com.simplysmart.service.model.matrix.TareWeight;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
-import com.simplysmart.service.permission.MarshmallowPermission;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -60,7 +57,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements LogoutListener {
-
 
 
     private TextView no_data_found;
@@ -84,8 +80,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         getUserInfo();
 
     }
-
-
 
     @Override
     protected void onStart() {
@@ -126,15 +120,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 startActivity(intent);
                 break;
             case R.id.logout:
-                AlertDialogLogout.newInstance("Logout","Do you want to logout?","No","Logout")
-                        .show(getFragmentManager(),"logout");
+                AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
+                        .show(getFragmentManager(), "logout");
                 break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 
     public void refreshLayout() {
@@ -220,6 +213,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     //Set matrix data to list
     private void setMatrixData(MatrixResponse response) {
         ArrayList<MatrixData> matrixDataArrayList = response.getData();
+        ArrayList<TareWeight> tareWeights = response.getTare_weights();
         try {
             Realm realm = Realm.getDefaultInstance();
             for (int i = 0; i < matrixDataArrayList.size(); i++) {
@@ -256,6 +250,19 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                     realm.commitTransaction();
                 }
             }
+
+            if (tareWeights != null && tareWeights.size() > 0) {
+                TareWeightRealm.deleteAll();
+                for (int i = 0; i < tareWeights.size(); i++) {
+                    TareWeight tareWeight = tareWeights.get(i);
+                    TareWeightRealm tareWeightRealm;
+
+                    realm.beginTransaction();
+                    tareWeightRealm = realm.copyToRealm(new TareWeightRealm(tareWeight, GlobalData.getInstance().getSelectedUnitId()));
+                    realm.commitTransaction();
+                }
+            }
+
             savedToDisk = true;
             setDataInList(realm);
 
@@ -388,6 +395,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         if (residentData.getUnits() != null && residentData.getUnits().size() > 0) {
             GlobalData.getInstance().setUnits(residentData.getUnits());
             GlobalData.getInstance().setSelectedUnitId(residentData.getUnits().get(0).getId());
+            GlobalData.getInstance().setSelectedUnit(residentData.getUnits().get(0).getName());
             initializeRemainingStuff();
         } else {
             AlertDialogStandard.newInstance(getString(R.string.app_name), "No data found for this user.", "", "CLOSE")
@@ -400,7 +408,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setTitle("Service");
+        if (GlobalData.getInstance().getSelectedUnit() != null && GlobalData.getInstance().getSelectedUnit().equals("")) {
+            getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
+        } else {
+            getSupportActionBar().setTitle("Mailhem");
+        }
 
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -480,6 +492,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 uncheckAllMenuItems(navigationView);
                 item.setChecked(true);
                 GlobalData.getInstance().setSelectedUnitId(unit.getId());
+                GlobalData.getInstance().setSelectedUnit(unit.getName());
                 if (NetworkUtilities.isInternet(getApplicationContext())) {
                     swipeRefreshLayout.post(new Runnable() {
                         @Override

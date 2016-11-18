@@ -13,8 +13,7 @@ public class ReadingData implements Parcelable {
     private String sensor_name;
     private String value;
     private String photographic_evidence_url;
-
-
+    private String tare_weight;
 
     public ReadingData(){
     }
@@ -25,6 +24,7 @@ public class ReadingData implements Parcelable {
         sensor_name = in.readString();
         value = in.readString();
         photographic_evidence_url = in.readString();
+        tare_weight = in.readString();
     }
 
     @Override
@@ -34,6 +34,7 @@ public class ReadingData implements Parcelable {
         dest.writeString(sensor_name);
         dest.writeString(value);
         dest.writeString(photographic_evidence_url);
+        dest.writeString(tare_weight);
     }
 
     @Override
@@ -91,5 +92,13 @@ public class ReadingData implements Parcelable {
 
     public void setLocal_id(int local_id) {
         this.local_id = local_id;
+    }
+
+    public String getTare_weight() {
+        return tare_weight;
+    }
+
+    public void setTare_weight(String tare_weight) {
+        this.tare_weight = tare_weight;
     }
 }
