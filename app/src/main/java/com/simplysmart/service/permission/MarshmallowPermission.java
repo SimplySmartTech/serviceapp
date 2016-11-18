@@ -27,21 +27,23 @@ public class MarshmallowPermission {
             // Provide an additional rationale to the user if the permission was not granted
             // and the user would benefit from additional context for the use of the permission.
             // Display a SnackBar with a button to request the missing permission.
-            Snackbar.make(mLayout, "External Storage Access is required.",
-                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Request the permission
-                    ActivityCompat.requestPermissions(context,
-                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            PERMISSION_EXTERNAL_STORAGE);
-                }
-            }).show();
+//            Snackbar.make(mLayout, "External Storage Access is required.",
+//                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    // Request the permission
+//
+//                }
+//            }).show();
+
+            ActivityCompat.requestPermissions(context,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    PERMISSION_EXTERNAL_STORAGE);
 
         } else {
-            Snackbar.make(mLayout,
-                    "Permission is not available. Requesting External Storage permission.",
-                    Snackbar.LENGTH_SHORT).show();
+//            Snackbar.make(mLayout,
+//                    "Permission is not available. Requesting External Storage permission.",
+//                    Snackbar.LENGTH_SHORT).show();
             // Request the permission. The result will be received in onRequestPermissionResult().
             ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSION_EXTERNAL_STORAGE);
@@ -56,21 +58,23 @@ public class MarshmallowPermission {
             // Provide an additional rationale to the user if the permission was not granted
             // and the user would benefit from additional context for the use of the permission.
             // Display a SnackBar with a button to request the missing permission.
-            Snackbar.make(mLayout, "Camera Access is required.",
-                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Request the permission
-                    ActivityCompat.requestPermissions(context,
-                            new String[]{Manifest.permission.CAMERA},
-                            PERMISSION_CAMERA);
-                }
-            }).show();
+//            Snackbar.make(mLayout, "Camera Access is required.",
+//                    Snackbar.LENGTH_INDEFINITE).setAction("OK", new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    // Request the permission
+//
+//                }
+//            }).show();
+
+            ActivityCompat.requestPermissions(context,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSION_CAMERA);
 
         } else {
-            Snackbar.make(mLayout,
-                    "Permission is not available. Requesting Camera access permission.",
-                    Snackbar.LENGTH_SHORT).show();
+//            Snackbar.make(mLayout,
+//                    "Permission is not available. Requesting Camera access permission.",
+//                    Snackbar.LENGTH_SHORT).show();
             // Request the permission. The result will be received in onRequestPermissionResult().
             ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.CAMERA},
                     PERMISSION_CAMERA);

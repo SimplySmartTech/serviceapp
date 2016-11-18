@@ -78,6 +78,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             holder = new GroupHolder();
             convertView = inflater.inflate(R.layout.matrix_list_row_parent, parent, false);
             holder.typeName = (TextView) convertView.findViewById(R.id.typeName);
+            holder.topSeparator = (View) convertView.findViewById(R.id.topSeparator);
 //            holder.iconLabel = (TextView) convertView.findViewById(R.id.iconLabel);
 //            holder.clickArrow = (ImageView) convertView.findViewById(R.id.clickArrow);
 //            holder.topSeparator = (View)convertView.findViewById(R.id.topSeparator);
@@ -91,7 +92,9 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
         } else {
             holder.typeName.setText("");
         }
-
+        if(groupPosition==0){
+            holder.topSeparator.setVisibility(View.GONE);
+        }
         ExpandableListView mExpandableListView = (ExpandableListView) parent;
         mExpandableListView.expandGroup(groupPosition);
 
@@ -127,7 +130,7 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.matrix_list_row_child, parent, false);
             holder.sensorName = (TextView) convertView.findViewById(R.id.sensorName);
 //            holder.checkDoneImage = (ImageView) convertView.findViewById(R.id.checkDoneImage);
-            holder.bottomSeparator = (View) convertView.findViewById(R.id.bottomSeparator);
+//            holder.bottomSeparator = (View) convertView.findViewById(R.id.bottomSeparator);
             convertView.setTag(holder);
         } else {
             holder = (ChildHolder) convertView.getTag();
@@ -140,11 +143,11 @@ public class MatrixListAdapter extends BaseExpandableListAdapter {
         }
 
 
-        if(isLastChild){
-            holder.bottomSeparator.setVisibility(View.VISIBLE);
-        }else {
-            holder.bottomSeparator.setVisibility(View.GONE);
-        }
+//        if(isLastChild){
+//            holder.bottomSeparator.setVisibility(View.GONE);
+//        }else {
+//            holder.bottomSeparator.setVisibility(View.VISIBLE);
+//        }
 
 //        if (matrixData.get(groupPosition).getSensors().get(childPosition).isChecked()) {
 //            holder.checkDoneImage.setImageResource(R.drawable.tick_green);

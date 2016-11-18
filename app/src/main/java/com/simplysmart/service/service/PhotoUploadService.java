@@ -33,6 +33,7 @@ import com.simplysmart.service.activity.InputFormActivity;
 import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.DebugLog;
+import com.simplysmart.service.common.ScalingUtilities;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
@@ -90,6 +91,10 @@ public class PhotoUploadService extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
+    private void sendUploadCompleteBroadcast() {
+        Intent i = new Intent("uploadComplete");
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+    }
 
     private void uploadImage() {
         //TODO : Remove toast.
@@ -127,6 +132,7 @@ public class PhotoUploadService extends Service {
     }
 
     private void beginUpload(ReadingDataRealm readingDataRealm) {
+        Log.d("Local photo url:",readingDataRealm.getLocal_photo_url());
         String filePath = compressImage(readingDataRealm.getLocal_photo_url());
         if (filePath == null) {
 //            Toast.makeText(this, "Could not find the filepath of the selected file", Toast.LENGTH_LONG).show();
@@ -148,11 +154,124 @@ public class PhotoUploadService extends Service {
         }
     }
 
+    class UploadListener implements TransferListener {
+
+        private String fileName;
+        private long timestamp;
+
+        UploadListener(long timestamp, String fileName) {
+            this.fileName = fileName;
+            this.timestamp = timestamp;
+        }
+
+        @Override
+        public void onError(int id, Exception e) {
+            Log.e(TAG, "Error during upload: " + id, e);
+            count--;
+            if(count==0){
+                sendUploadCompleteBroadcast();
+            }
+        }
+
+        @Override
+        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d", id, bytesTotal, bytesCurrent));
+        }
+
+        @Override
+        public void onStateChanged(int id, TransferState newState) {
+            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
+
+            if (newState == TransferState.COMPLETED) {
+
+                String url = AWSConstants.S3_URL
+                        + AWSConstants.BUCKET_NAME + "/"
+                        + AWSConstants.PATH_FOLDER
+                        + fileName;
+
+                DebugLog.d("URL :::: " + url);
+
+                Realm realm = Realm.getDefaultInstance();
+                ReadingDataRealm reading = realm.where(ReadingDataRealm.class).equalTo("timestamp",timestamp).findFirst();
+
+                realm.beginTransaction();
+                reading.setUploadedImage(true);
+                reading.setPhotographic_evidence_url(url);
+                realm.commitTransaction();
+
+                count --;
+                Log.d("COUNT : ", count+"");
+                if(count==0){
+                    sendUploadCompleteBroadcast();
+                }
+
+            }
+        }
+    }
+
+    private String secondCompressMethod(String path) {
+        String strMyImagePath = null;
+        Bitmap scaledBitmap = null;
+
+        try {
+            // Part 1: Decode image
+            Bitmap unscaledBitmap = ScalingUtilities.decodeFile(path, StringConstants.COMRESS_WIDTH, StringConstants.COMPRESS_HEIGHT, ScalingUtilities.ScalingLogic.FIT);
+
+            if (!(unscaledBitmap.getWidth() <= StringConstants.COMRESS_WIDTH && unscaledBitmap.getHeight() <= StringConstants.COMPRESS_HEIGHT)) {
+                // Part 2: Scale image
+                scaledBitmap = ScalingUtilities.createScaledBitmap(unscaledBitmap, StringConstants.COMRESS_WIDTH, StringConstants.COMPRESS_HEIGHT, ScalingUtilities.ScalingLogic.FIT);
+            } else {
+                unscaledBitmap.recycle();
+                return path;
+            }
+
+            // Store to tmp file
+
+            String extr = Environment.getExternalStorageDirectory().toString();
+            File mFolder = new File(extr + "/TempImages");
+            if (!mFolder.exists()) {
+                mFolder.mkdir();
+            }
+
+            String s = ("/" + System.currentTimeMillis() + ".jpg");
+
+            File f = new File(mFolder.getAbsolutePath(), s);
+
+            strMyImagePath = f.getAbsolutePath();
+            FileOutputStream fos = null;
+
+            try {
+
+                fos = new FileOutputStream(f);
+                scaledBitmap.compress(Bitmap.CompressFormat.PNG, 70, fos);
+                fos.flush();
+                fos.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            scaledBitmap.recycle();
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        if (strMyImagePath == null) {
+            return path;
+        }
+        return strMyImagePath;
+
+    }
+
     public String compressImage(String imageUri) {
 
         String filePath = getRealPathFromURI(imageUri);
         Bitmap scaledBitmap = null;
 
+        Log.d("Local photo path", imageUri);
         BitmapFactory.Options options = new BitmapFactory.Options();
 
         options.inJustDecodeBounds = true;
@@ -284,65 +403,5 @@ public class PhotoUploadService extends Service {
         return inSampleSize;
     }
 
-    private void sendUploadCompleteBroadcast() {
-        Intent i = new Intent("uploadComplete");
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-    }
-
-
-    class UploadListener implements TransferListener {
-
-        private String fileName;
-        private long timestamp;
-
-        UploadListener(long timestamp, String fileName) {
-            this.fileName = fileName;
-            this.timestamp = timestamp;
-        }
-
-        @Override
-        public void onError(int id, Exception e) {
-            Log.e(TAG, "Error during upload: " + id, e);
-            count--;
-            if(count==0){
-                sendUploadCompleteBroadcast();
-            }
-        }
-
-        @Override
-        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d", id, bytesTotal, bytesCurrent));
-        }
-
-        @Override
-        public void onStateChanged(int id, TransferState newState) {
-            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
-
-            if (newState == TransferState.COMPLETED) {
-
-                String url = AWSConstants.S3_URL
-                        + AWSConstants.BUCKET_NAME + "/"
-                        + AWSConstants.PATH_FOLDER
-                        + fileName;
-
-                DebugLog.d("URL :::: " + url);
-
-                Realm realm = Realm.getDefaultInstance();
-                ReadingDataRealm reading = realm.where(ReadingDataRealm.class).equalTo("timestamp",timestamp).findFirst();
-
-                realm.beginTransaction();
-                reading.setUploadedImage(true);
-                reading.setPhotographic_evidence_url(url);
-                realm.commitTransaction();
-
-                count --;
-                Log.d("COUNT : ", count+"");
-                if(count==0){
-                    sendUploadCompleteBroadcast();
-                }
-
-            }
-        }
-    }
 }
 

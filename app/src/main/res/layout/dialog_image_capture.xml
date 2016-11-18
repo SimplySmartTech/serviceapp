@@ -9,6 +9,7 @@
         android:id="@+id/lLayoutCameraDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center|start"
         android:orientation="horizontal"
         android:padding="18dp">
@@ -16,6 +17,7 @@
         <Button
             android:layout_width="25dp"
             android:layout_height="25dp"
+            android:alpha="0.6"
             android:background="@drawable/gal_ic_photo_camera_black" />
 
         <TextView
@@ -32,14 +34,17 @@
         android:id="@+id/lLayoutGalleryDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
+        android:padding="18dp"
         android:paddingLeft="18dp"
         android:paddingRight="18dp">
 
         <Button
             android:layout_width="25dp"
             android:layout_height="25dp"
+            android:alpha="0.6"
             android:background="@drawable/gal_ic_photo_black" />
 
         <TextView
@@ -56,6 +61,7 @@
         android:id="@+id/lLayoutRemoveDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="18dp">
@@ -63,6 +69,7 @@
         <Button
             android:layout_width="25dp"
             android:layout_height="25dp"
+            android:alpha="0.6"
             android:background="@drawable/gal_ic_cancel_black" />
 
         <TextView

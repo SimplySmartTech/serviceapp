@@ -1,13 +1,17 @@
 package com.simplysmart.service.activity;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -31,8 +35,10 @@ import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
+import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.endpint.ApiInterface;
+import com.simplysmart.service.interfaces.LogoutListener;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
@@ -40,6 +46,7 @@ import com.simplysmart.service.model.matrix.SensorData;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
+import com.simplysmart.service.permission.MarshmallowPermission;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -52,7 +59,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements LogoutListener {
+
+
 
     private TextView no_data_found;
     private ExpandableListView matrixList;
@@ -73,7 +82,9 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         getUserInfo();
+
     }
+
 
 
     @Override
@@ -115,13 +126,16 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent);
                 break;
             case R.id.logout:
-                logout();
+                AlertDialogLogout.newInstance("Logout","Do you want to logout?","No","Logout")
+                        .show(getFragmentManager(),"logout");
                 break;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     public void refreshLayout() {
         if (NetworkUtilities.isInternet(this)) {
@@ -480,8 +494,6 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
-
-
     }
 
     private void setPic(ImageView view, String image) {
@@ -492,6 +504,12 @@ public class MainActivity extends BaseActivity {
                 .resize(64, 64)
                 .error(R.drawable.ic_menu_slideshow).into(view);
 
+    }
+
+    @Override
+    public void logoutUser() {
+        logout();
+        finish();
     }
 
 }

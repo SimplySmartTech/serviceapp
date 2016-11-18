@@ -5,6 +5,7 @@ package com.simplysmart.service.model.matrix;
  */
 
 public class Reading {
+    private String tare_weight;
     private String value;
     private String photographic_evidence_url;
     private long timestamp;

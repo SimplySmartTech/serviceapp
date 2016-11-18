@@ -31,6 +31,7 @@ import android.view.WindowManager;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
+import com.simplysmart.service.common.ScalingUtilities;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
@@ -50,6 +51,7 @@ import java.net.URISyntaxException;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
+
 
     private Context context;
     private FragmentManager fragmentManager;
@@ -232,6 +234,64 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+
+    private String secondCompressMethod(String path) {
+        String strMyImagePath = null;
+        Bitmap scaledBitmap = null;
+
+        try {
+            // Part 1: Decode image
+            Bitmap unscaledBitmap = ScalingUtilities.decodeFile(path, StringConstants.COMRESS_WIDTH, StringConstants.COMPRESS_HEIGHT, ScalingUtilities.ScalingLogic.FIT);
+
+            if (!(unscaledBitmap.getWidth() <= StringConstants.COMRESS_WIDTH && unscaledBitmap.getHeight() <= StringConstants.COMPRESS_HEIGHT)) {
+                // Part 2: Scale image
+                scaledBitmap = ScalingUtilities.createScaledBitmap(unscaledBitmap, StringConstants.COMRESS_WIDTH, StringConstants.COMPRESS_HEIGHT, ScalingUtilities.ScalingLogic.FIT);
+            } else {
+                unscaledBitmap.recycle();
+                return path;
+            }
+
+            // Store to tmp file
+
+            String extr = Environment.getExternalStorageDirectory().toString();
+            File mFolder = new File(extr + "/TempImages");
+            if (!mFolder.exists()) {
+                mFolder.mkdir();
+            }
+
+            String s = "tmp.png";
+
+            File f = new File(mFolder.getAbsolutePath(), s);
+
+            strMyImagePath = f.getAbsolutePath();
+            FileOutputStream fos = null;
+
+            try {
+
+                fos = new FileOutputStream(f);
+                scaledBitmap.compress(Bitmap.CompressFormat.PNG, 70, fos);
+                fos.flush();
+                fos.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            scaledBitmap.recycle();
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+        if (strMyImagePath == null) {
+            return path;
+        }
+        return strMyImagePath;
+
     }
 
     public String compressImage(String imageUri) {

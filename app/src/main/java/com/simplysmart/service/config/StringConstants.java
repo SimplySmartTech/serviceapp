@@ -16,4 +16,10 @@ public class StringConstants {
     public static String ALL_DONE = "ALL_DONE";
     public static String USE_UNIT = "USE_UNIT";
     public static String UNIT_ID = "UNIT_ID";
+    public static int COMRESS_WIDTH = 612;
+    public static int COMPRESS_HEIGHT = 816;
+
+    public static final int PERMISSION_REQUEST_INTERNET = 0;
+    public static final int PERMISSION_EXTERNAL_STORAGE = 1;
+    public static final int PERMISSION_CAMERA = 2;
 }
