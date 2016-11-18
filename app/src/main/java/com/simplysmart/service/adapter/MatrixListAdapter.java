@@ -49,8 +49,11 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
 
     @Override
     public void onBindViewHolder(ParentViewHolder holder, int position) {
+
         final MatrixData data = matrixData.get(position);
         holder.sensor_type.setText(data.getType());
+        String unit = data.getSensors().get(0).getUnit();
+        holder.unit.setText(unit);
         holder.sensor_type.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,6 +68,22 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
                 }
             }
         });
+
+        holder.unit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(data.getSensors()!=null && data.getSensors().size()>1) {
+                    Intent i = new Intent(mContext, SensorListActivity.class);
+                    i.putExtra(StringConstants.METRIC_DATA, data);
+                    mContext.startActivity(i);
+                }else{
+                    Intent i = new Intent(mContext, InputFormActivity.class);
+                    i.putExtra(StringConstants.SENSOR_DATA,data.getSensors().get(0));
+                    mContext.startActivity(i);
+                }
+            }
+        });
+
     }
 
     @Override

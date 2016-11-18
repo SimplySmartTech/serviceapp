@@ -26,6 +26,7 @@
 
     <include
         android:id="@+id/sensorLayout"
+        android:layout_margin="2dp"
         android:layout_below="@id/toolbar_Layout"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"

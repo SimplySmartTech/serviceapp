@@ -23,6 +23,8 @@ public class MatrixDataRealm extends RealmObject {
     private String type;
     private String utility_id;
     private String icon;
+    private int order;
+    private boolean mandatory;
     private RealmList<SensorDataRealm> sensors;
 
     public MatrixDataRealm() {
@@ -35,6 +37,8 @@ public class MatrixDataRealm extends RealmObject {
         this.type = matrixData.getType();
         this.utility_id = matrixData.getUtility_id();
         this.icon = matrixData.getIcon();
+        this.order = matrixData.getOrder();
+        this.mandatory = matrixData.isMandatory();
         this.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
     }
 

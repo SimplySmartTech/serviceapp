@@ -56,6 +56,8 @@ import com.squareup.picasso.Picasso;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -311,6 +313,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 no_data_found.setText("No data found");
 
             }
+
+            Collections.sort(adapterData, new Comparator<MatrixData>() {
+                @Override
+                public int compare(MatrixData o1, MatrixData o2) {
+                    return o1.getOrder()-o2.getOrder();
+                }
+            });
+
             matrixListAdapter = new MatrixListAdapter(this, adapterData);
         }
 
@@ -459,12 +469,18 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         int dateOfMonth= calendar.get(Calendar.DATE);
         buttonText = "Submit readings for "+dateOfMonth+" "+month;
 
-        SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        String date = UserInfo.getString(StringConstants.DATE_FOR_SUBMIT,"");
-        if(date.equals("")){
-            //
-        }else{
-            buttonText = date;
+        Realm realm = Realm.getDefaultInstance();
+        ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
+        if (readingDataRealm != null) {
+            String oldDate = getDate(readingDataRealm.getTimestamp(), "dd-MM-yyyy");
+            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
+
+            if (!oldDate.equals(newDate)) {
+                calendar.setTimeInMillis(time-86400000);
+                month = calendar.getDisplayName(Calendar.MONTH,Calendar.SHORT,Locale.getDefault());
+                dateOfMonth = calendar.get(Calendar.DATE);
+                buttonText = "Submit readings for "+dateOfMonth+" "+month;
+            }
         }
 
         submitButton.setText(buttonText);
@@ -520,22 +536,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             }
         });
 
-        Realm realm = Realm.getDefaultInstance();
-        ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
-        if (readingDataRealm != null) {
-            String oldDate = getDate(readingDataRealm.getTimestamp(), "dd-MM-yyyy");
-            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
 
-            if (oldDate.equals(newDate)) {
-                SharedPreferences.Editor editor = UserInfo.edit();
-                editor.putString(StringConstants.DATE_FOR_SUBMIT,buttonText);
-            }else{
-                //
-            }
-        }else{
-            SharedPreferences.Editor editor = UserInfo.edit();
-            editor.putString(StringConstants.DATE_FOR_SUBMIT,buttonText);
-        }
 
         //        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 //            @Override

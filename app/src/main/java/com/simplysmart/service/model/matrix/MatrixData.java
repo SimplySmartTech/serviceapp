@@ -15,15 +15,20 @@ public class MatrixData implements Parcelable  {
     private String type;
     private String utility_id;
     private String icon;
+    private int order;
+    private boolean mandatory;
 
     private ArrayList<SensorData> sensors;
 
     public MatrixData(){}
 
+
     protected MatrixData(Parcel in) {
         type = in.readString();
         utility_id = in.readString();
         icon = in.readString();
+        order = in.readInt();
+        mandatory = in.readByte() != 0;
         sensors = in.createTypedArrayList(SensorData.CREATOR);
     }
 
@@ -32,6 +37,8 @@ public class MatrixData implements Parcelable  {
         dest.writeString(type);
         dest.writeString(utility_id);
         dest.writeString(icon);
+        dest.writeInt(order);
+        dest.writeByte((byte) (mandatory ? 1 : 0));
         dest.writeTypedList(sensors);
     }
 
@@ -51,6 +58,22 @@ public class MatrixData implements Parcelable  {
             return new MatrixData[size];
         }
     };
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
 
     public String getIcon() {
         return icon;

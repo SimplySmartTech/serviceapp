@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:background="@drawable/card_bg"
     android:gravity="center_vertical">
 
 
@@ -22,6 +22,7 @@
         android:orientation="vertical"
         android:layout_centerInParent="true"
         android:gravity="center"
+        android:weightSum="1.0"
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:background="?attr/selectableItemBackground">
@@ -29,7 +30,8 @@
         <TextView
             android:id="@+id/typeName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
             android:gravity="center"
             android:padding="16dp"
             android:inputType="textMultiLine"
@@ -39,6 +41,17 @@
             android:textColor="@color/bw_color_white"
             android:textSize="14sp"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/unit"
+            android:text="Unit"
+            android:layout_weight="0.4"
+            android:gravity="center|top"
+            android:textColor="@color/bw_color_white"
+            android:background="@color/colorPrimaryDark"
+            android:textSize="13dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp" />
 
     </LinearLayout>
 
