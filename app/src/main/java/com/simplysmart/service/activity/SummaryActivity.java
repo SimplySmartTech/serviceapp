@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -84,6 +85,15 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
 
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
+
+        Button submit = (Button)findViewById(R.id.submit);
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initializeUpload = true;
+                checkAndSubmitData();
+            }
+        });
 
         summary = (RecyclerView) findViewById(R.id.summary);
         summaryList = new ArrayList<>();

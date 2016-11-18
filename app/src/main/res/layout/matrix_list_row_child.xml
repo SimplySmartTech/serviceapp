@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:background="@color/bw_color_white"
+    android:layout_margin="8dp"
+    android:background="@color/colorPrimaryDark"
     android:orientation="vertical">
 
     <!--<TextView-->
@@ -21,40 +22,36 @@
         <!--android:visibility="gone"-->
         <!--android:src="@drawable/tick_grey" />-->
 
-    <View
-        android:visibility="visible"
-        android:id="@+id/topSeparator"
-        android:background="@color/bw_color_light_gray"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"/>
 
     <LinearLayout
+        android:id="@+id/parentLayout"
         android:orientation="horizontal"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_centerInParent="true"
+        android:background="?attr/selectableItemBackground"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="120dp">
 
-        <ImageView
-            android:alpha="0.4"
-            android:paddingStart="16dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_label_outline_black_24dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!--<ImageView-->
+            <!--android:alpha="0.4"-->
+            <!--android:paddingStart="16dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:src="@drawable/ic_label_outline_black_24dp"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
 
         <TextView
             android:id="@+id/sensorName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:paddingTop="16dp"
             android:paddingBottom="16dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:ellipsize="end"
-            android:gravity="start|center_vertical"
-            android:maxLines="1"
-            android:text=""
-            android:textSize="16sp" />
+            android:gravity="center"
+            android:textColor="@color/bw_color_white"
+            android:text="Weight Sensor"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -65,4 +62,4 @@
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="1dp"/>-->
 
-</LinearLayout>
+</RelativeLayout>

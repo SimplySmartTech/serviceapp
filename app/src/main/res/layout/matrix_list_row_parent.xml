@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:gravity="center_vertical">
 
 
@@ -14,32 +15,30 @@
     <!--android:gravity="center"-->
     <!--android:textColor="@color/bw_color_black"-->
     <!--android:textSize="20sp" />-->
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bw_color_white">
 
-        <View
-            android:id="@+id/topSeparator"
-            android:layout_width="match_parent"
-            android:layout_height="8dp"
-            android:background="@drawable/gradient"
-            android:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/parentLayout"
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="?attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/typeName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:gravity="start"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:padding="16dp"
+            android:inputType="textMultiLine"
+            android:background="@color/colorPrimaryDark"
             android:paddingBottom="8dp"
-            android:text="Weight"
-            android:textColor="@color/colorPrimary"
+            android:text="Weight "
+            android:textColor="@color/bw_color_white"
             android:textSize="14sp"
             android:textStyle="bold" />
-
 
     </LinearLayout>
 

@@ -115,7 +115,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         setContentView(R.layout.activity_input_form);
 
         if (getIntent() != null && getIntent().getExtras() != null) {
-            sensorData = getIntent().getParcelableExtra("SENSOR_DATA");
+            sensorData = getIntent().getParcelableExtra(StringConstants.SENSOR_DATA);
             groupPosition = getIntent().getIntExtra("groupPosition", -1);
             childPosition = getIntent().getIntExtra("childPosition", -1);
         } else {

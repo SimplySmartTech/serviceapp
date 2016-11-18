@@ -15,13 +15,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-            <ExpandableListView
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/submit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@color/accent"
+                    android:padding="4dp"
+                    android:text=""
+                    android:textColor="@color/bw_color_white"
+                    android:textSize="14sp" />
+
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/matrixList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:childIndicator="@color/primary"
                 android:divider="@android:color/transparent"
                 android:groupIndicator="@color/accent" />
+
+            </LinearLayout>
 
 
     </android.support.v4.widget.SwipeRefreshLayout>

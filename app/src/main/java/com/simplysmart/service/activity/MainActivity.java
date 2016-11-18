@@ -12,12 +12,15 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,11 +32,15 @@ import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
+import com.simplysmart.service.config.StringConstants;
+import com.simplysmart.service.custom_views.CustomGridLayoutManager;
 import com.simplysmart.service.database.MatrixDataRealm;
+import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
+import com.simplysmart.service.dialog.SubmitReadingDialog;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.LogoutListener;
 import com.simplysmart.service.model.common.APIError;
@@ -46,7 +53,10 @@ import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -60,9 +70,10 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
 
     private TextView no_data_found;
-    private ExpandableListView matrixList;
+    private RecyclerView matrixList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private MatrixListAdapter matrixListAdapter;
+    private Button submitButton;
     private MatrixResponse matrixResponse;
     private int lastExpandedPosition = -1;
 
@@ -303,6 +314,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             matrixListAdapter = new MatrixListAdapter(this, adapterData);
         }
 
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,2);
+        matrixList.setLayoutManager(gridLayoutManager);
 
         String text = new Gson().toJson(adapterData);
         Log.d("Data saved:", text);
@@ -342,11 +355,16 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         } else {
             sgtz = false;
             no_data_found.setText("No data found.");
+
+
         }
         matrixListAdapter = new MatrixListAdapter(this, adapterData);
 
         String text = new Gson().toJson(adapterData);
         Log.d("Data saved:", text);
+
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,2);
+        matrixList.setLayoutManager(gridLayoutManager);
         matrixList.setAdapter(matrixListAdapter);
 
         if (sgtz) {
@@ -429,9 +447,34 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-
+        submitButton = (Button)findViewById(R.id.submit);
         no_data_found = (TextView) findViewById(R.id.no_data_found);
-        matrixList = (ExpandableListView) findViewById(R.id.matrixList);
+        matrixList = (RecyclerView) findViewById(R.id.matrixList);
+
+        String buttonText;
+        Calendar calendar = Calendar.getInstance();
+        long time = calendar.getTimeInMillis();
+        calendar.setTimeInMillis(time);
+        String month = calendar.getDisplayName(Calendar.MONTH,Calendar.SHORT,Locale.getDefault());
+        int dateOfMonth= calendar.get(Calendar.DATE);
+        buttonText = "Submit readings for "+dateOfMonth+" "+month;
+
+        SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        String date = UserInfo.getString(StringConstants.DATE_FOR_SUBMIT,"");
+        if(date.equals("")){
+            //
+        }else{
+            buttonText = date;
+        }
+
+        submitButton.setText(buttonText);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this,SummaryActivity.class);
+                startActivity(i);
+            }
+        });
 
         if (NetworkUtilities.isInternet(this)) {
             swipeRefreshLayout.post(new Runnable() {
@@ -451,37 +494,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 refreshLayout();
             }
         });
-
-        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-
-                Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
-                intent.putExtra("SENSOR_DATA", adapterData.get(groupPosition).getSensors().get(childPosition));
-                intent.putExtra("groupPosition", groupPosition);
-                intent.putExtra("childPosition", childPosition);
-                startActivity(intent);
-                return true;
-            }
-        });
-
-        matrixList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                return true;
-            }
-        });
-
-//        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-//            @Override
-//            public void onGroupExpand(int groupPosition) {
-//                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
-//                    matrixList.collapseGroup(lastExpandedPosition);
-//                }
-//                lastExpandedPosition = groupPosition;
-//            }
-//        });
-
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -507,6 +519,63 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 return true;
             }
         });
+
+        Realm realm = Realm.getDefaultInstance();
+        ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
+        if (readingDataRealm != null) {
+            String oldDate = getDate(readingDataRealm.getTimestamp(), "dd-MM-yyyy");
+            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
+
+            if (oldDate.equals(newDate)) {
+                SharedPreferences.Editor editor = UserInfo.edit();
+                editor.putString(StringConstants.DATE_FOR_SUBMIT,buttonText);
+            }else{
+                //
+            }
+        }else{
+            SharedPreferences.Editor editor = UserInfo.edit();
+            editor.putString(StringConstants.DATE_FOR_SUBMIT,buttonText);
+        }
+
+        //        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//
+//                Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
+//                intent.putExtra("SENSOR_DATA", adapterData.get(groupPosition).getSensors().get(childPosition));
+//                intent.putExtra("groupPosition", groupPosition);
+//                intent.putExtra("childPosition", childPosition);
+//                startActivity(intent);
+//                return true;
+//            }
+//        });
+//
+//        matrixList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+//            @Override
+//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+//                return true;
+//            }
+//        });
+
+//        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+//            @Override
+//            public void onGroupExpand(int groupPosition) {
+//                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
+//                    matrixList.collapseGroup(lastExpandedPosition);
+//                }
+//                lastExpandedPosition = groupPosition;
+//            }
+//        });
+
+    }
+
+    public static String getDate(long milliSeconds, String dateFormat) {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
     }
 
     private void setPic(ImageView view, String image) {
