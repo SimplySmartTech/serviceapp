@@ -4,15 +4,12 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.renderscript.ScriptGroup;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -98,7 +95,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private RecyclerView readingList;
 
     private String uploadedReadingUrl = "";
-    private String tare_weight="";
+    private String tare_weight = "";
 
     private SensorData sensorData;
     private int groupPosition;
@@ -107,6 +104,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private ReadingData readingData;
     private boolean imageTaken = false;
     private boolean uploadedImage = false;
+    private boolean needSpinner = false;
 
     private ReadingListAdapter readingListAdapter;
 
@@ -208,7 +206,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         submitForm = (TextView) findViewById(R.id.submit);
         readingList = (RecyclerView) findViewById(R.id.readingList);
         middleLine = findViewById(R.id.middleSeparator);
-        tareWeightSpinner = (Spinner)findViewById(R.id.tare_weight_spinner);
+        tareWeightSpinner = (Spinner) findViewById(R.id.tare_weight_spinner);
         unit.setText(sensorData.getUnit());
 
 
@@ -287,17 +285,19 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             }
         });
 
+
         ArrayList<String> tareWeights = new ArrayList<>();
         final RealmResults<TareWeightRealm> tareWeightsList = TareWeightRealm.getTareWeights(GlobalData.getInstance().getSelectedUnitId());
-        if(tareWeightsList.size()>0) {
+        if (tareWeightsList.size() > 0) {
+            tareWeights.add("--Select--");
             for (int i = 0; i < tareWeightsList.size(); i++) {
                 TareWeightRealm item = tareWeightsList.get(i);
-                tareWeights.add(item.getName()+ " ("+item.getValue()+")");
+                tareWeights.add(item.getName() + " (" + item.getValue() + ")");
             }
         }
 
-        if(sensorData.getSensor_name().trim().equalsIgnoreCase("net weight")) {
-
+        if (sensorData.getSensor_name().trim().equalsIgnoreCase("net weight")) {
+            needSpinner = true;
             ArrayAdapter<String> tareWeightAdapter = new ArrayAdapter<String>(InputFormActivity.this, android.R.layout.simple_spinner_item, tareWeights);
             tareWeightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             tareWeightSpinner.setAdapter(tareWeightAdapter);
@@ -305,16 +305,21 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             tareWeightSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    tare_weight = tareWeightsList.get(position).getValue();
+                    if(position>0) {
+                        tare_weight = tareWeightsList.get(position - 1).getValue();
+                    }else{
+                        tare_weight = "";
+                    }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    tare_weight = tareWeightsList.get(0).getValue();
+                    tare_weight = "";
                 }
             });
 
-        }else{
+        } else {
+            needSpinner = false;
             tareWeightSpinner.setVisibility(View.GONE);
             tare_weight = "";
         }
@@ -323,53 +328,72 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             @Override
             public void onClick(View v) {
                 mInputReadingValue.clearFocus();
-
-                if (imageTaken) {
-                    if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
-
-                        readingData = new ReadingData();
-                        readingData.setUtility_id(sensorData.getUtility_identifier());
-                        readingData.setValue(mInputReadingValue.getText().toString());
-                        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-                        readingData.setSensor_name(sensorData.getSensor_name());
-                        readingData.setTare_weight(tare_weight);
-                        saveToDisk(readingData);
-
-                        mInputReadingValue.setText("");
-                        mCurrentPhotoPath = "";
-                        uploadedReadingUrl = "";
-                        imageTaken = false;
-                        uploadedImage = false;
-                        if(NetworkUtilities.isInternet(InputFormActivity.this)) {
-                            Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
-                            i.putExtra(StringConstants.USE_UNIT, false);
-                            startService(i);
-                        }
-
-                    } else {
-                        showSnackBar(mParentLayout, "Please enter reading before submit.");
+            //TODO Try to improve this.
+                if (needSpinner) {
+                    if(!tare_weight.equals("")){
+                        saveReadingToDisk();
+                    }else{
+                        showSnackBar(mParentLayout, "Please select tare weight");
                     }
                 } else {
-                    if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
-                        readingData = new ReadingData();
-                        readingData.setUtility_id(sensorData.getUtility_identifier());
-                        readingData.setValue(mInputReadingValue.getText().toString());
-                        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-                        readingData.setSensor_name(sensorData.getSensor_name());
-                        saveToDisk(readingData);
-
-                        mInputReadingValue.setText("");
-                        mCurrentPhotoPath = "";
-                        uploadedReadingUrl = "";
-                        imageTaken = false;
-                        uploadedImage = false;
-                    } else {
-                        showSnackBar(mParentLayout, "Please enter reading before submit.");
-                    }
+                    saveReadingToDisk();
                 }
-
             }
         });
+    }
+
+    private void saveReadingToDisk(){
+        if (imageTaken) {
+            if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
+                submitForImage();
+
+            } else {
+                showSnackBar(mParentLayout, "Please enter reading before submit.");
+            }
+
+        } else {
+            if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
+                submitWithoutImage();
+            } else {
+                showSnackBar(mParentLayout, "Please enter reading before submit.");
+            }
+        }
+    }
+
+    private void submitForImage(){
+        readingData = new ReadingData();
+        readingData.setUtility_id(sensorData.getUtility_identifier());
+        readingData.setValue(mInputReadingValue.getText().toString());
+        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
+        readingData.setSensor_name(sensorData.getSensor_name());
+        readingData.setTare_weight(tare_weight);
+        saveToDisk(readingData);
+
+        mInputReadingValue.setText("");
+        mCurrentPhotoPath = "";
+        uploadedReadingUrl = "";
+        imageTaken = false;
+        uploadedImage = false;
+        if (NetworkUtilities.isInternet(InputFormActivity.this)) {
+            Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
+            i.putExtra(StringConstants.USE_UNIT, false);
+            startService(i);
+        }
+    }
+
+    private void submitWithoutImage(){
+        readingData = new ReadingData();
+        readingData.setUtility_id(sensorData.getUtility_identifier());
+        readingData.setValue(mInputReadingValue.getText().toString());
+        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
+        readingData.setSensor_name(sensorData.getSensor_name());
+        saveToDisk(readingData);
+
+        mInputReadingValue.setText("");
+        mCurrentPhotoPath = "";
+        uploadedReadingUrl = "";
+        imageTaken = false;
+        uploadedImage = false;
     }
 
     private void setList(ReadingDataRealm dataRealm) {
@@ -408,7 +432,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private void saveToDisk(ReadingData readingData) {
 
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm aa",Locale.getDefault());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.getDefault());
         String time = simpleDateFormat.format(calendar.getTimeInMillis());
 
         Realm realm = Realm.getDefaultInstance();
@@ -494,7 +518,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
 
-
     private void dispatchTakePictureIntent() {
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -546,7 +569,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             try {
                 if (mCurrentPhotoPath != null) {
-                    Log.d("CameraPhoto",mCurrentPhotoPath);
+                    Log.d("CameraPhoto", mCurrentPhotoPath);
                     imageTaken = true;
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
@@ -560,7 +583,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 String path = getPath(uri);
                 if (path != null) {
                     mCurrentPhotoPath = path;
-                    Log.d("GalleryPhoto",mCurrentPhotoPath);
+                    Log.d("GalleryPhoto", mCurrentPhotoPath);
                     imageTaken = true;
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
