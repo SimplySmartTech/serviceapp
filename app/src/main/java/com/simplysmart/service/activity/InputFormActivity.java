@@ -289,7 +289,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         ArrayList<String> tareWeights = new ArrayList<>();
         final RealmResults<TareWeightRealm> tareWeightsList = TareWeightRealm.getTareWeights(GlobalData.getInstance().getSelectedUnitId());
         if (tareWeightsList.size() > 0) {
-            tareWeights.add("--Select--");
+            tareWeights.add("--Select Tare Weight--");
             for (int i = 0; i < tareWeightsList.size(); i++) {
                 TareWeightRealm item = tareWeightsList.get(i);
                 tareWeights.add(item.getName() + " (" + item.getValue() + ")");
