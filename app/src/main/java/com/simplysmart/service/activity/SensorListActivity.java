@@ -65,11 +65,7 @@ public class SensorListActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        if (GlobalData.getInstance().getSelectedUnit() != null && GlobalData.getInstance().getSelectedUnit().equals("")) {
-            getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
-        } else {
-            getSupportActionBar().setTitle("Mailhem");
-        }
+        getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
 
         if(getIntent()!=null && getIntent().getExtras()!=null) {
             data = getIntent().getParcelableExtra(StringConstants.METRIC_DATA);

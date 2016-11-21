@@ -308,13 +308,13 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                     if(position>0) {
                         tare_weight = tareWeightsList.get(position - 1).getValue();
                     }else{
-                        tare_weight = "";
+                        tare_weight = null;
                     }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-                    tare_weight = "";
+                    tare_weight = null;
                 }
             });
 
@@ -333,12 +333,12 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                         if (tare_weight!=null) {
                             saveReadingToDisk();
                             tareWeightSpinner.setSelection(0);
+                            tare_weight = null;
                         } else {
                             showSnackBar(mParentLayout, "Please select tare weight");
                         }
                     } else {
                         saveReadingToDisk();
-
                     }
             }
         });
