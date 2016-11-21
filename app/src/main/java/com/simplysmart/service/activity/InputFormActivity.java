@@ -2,7 +2,6 @@ package com.simplysmart.service.activity;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,7 +10,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -26,35 +24,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.ReadingListAdapter;
-import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
-import com.simplysmart.service.common.DebugLog;
-import com.simplysmart.service.config.ErrorUtils;
+import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
-import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingDialog;
-import com.simplysmart.service.endpint.ApiInterface;
-import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.SensorData;
 import com.simplysmart.service.permission.MarshmallowPermission;
 import com.simplysmart.service.service.PhotoUploadService;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,9 +56,6 @@ import java.util.Locale;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.view.View.GONE;
 
@@ -134,6 +117,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         getSupportActionBar().setTitle("Input Reading");
 
         bindViews();
+
         Realm realm = Realm.getDefaultInstance();
         ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
         if (readingDataRealm != null) {
@@ -145,7 +129,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 dialog.show(getFragmentManager(), "submitDialog");
             }
         }
-
 
         RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
         if (localDataList == null || localDataList.size() == 0) {
@@ -196,7 +179,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             readingListAdapter.notifyItemChanged(position);
         }
     }
-
 
     private void bindViews() {
         mParentLayout = (LinearLayout) findViewById(R.id.parentLayout);
@@ -305,9 +287,9 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             tareWeightSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if(position>0) {
+                    if (position > 0) {
                         tare_weight = tareWeightsList.get(position - 1).getValue();
-                    }else{
+                    } else {
                         tare_weight = "";
                     }
                 }
@@ -321,19 +303,21 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         } else {
             needSpinner = false;
             tareWeightSpinner.setVisibility(View.GONE);
-            tare_weight = "";
+            tare_weight = null;
         }
 
         submitForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mInputReadingValue.clearFocus();
-            //TODO Try to improve this.
+
+                CommonMethod.hideKeyboard(InputFormActivity.this);
+
+                //TODO Try to improve this.
                 if (needSpinner) {
-                    if(!tare_weight.equals("")){
+                    if (tare_weight != null) {
                         saveReadingToDisk();
                         tareWeightSpinner.setSelection(0);
-                    }else{
+                    } else {
                         showSnackBar(mParentLayout, "Please select tare weight");
                     }
                 } else {
@@ -343,7 +327,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         });
     }
 
-    private void saveReadingToDisk(){
+    private void saveReadingToDisk() {
         if (imageTaken) {
             if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
                 submitForImage();
@@ -361,7 +345,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
     }
 
-    private void submitForImage(){
+    private void submitForImage() {
         readingData = new ReadingData();
         readingData.setUtility_id(sensorData.getUtility_identifier());
         readingData.setValue(mInputReadingValue.getText().toString());
@@ -375,6 +359,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         uploadedReadingUrl = "";
         imageTaken = false;
         uploadedImage = false;
+
         if (NetworkUtilities.isInternet(InputFormActivity.this)) {
             Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
             i.putExtra(StringConstants.USE_UNIT, false);
@@ -382,7 +367,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
     }
 
-    private void submitWithoutImage(){
+    private void submitWithoutImage() {
         readingData = new ReadingData();
         readingData.setUtility_id(sensorData.getUtility_identifier());
         readingData.setValue(mInputReadingValue.getText().toString());
@@ -518,7 +503,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         dialog.show();
     }
 
-
     private void dispatchTakePictureIntent() {
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -553,17 +537,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         return image;
     }
 
-    public File getTempFile(Context context, String url) {
-        File file = null;
-        try {
-            String fileName = Uri.parse(url).getLastPathSegment();
-            file = File.createTempFile(fileName, ".jpg", context.getCacheDir());
-        } catch (IOException e) {
-            // Error while creating file
-        }
-        return file;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -594,116 +567,4 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             }
         }
     }
-
-    private void setPic(ImageView view) {
-
-        Picasso.with(InputFormActivity.this).load(image)
-                .placeholder(R.drawable.ic_menu_slideshow)
-                .noFade()
-                .error(R.drawable.ic_menu_slideshow).into(view);
-
-        view.setVisibility(View.VISIBLE);
-        view.setScaleType(ImageView.ScaleType.CENTER_CROP);
-    }
-
-    private void beginUpload(String filePath) {
-        if (filePath == null) {
-            Toast.makeText(this, "Could not find the filepath of the selected file", Toast.LENGTH_LONG).show();
-            return;
-        }
-        File file = new File(filePath);
-        image = file;
-
-
-        TransferObserver observer = transferUtility.upload(
-                AWSConstants.BUCKET_NAME,
-                AWSConstants.PATH_FOLDER + file.getName(),
-                file, CannedAccessControlList.PublicRead);
-
-        observer.setTransferListener(new UploadListener());
-    }
-
-    private class UploadListener implements TransferListener {
-
-        @Override
-        public void onError(int id, Exception e) {
-//            mSubmitForm.setEnabled(true);
-//            mSubmitForm.setText("SUBMIT FORM");
-            uploadedImage = false;
-            dismissActivitySpinner();
-            Log.e(TAG, "Error during upload: " + id, e);
-        }
-
-        @Override
-        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d", id, bytesTotal, bytesCurrent));
-        }
-
-        @Override
-        public void onStateChanged(int id, TransferState newState) {
-            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
-
-            if (newState == TransferState.COMPLETED) {
-
-                String url = AWSConstants.S3_URL
-                        + AWSConstants.BUCKET_NAME + "/"
-                        + AWSConstants.PATH_FOLDER
-                        + image.getName();
-
-                DebugLog.d("URL :::: " + url);
-                uploadedReadingUrl = url;
-                uploadedImage = true;
-                dismissActivitySpinner();
-
-//                uploadImage.setText("CHANGE IMAGE");
-//                mSubmitForm.setEnabled(true);
-//                mSubmitForm.setText("SUBMIT FORM");
-
-            }
-        }
-    }
-
-    private void postReadingRequest(ReadingData readingData, String subDomain) {
-
-        if (NetworkUtilities.isInternet(InputFormActivity.this)) {
-
-            showActivitySpinner();
-
-            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-            Call<JsonObject> call = apiInterface.submitReading(subDomain, readingData);
-            call.enqueue(new Callback<JsonObject>() {
-
-                @Override
-                public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
-
-                    if (response.isSuccessful()) {
-
-                        Intent i = new Intent("UPDATE_METRIC_SENSOR_LIST_ROW");
-                        i.putExtra("groupPosition", groupPosition);
-                        i.putExtra("childPosition", childPosition);
-                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-                        finish();
-
-                    } else if (response.code() == 401) {
-                        handleAuthorizationFailed();
-                    } else {
-                        APIError error = ErrorUtils.parseError(response);
-                        displayMessage(error.message());
-                    }
-                    dismissActivitySpinner();
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    dismissActivitySpinner();
-                    DebugLog.d(t.getLocalizedMessage());
-                    displayMessage(getResources().getString(R.string.error_in_network));
-                }
-            });
-        } else {
-            displayMessage(getString(R.string.error_no_internet_connection));
-        }
-    }
-
-
 }
