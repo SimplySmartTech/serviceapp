@@ -245,7 +245,10 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         realm.commitTransaction();
                     } else {
                         realm.beginTransaction();
-                        data = realm.where(SensorDataRealm.class).equalTo("sensor_name", matrixData.getSensors().get(j).getSensor_name()).findFirst();
+                        data = realm.where(SensorDataRealm.class)
+                                .equalTo("sensor_name", matrixData.getSensors().get(j).getSensor_name())
+                                .equalTo("utility_identifier",matrixData.getUtility_id())
+                                .findFirst();
                         data.setData(matrixData.getSensors().get(j));
                         realm.commitTransaction();
                     }
@@ -279,11 +282,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 }
             }
 
-            //TODO CHeck why this happens.
-            realm.beginTransaction();
-            SensorDataRealm sensorDataRealm = realm.where(SensorDataRealm.class).equalTo("sensor_name","Overflow").findFirst();
-            sensorDataRealm.setUnit("pH");
-            realm.commitTransaction();
+//            //TODO CHeck why this happens.
+//            realm.beginTransaction();
+//            SensorDataRealm sensorDataRealm = realm.where(SensorDataRealm.class).equalTo("sensor_name","Overflow").findFirst();
+//            sensorDataRealm.setUnit("pH");
+//            realm.commitTransaction();
 
             savedToDisk = true;
             setDataInList(realm);
