@@ -1,11 +1,9 @@
 package com.simplysmart.service.service;
 
-import android.app.IntentService;
+import android.annotation.SuppressLint;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.content.ContentUris;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,38 +12,33 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.media.ExifInterface;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.simplysmart.service.activity.InputFormActivity;
 import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.DebugLog;
-import com.simplysmart.service.common.ScalingUtilities;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Queue;
+import java.net.URISyntaxException;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 import static android.content.ContentValues.TAG;
@@ -54,7 +47,7 @@ import static android.content.ContentValues.TAG;
  * Created by shailendrapsp on 7/11/16.
  */
 
-public class PhotoUploadService extends Service{
+public class PhotoUploadService extends Service {
 
     private TransferUtility transferUtility;
     private int count = 0;
@@ -76,7 +69,7 @@ public class PhotoUploadService extends Service{
 //        Log.d("TAG","Reached photo upload service.");
         transferUtility = Util.getTransferUtility(getApplicationContext());
         try {
-            if(intent!=null && intent.getExtras()!=null) {
+            if (intent != null && intent.getExtras() != null) {
                 boolean useUnitId = intent.getBooleanExtra(StringConstants.USE_UNIT, false);
                 if (useUnitId) {
                     uploadImage(intent.getStringExtra(StringConstants.UNIT_ID));
@@ -84,7 +77,7 @@ public class PhotoUploadService extends Service{
                     uploadImage();
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -102,12 +95,15 @@ public class PhotoUploadService extends Service{
         Realm realm = Realm.getDefaultInstance();
         RealmResults<ReadingDataRealm> readingsList = realm
                 .where(ReadingDataRealm.class)
-                .equalTo("uploadedImage",false)
+                .equalTo("uploadedImage", false)
                 .findAll();
 
         for (ReadingDataRealm reading : readingsList) {
-            if (reading.getLocal_photo_url()!=null && !reading.getLocal_photo_url().equals("")) {
+            if (reading.getLocal_photo_url() != null && !reading.getLocal_photo_url().equals("")) {
+                DebugLog.d("Got photo URL : " + reading.getLocal_photo_url());
                 beginUpload(reading);
+            } else {
+                DebugLog.d("No photo URL");
             }
         }
     }
@@ -118,21 +114,21 @@ public class PhotoUploadService extends Service{
         Realm realm = Realm.getDefaultInstance();
         RealmResults<ReadingDataRealm> readingsList = realm
                 .where(ReadingDataRealm.class)
-                .equalTo("uploadedImage",false)
-                .equalTo("unit_id",unit_id)
+                .equalTo("uploadedImage", false)
+                .equalTo("unit_id", unit_id)
                 .findAll();
 
         for (ReadingDataRealm reading : readingsList) {
-            if (reading.getLocal_photo_url()!=null && !reading.getLocal_photo_url().equals("")) {
+            if (reading.getLocal_photo_url() != null && !reading.getLocal_photo_url().equals("")) {
                 beginUpload(reading);
-            }else{
+            } else {
                 sendUploadCompleteBroadcast();
             }
         }
     }
 
     private void beginUpload(ReadingDataRealm readingDataRealm) {
-        Log.d("Local photo url:",readingDataRealm.getLocal_photo_url());
+        Log.d("Local photo url:", readingDataRealm.getLocal_photo_url());
         String filePath;
         try {
             filePath = compressImage(readingDataRealm.getLocal_photo_url());
@@ -155,10 +151,10 @@ public class PhotoUploadService extends Service{
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            count --;
-            if(count==0){
+            count--;
+            if (count == 0) {
                 sendUploadCompleteBroadcast();
             }
         }
@@ -170,7 +166,7 @@ public class PhotoUploadService extends Service{
         readingDataRealm.setPhotographic_evidence_url(aws_url);
         readingDataRealm.setUploadedImage(true);
         realm.commitTransaction();
-        DebugLog.d("URL:"+readingDataRealm.getPhotographic_evidence_url());
+        DebugLog.d("URL:" + readingDataRealm.getPhotographic_evidence_url());
     }
 
     class UploadListener implements TransferListener {
@@ -179,7 +175,7 @@ public class PhotoUploadService extends Service{
         private long timestamp;
         private ReadingDataRealm rdr;
 
-        UploadListener(long timestamp, String fileName,ReadingDataRealm rdr) {
+        UploadListener(long timestamp, String fileName, ReadingDataRealm rdr) {
             this.fileName = fileName;
             this.timestamp = timestamp;
             this.rdr = rdr;
@@ -189,7 +185,7 @@ public class PhotoUploadService extends Service{
         public void onError(int id, Exception e) {
             Log.e(TAG, "Error during upload: " + id, e);
             count--;
-            if(count==0){
+            if (count == 0) {
                 sendUploadCompleteBroadcast();
             }
         }
@@ -212,74 +208,81 @@ public class PhotoUploadService extends Service{
 
                 DebugLog.d("URL :::: " + url);
 
-                count --;
-                Log.d("COUNT : ", count+"");
-                if(count==0){
+                count--;
+                Log.d("COUNT : ", count + "");
+                if (count == 0) {
                     sendUploadCompleteBroadcast();
                 }
 
-                onUploadComplete(rdr,url);
+                onUploadComplete(rdr, url);
             }
         }
 
 
     }
 
-    private String secondCompressMethod(String path) {
-        String strMyImagePath = null;
-        Bitmap scaledBitmap = null;
-
-        try {
-            // Part 1: Decode image
-            Bitmap unscaledBitmap = ScalingUtilities.decodeFile(path, StringConstants.COMRESS_WIDTH, StringConstants.COMPRESS_HEIGHT, ScalingUtilities.ScalingLogic.FIT);
-
-            if (!(unscaledBitmap.getWidth() <= StringConstants.COMRESS_WIDTH && unscaledBitmap.getHeight() <= StringConstants.COMPRESS_HEIGHT)) {
-                // Part 2: Scale image
-                scaledBitmap = ScalingUtilities.createScaledBitmap(unscaledBitmap, StringConstants.COMRESS_WIDTH, StringConstants.COMPRESS_HEIGHT, ScalingUtilities.ScalingLogic.FIT);
-            } else {
-                unscaledBitmap.recycle();
-                return path;
+    @SuppressLint("NewApi")
+    protected String getPath(Uri uri) throws URISyntaxException {
+        final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
+        String selection = null;
+        String[] selectionArgs = null;
+        // Uri is different in versions after KITKAT (Android 4.4), we need to
+        // deal with different Uris.
+        if (needToCheckUri && DocumentsContract.isDocumentUri(getApplicationContext(), uri)) {
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            } else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                uri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+            } else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                if ("image".equals(type)) {
+                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                selection = "_id=?";
+                selectionArgs = new String[]{
+                        split[1]
+                };
             }
-
-            // Store to tmp file
-
-            String extr = Environment.getExternalStorageDirectory().toString();
-            File mFolder = new File(extr + "/TempImages");
-            if (!mFolder.exists()) {
-                mFolder.mkdir();
-            }
-
-            String s = ("/" + System.currentTimeMillis() + ".jpg");
-
-            File f = new File(mFolder.getAbsolutePath(), s);
-
-            strMyImagePath = f.getAbsolutePath();
-            FileOutputStream fos = null;
-
+        }
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = null;
             try {
-
-                fos = new FileOutputStream(f);
-                scaledBitmap.compress(Bitmap.CompressFormat.PNG, 70, fos);
-                fos.flush();
-                fos.close();
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                cursor = getContentResolver().query(uri, projection, selection, selectionArgs, null);
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            scaledBitmap.recycle();
-
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
         }
+        return null;
+    }
 
-        if (strMyImagePath == null) {
-            return path;
-        }
-        return strMyImagePath;
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
 
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 
     public String compressImage(String imageUri) {
@@ -287,7 +290,6 @@ public class PhotoUploadService extends Service{
         String filePath = getRealPathFromURI(imageUri);
         Bitmap scaledBitmap = null;
 
-        Log.d("Local photo path", imageUri);
         BitmapFactory.Options options = new BitmapFactory.Options();
 
         options.inJustDecodeBounds = true;
@@ -332,7 +334,6 @@ public class PhotoUploadService extends Service{
             scaledBitmap = Bitmap.createBitmap(actualWidth, actualHeight, Bitmap.Config.ARGB_8888);
         } catch (OutOfMemoryError exception) {
             exception.printStackTrace();
-
         }
 
         float ratioX = actualWidth / (float) options.outWidth;
@@ -419,5 +420,6 @@ public class PhotoUploadService extends Service{
         }
         return inSampleSize;
     }
+
 
 }
