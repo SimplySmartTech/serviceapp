@@ -113,12 +113,14 @@ public class MatrixDataRealm extends RealmObject {
                 .findAll();
         for (ReadingDataRealm dataRealm:results) {
             try {
-                File file = new File(dataRealm.getLocal_photo_url());
-                if (file.exists()) {
-                    try {
-                        file.delete();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                if(dataRealm.getLocal_photo_url()!=null && !dataRealm.getLocal_photo_url().equals("")) {
+                    File file = new File(dataRealm.getLocal_photo_url());
+                    if (file.exists()) {
+                        try {
+                            file.delete();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }catch (Exception e){

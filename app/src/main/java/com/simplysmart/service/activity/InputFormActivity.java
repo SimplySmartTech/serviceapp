@@ -321,24 +321,25 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         } else {
             needSpinner = false;
             tareWeightSpinner.setVisibility(View.GONE);
-            tare_weight = "";
+            tare_weight = null;
         }
 
         submitForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mInputReadingValue.clearFocus();
-            //TODO Try to improve this.
-                if (needSpinner) {
-                    if(!tare_weight.equals("")){
+                    mInputReadingValue.clearFocus();
+                    //TODO Try to improve this.
+                    if (needSpinner) {
+                        if (tare_weight!=null) {
+                            saveReadingToDisk();
+                            tareWeightSpinner.setSelection(0);
+                        } else {
+                            showSnackBar(mParentLayout, "Please select tare weight");
+                        }
+                    } else {
                         saveReadingToDisk();
-                        tareWeightSpinner.setSelection(0);
-                    }else{
-                        showSnackBar(mParentLayout, "Please select tare weight");
+
                     }
-                } else {
-                    saveReadingToDisk();
-                }
             }
         });
     }
