@@ -3,9 +3,4 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.simplysmart.service.activity.HomeActivity">
 
-    <item
-        android:id="@+id/submit"
-        android:title="@string/submit"
-        app:showAsAction="never" />
-
 </menu>

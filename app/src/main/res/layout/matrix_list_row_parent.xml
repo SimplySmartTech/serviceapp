@@ -39,7 +39,7 @@
             android:paddingBottom="8dp"
             android:text="Weight "
             android:textColor="@color/bw_color_white"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView

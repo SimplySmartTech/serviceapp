@@ -78,6 +78,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private Button submitButton;
     private MatrixResponse matrixResponse;
     private int lastExpandedPosition = -1;
+    private NavigationView navigationView;
 
     private boolean savedToDisk = false;
     private ArrayList<MatrixData> adapterData;
@@ -91,6 +92,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         setContentView(R.layout.activity_main);
 
         getUserInfo();
+
+
 
     }
 
@@ -176,7 +179,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         TextView companyName = (TextView) view.findViewById(R.id.companyName);
         TextView userName = (TextView) view.findViewById(R.id.userName);
 
-        setPic(companyLogo, residentData.getCompany().getLogo_url());
+        companyLogo.setImageResource(R.drawable.ic_launcher);
         companyName.setText(residentData.getCompany().getName());
         userName.setText(residentData.getName());
 
@@ -435,25 +438,20 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private void initializeRemainingStuff() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        if (GlobalData.getInstance().getSelectedUnit() != null && GlobalData.getInstance().getSelectedUnit().equals("")) {
-            getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
-        } else {
-            getSupportActionBar().setTitle("Mailhem");
-        }
+        getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
 
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         setDataInHeader(navigationView);
 
         Menu menu = navigationView.getMenu();
         units = GlobalData.getInstance().getUnits();
         for (int i = 0; i < units.size(); i++) {
-            menu.add(i, i, i, units.get(i).getName().toUpperCase());
+            menu.add(i, i, i, units.get(i).getName());
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
@@ -520,7 +518,9 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 uncheckAllMenuItems(navigationView);
                 item.setChecked(true);
                 GlobalData.getInstance().setSelectedUnitId(unit.getId());
-                GlobalData.getInstance().setSelectedUnit(unit.getName());
+                GlobalData.getInstance().setSelectedUnit(item.getTitle().toString());
+
+                getSupportActionBar().setTitle(item.getTitle().toString());
                 if (NetworkUtilities.isInternet(getApplicationContext())) {
                     swipeRefreshLayout.post(new Runnable() {
                         @Override
@@ -535,6 +535,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 return true;
             }
         });
+
+
 
 
 

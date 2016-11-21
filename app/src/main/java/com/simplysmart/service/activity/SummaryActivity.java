@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,9 +14,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
@@ -34,17 +32,14 @@ import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
-import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.Metric;
 import com.simplysmart.service.model.matrix.Reading;
+import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.service.PhotoUploadService;
 
-import java.io.File;
 import java.util.ArrayList;
-
-import javax.microedition.khronos.opengles.GL;
 
 import io.realm.RealmList;
 import retrofit2.Call;
@@ -55,7 +50,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements EditDialog.EditDialogListener{
+public class SummaryActivity extends BaseActivity implements EditDialog.EditDialogListener {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -64,6 +59,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     private SummaryListAdapter adapter;
     private boolean allDone = false;
     private boolean initializeUpload = false;
+    private Button submit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +72,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        if(NetworkUtilities.isInternet(this)) {
+        if (NetworkUtilities.isInternet(this)) {
             Intent i = new Intent(this, PhotoUploadService.class);
             i.putExtra(StringConstants.USE_UNIT, true);
             i.putExtra(StringConstants.UNIT_ID, GlobalData.getInstance().getSelectedUnitId());
@@ -86,7 +82,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
 
-        Button submit = (Button)findViewById(R.id.submit);
+        submit = (Button) findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,11 +147,11 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                                 reading.setTimestamp(rdr.getTimestamp());
                                 reading.setTare_weight(rdr.getTare_weight());
                                 readings.add(reading);
-                                if(!rdr.isUploadedImage()){
+                                if (!rdr.isUploadedImage()) {
                                     count++;
                                 }
 
-                                Log.d("TAG",rdr.getPhotographic_evidence_url());
+                                Log.d("TAG", rdr.getPhotographic_evidence_url());
 
                                 summaryList.add(summary);
                             }
@@ -168,7 +164,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
             }
         }
 
-        if(count==0){
+        if (count == 0) {
             allDone = true;
         }
 
@@ -178,18 +174,20 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        adapter = new SummaryListAdapter(summaryList, this,getFragmentManager());
+        adapter = new SummaryListAdapter(summaryList, this, getFragmentManager());
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
-        TextView no_data_found = (TextView)findViewById(R.id.no_data_found);
-        if(summaryList.size()>0){
+        TextView no_data_found = (TextView) findViewById(R.id.no_data_found);
+        if (summaryList.size() > 0) {
             summary.setVisibility(View.VISIBLE);
             no_data_found.setVisibility(View.GONE);
-        }else{
+            submit.setVisibility(View.VISIBLE);
+        } else {
             summary.setVisibility(View.GONE);
             no_data_found.setText("No data found.");
             no_data_found.setVisibility(View.VISIBLE);
+            submit.setVisibility(View.GONE);
         }
     }
 
@@ -239,17 +237,19 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     }
 
     private void checkAndSubmitData() {
-        if(!allDone) {
-            showActivitySpinner("Uploading images . . .");
-        }else{
-            showActivitySpinner("Submitting readings . . .");
-            submitData();
+        if (summaryList != null && summaryList.size() > 0) {
+            if (!allDone) {
+                showActivitySpinner("Uploading images . . .");
+            } else {
+                showActivitySpinner("Submitting readings . . .");
+                submitData();
+            }
         }
     }
 
     @Override
-    public void updateResult(boolean done, int position,String value) {
-        if(done){
+    public void updateResult(boolean done, int position, String value) {
+        if (done) {
             summaryList.get(position).setValue(value);
             adapter.notifyItemChanged(position);
         }
@@ -263,7 +263,8 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
-                        showSnackBar(mParentLayout, "Data successfully submitted.", true);
+//                        ashowSnckBar(mParentLayout, "Data successfully submitted.", true);
+                        Toast.makeText(getApplicationContext(),"Data successfully submitted.",Toast.LENGTH_SHORT).show();
                         removeLocalData(GlobalData.getInstance().getSelectedUnitId());
                         exitScreen();
                         dismissActivitySpinner();
@@ -289,8 +290,8 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     }
 
     private void exitScreen() {
-        Intent i = new Intent(this,MainActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent i = new Intent(this, MainActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
     }
 
@@ -304,9 +305,9 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     private BroadcastReceiver uploadComplete = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            allDone= true;
+            allDone = true;
             dismissActivitySpinner();
-            if(initializeUpload) {
+            if (initializeUpload) {
                 showActivitySpinner("Submitting readings . . .");
                 submitData();
             }

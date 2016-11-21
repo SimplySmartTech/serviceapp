@@ -54,7 +54,7 @@ import static android.content.ContentValues.TAG;
  * Created by shailendrapsp on 7/11/16.
  */
 
-public class PhotoUploadService extends Service {
+public class PhotoUploadService extends Service{
 
     private TransferUtility transferUtility;
     private int count = 0;
@@ -133,35 +133,56 @@ public class PhotoUploadService extends Service {
 
     private void beginUpload(ReadingDataRealm readingDataRealm) {
         Log.d("Local photo url:",readingDataRealm.getLocal_photo_url());
-        String filePath = compressImage(readingDataRealm.getLocal_photo_url());
-        if (filePath == null) {
-//            Toast.makeText(this, "Could not find the filepath of the selected file", Toast.LENGTH_LONG).show();
-            return;
-        }
-
+        String filePath;
         try {
-            File file = new File(filePath);
-            TransferObserver observer = transferUtility.upload(
-                    AWSConstants.BUCKET_NAME,
-                    AWSConstants.PATH_FOLDER + file.getName(),
-                    file, CannedAccessControlList.PublicRead);
+            filePath = compressImage(readingDataRealm.getLocal_photo_url());
 
-            observer.setTransferListener(new UploadListener(readingDataRealm.getTimestamp(), file.getName()));
-            count++;
+            if (filePath == null) {
+//            Toast.makeText(this, "Could not find the filepath of the selected file", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            try {
+                File file = new File(filePath);
+                TransferObserver observer = transferUtility.upload(
+                        AWSConstants.BUCKET_NAME,
+                        AWSConstants.PATH_FOLDER + file.getName(),
+                        file, CannedAccessControlList.PublicRead);
+
+                observer.setTransferListener(new UploadListener(readingDataRealm.getTimestamp(), file.getName(), readingDataRealm));
+                count++;
 //            Toast.makeText(getApplicationContext(), "Network Available : Set for uploading"+filePath, Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }catch (Exception e){
             e.printStackTrace();
+            count --;
+            if(count==0){
+                sendUploadCompleteBroadcast();
+            }
         }
+    }
+
+    public void onUploadComplete(ReadingDataRealm readingDataRealm, String aws_url) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        readingDataRealm.setPhotographic_evidence_url(aws_url);
+        readingDataRealm.setUploadedImage(true);
+        realm.commitTransaction();
+        DebugLog.d("URL:"+readingDataRealm.getPhotographic_evidence_url());
     }
 
     class UploadListener implements TransferListener {
 
         private String fileName;
         private long timestamp;
+        private ReadingDataRealm rdr;
 
-        UploadListener(long timestamp, String fileName) {
+        UploadListener(long timestamp, String fileName,ReadingDataRealm rdr) {
             this.fileName = fileName;
             this.timestamp = timestamp;
+            this.rdr = rdr;
         }
 
         @Override
@@ -191,22 +212,17 @@ public class PhotoUploadService extends Service {
 
                 DebugLog.d("URL :::: " + url);
 
-                Realm realm = Realm.getDefaultInstance();
-                ReadingDataRealm reading = realm.where(ReadingDataRealm.class).equalTo("timestamp",timestamp).findFirst();
-
-                realm.beginTransaction();
-                reading.setUploadedImage(true);
-                reading.setPhotographic_evidence_url(url);
-                realm.commitTransaction();
-
                 count --;
                 Log.d("COUNT : ", count+"");
                 if(count==0){
                     sendUploadCompleteBroadcast();
                 }
 
+                onUploadComplete(rdr,url);
             }
         }
+
+
     }
 
     private String secondCompressMethod(String path) {
@@ -316,6 +332,7 @@ public class PhotoUploadService extends Service {
             scaledBitmap = Bitmap.createBitmap(actualWidth, actualHeight, Bitmap.Config.ARGB_8888);
         } catch (OutOfMemoryError exception) {
             exception.printStackTrace();
+
         }
 
         float ratioX = actualWidth / (float) options.outWidth;
@@ -404,4 +421,3 @@ public class PhotoUploadService extends Service {
     }
 
 }
-

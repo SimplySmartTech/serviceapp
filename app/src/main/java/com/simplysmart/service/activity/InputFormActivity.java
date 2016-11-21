@@ -332,6 +332,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 if (needSpinner) {
                     if(!tare_weight.equals("")){
                         saveReadingToDisk();
+                        tareWeightSpinner.setSelection(0);
                     }else{
                         showSnackBar(mParentLayout, "Please select tare weight");
                     }
