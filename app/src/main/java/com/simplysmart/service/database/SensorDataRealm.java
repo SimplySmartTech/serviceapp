@@ -50,11 +50,12 @@ public class SensorDataRealm extends RealmObject{
         this.isChecked = sensorData.isChecked();
     }
 
-    public static boolean alreadyExists(String sensor_name){
+    public static boolean alreadyExists(String sensor_name,String utility_identifier){
         Realm realm = Realm.getDefaultInstance();
         RealmResults<SensorDataRealm> results = realm
                 .where(SensorDataRealm.class)
                 .equalTo("sensor_name",sensor_name)
+                .equalTo("utility_identifier",utility_identifier)
                 .findAll();
         if(results.size()>0){
             return true;

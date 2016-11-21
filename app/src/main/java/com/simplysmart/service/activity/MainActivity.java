@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,15 +31,12 @@ import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
-import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.custom_views.CustomGridLayoutManager;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
-import com.simplysmart.service.dialog.SubmitReadingDialog;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.LogoutListener;
 import com.simplysmart.service.model.common.APIError;
@@ -92,7 +88,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         setContentView(R.layout.activity_main);
 
         getUserInfo();
-
 
 
     }
@@ -238,7 +233,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 RealmList<SensorDataRealm> sensorDataRealmList = new RealmList<>();
                 for (int j = 0; j < matrixData.getSensors().size(); j++) {
                     SensorDataRealm data;
-                    if (!SensorDataRealm.alreadyExists(matrixData.getSensors().get(j).getSensor_name())) {
+                    if (!SensorDataRealm.alreadyExists(matrixData.getSensors().get(j).getSensor_name(), matrixData.getUtility_id())) {
                         realm.beginTransaction();
                         data = realm.createObject(SensorDataRealm.class);
                         data.setData(matrixData.getSensors().get(j));
@@ -247,12 +242,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         realm.beginTransaction();
                         data = realm.where(SensorDataRealm.class)
                                 .equalTo("sensor_name", matrixData.getSensors().get(j).getSensor_name())
-                                .equalTo("utility_identifier",matrixData.getUtility_id())
+                                .equalTo("utility_identifier", matrixData.getUtility_id())
                                 .findFirst();
+
                         data.setData(matrixData.getSensors().get(j));
                         realm.commitTransaction();
                     }
-
                     sensorDataRealmList.add(data);
                 }
 
@@ -282,11 +277,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 }
             }
 
-//            //TODO CHeck why this happens.
-//            realm.beginTransaction();
-//            SensorDataRealm sensorDataRealm = realm.where(SensorDataRealm.class).equalTo("sensor_name","Overflow").findFirst();
-//            sensorDataRealm.setUnit("pH");
-//            realm.commitTransaction();
+            //TODO CHeck why this h
+            realm.beginTransaction();
+            SensorDataRealm sensorDataRealm = realm.where(SensorDataRealm.class).equalTo("sensor_name", "Overflow").findFirst();
+            sensorDataRealm.setUnit("pH");
+            realm.commitTransaction();
 
             savedToDisk = true;
             setDataInList(realm);
@@ -329,14 +324,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             Collections.sort(adapterData, new Comparator<MatrixData>() {
                 @Override
                 public int compare(MatrixData o1, MatrixData o2) {
-                    return o1.getOrder()-o2.getOrder();
+                    return o1.getOrder() - o2.getOrder();
                 }
             });
 
             matrixListAdapter = new MatrixListAdapter(this, adapterData);
         }
 
-        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,2);
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
         matrixList.setLayoutManager(gridLayoutManager);
 
         String text = new Gson().toJson(adapterData);
@@ -385,7 +380,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         String text = new Gson().toJson(adapterData);
         Log.d("Data saved:", text);
 
-        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this,2);
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
         matrixList.setLayoutManager(gridLayoutManager);
         matrixList.setAdapter(matrixListAdapter);
 
@@ -464,7 +459,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
-        submitButton = (Button)findViewById(R.id.submit);
+        submitButton = (Button) findViewById(R.id.submit);
         no_data_found = (TextView) findViewById(R.id.no_data_found);
         matrixList = (RecyclerView) findViewById(R.id.matrixList);
 
@@ -472,9 +467,9 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         Calendar calendar = Calendar.getInstance();
         long time = calendar.getTimeInMillis();
         calendar.setTimeInMillis(time);
-        String month = calendar.getDisplayName(Calendar.MONTH,Calendar.SHORT,Locale.getDefault());
-        int dateOfMonth= calendar.get(Calendar.DATE);
-        buttonText = "Submit readings for "+dateOfMonth+" "+month;
+        String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
+        int dateOfMonth = calendar.get(Calendar.DATE);
+        buttonText = "Submit readings for " + dateOfMonth + " " + month;
 
         Realm realm = Realm.getDefaultInstance();
         ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
@@ -483,10 +478,10 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
 
             if (!oldDate.equals(newDate)) {
-                calendar.setTimeInMillis(time-86400000);
-                month = calendar.getDisplayName(Calendar.MONTH,Calendar.SHORT,Locale.getDefault());
+                calendar.setTimeInMillis(time - 86400000);
+                month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
                 dateOfMonth = calendar.get(Calendar.DATE);
-                buttonText = "Submit readings for "+dateOfMonth+" "+month;
+                buttonText = "Submit readings for " + dateOfMonth + " " + month;
             }
         }
 
@@ -494,7 +489,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivity.this,SummaryActivity.class);
+                Intent i = new Intent(MainActivity.this, SummaryActivity.class);
                 startActivity(i);
             }
         });
