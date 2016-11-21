@@ -279,6 +279,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 }
             }
 
+            //TODO CHeck why this happens.
+            realm.beginTransaction();
+            SensorDataRealm sensorDataRealm = realm.where(SensorDataRealm.class).equalTo("sensor_name","Overflow").findFirst();
+            sensorDataRealm.setUnit("pH");
+            realm.commitTransaction();
+
             savedToDisk = true;
             setDataInList(realm);
 
@@ -535,10 +541,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 return true;
             }
         });
-
-
-
-
 
         //        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
 //            @Override
