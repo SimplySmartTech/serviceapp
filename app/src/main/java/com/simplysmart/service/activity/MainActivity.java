@@ -88,8 +88,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         setContentView(R.layout.activity_main);
 
         getUserInfo();
-
-
     }
 
     @Override
@@ -139,7 +137,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     public void refreshLayout() {
         if (NetworkUtilities.isInternet(this)) {
@@ -253,6 +250,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
                 matrixDataRealm.setSensors(sensorDataRealmList);
                 MatrixDataRealm dataRealm;
+
                 if (!MatrixDataRealm.alreadyExists(matrixData.getUtility_id())) {
                     realm.beginTransaction();
                     dataRealm = realm.copyToRealm(matrixDataRealm);
@@ -276,12 +274,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                     realm.commitTransaction();
                 }
             }
-
-            //TODO CHeck why this h
-            realm.beginTransaction();
-            SensorDataRealm sensorDataRealm = realm.where(SensorDataRealm.class).equalTo("sensor_name", "Overflow").findFirst();
-            sensorDataRealm.setUnit("pH");
-            realm.commitTransaction();
 
             savedToDisk = true;
             setDataInList(realm);
@@ -354,27 +346,34 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 .where(MatrixDataRealm.class)
                 .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
                 .findAll();
+
         if (result.size() > 0) {
             no_data_found.setVisibility(View.GONE);
             for (int i = 0; i < result.size(); i++) {
+
                 MatrixData matrixData = new MatrixData();
                 matrixData.setIcon(result.get(i).getIcon());
                 matrixData.setType(result.get(i).getType());
                 matrixData.setUtility_id(result.get(i).getUtility_id());
                 ArrayList<SensorData> sensors = new ArrayList<>();
-                for (int j = 0; j < result.get(i).getSensors().size(); j++) {
-                    SensorData sensorData = new SensorData(result.get(i).getSensors().get(j));
-                    sensors.add(sensorData);
+
+                RealmList<SensorDataRealm> sensorResult = SensorDataRealm.getForUtilityId(matrixData.getUtility_id());
+                if (sensorResult != null && sensorResult.size() > 0) {
+                    for (int j = 0; j < sensorResult.size(); j++) {
+                        SensorData sensorData = new SensorData(sensorResult.get(j));
+                        sensors.add(sensorData);
+                    }
                 }
-                matrixData.setSensors(sensors);
+                if (sensors != null && sensors.size() > 0) {
+                    matrixData.setSensors(sensors);
+                }
                 adapterData.add(matrixData);
             }
         } else {
             sgtz = false;
             no_data_found.setText("No data found.");
-
-
         }
+
         matrixListAdapter = new MatrixListAdapter(this, adapterData);
 
         String text = new Gson().toJson(adapterData);
@@ -539,37 +538,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 return true;
             }
         });
-
-        //        matrixList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//            @Override
-//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//
-//                Intent intent = new Intent(MainActivity.this, InputFormActivity.class);
-//                intent.putExtra("SENSOR_DATA", adapterData.get(groupPosition).getSensors().get(childPosition));
-//                intent.putExtra("groupPosition", groupPosition);
-//                intent.putExtra("childPosition", childPosition);
-//                startActivity(intent);
-//                return true;
-//            }
-//        });
-//
-//        matrixList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-//            @Override
-//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-//                return true;
-//            }
-//        });
-
-//        matrixList.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-//            @Override
-//            public void onGroupExpand(int groupPosition) {
-//                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
-//                    matrixList.collapseGroup(lastExpandedPosition);
-//                }
-//                lastExpandedPosition = groupPosition;
-//            }
-//        });
-
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {

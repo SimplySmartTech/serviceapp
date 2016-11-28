@@ -111,6 +111,7 @@ public class MatrixDataRealm extends RealmObject {
                 .equalTo("utility_id",utility_id)
                 .equalTo("sensor_name", sensor_name)
                 .findAll();
+
         for (ReadingDataRealm dataRealm:results) {
             try {
                 if(dataRealm.getLocal_photo_url()!=null && !dataRealm.getLocal_photo_url().equals("")) {

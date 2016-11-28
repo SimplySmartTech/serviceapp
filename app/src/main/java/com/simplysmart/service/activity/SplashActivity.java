@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -17,6 +18,8 @@ import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
 
 import java.util.ArrayList;
+
+import io.realm.Realm;
 
 
 /**
@@ -36,7 +39,18 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor userInfoEdit = UserInfo.edit();
         isLogin = UserInfo.getBoolean("isLogin", false);
+
+        if (UserInfo.getBoolean("isFirstStart", true)) {
+            userInfoEdit.putBoolean("isFirstStart", false).commit();
+            Realm realm = Realm.getDefaultInstance();
+            try {
+                realm.deleteAll();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
 
         switchToNextActivity();
     }

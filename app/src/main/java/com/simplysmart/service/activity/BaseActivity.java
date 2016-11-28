@@ -384,16 +384,24 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void clearApplicationData() {
         File cacheDirectory = getCacheDir();
         File applicationDirectory = new File(cacheDirectory.getParent());
-        if (applicationDirectory.exists()) {
-            String[] fileNames = applicationDirectory.list();
-            for (String fileName : fileNames) {
-                if (!fileName.equals("lib")) {
-                    deleteFile(new File(applicationDirectory, fileName));
+        try {
+            if (applicationDirectory.exists()) {
+                String[] fileNames = applicationDirectory.list();
+                for (String fileName : fileNames) {
+                    if (!fileName.equals("lib")) {
+                        deleteFile(new File(applicationDirectory, fileName));
+                    }
                 }
             }
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
-        deleteFile(new File(Environment.getExternalStorageDirectory()+"/"+ StringConstants.STORAGE_DIRECTORY));
+        try {
+            deleteFile(new File(Environment.getExternalStorageDirectory() + "/" + StringConstants.STORAGE_DIRECTORY));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public static boolean deleteFile(File file) {
