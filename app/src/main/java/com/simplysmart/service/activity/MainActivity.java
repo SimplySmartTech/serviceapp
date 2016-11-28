@@ -556,7 +556,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 .noFade()
                 .resize(64, 64)
                 .error(R.drawable.ic_menu_slideshow).into(view);
-
     }
 
     @Override
