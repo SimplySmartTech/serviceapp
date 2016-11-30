@@ -10,15 +10,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.renderscript.ScriptGroup;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -38,6 +42,7 @@ import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.ReadingListAdapter;
 import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
+import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
@@ -156,6 +161,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
 
         initialiseViews();
+        setupUI(mParentLayout);
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {
@@ -209,7 +215,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         tareWeightSpinner = (Spinner) findViewById(R.id.tare_weight_spinner);
         unit.setText(sensorData.getUnit());
 
-
+        mInputReadingValue.clearFocus();
+        CommonMethod.hideKeyboard(this);
     }
 
     private void checkForPermissions() {
@@ -270,6 +277,32 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     private void initialiseViews() {
+
+        mInputReadingValue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mInputReadingValue.setCursorVisible(true);
+            }
+        });
+
+        mInputReadingValue.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                        case KeyEvent.KEYCODE_DPAD_CENTER:
+                        case KeyEvent.KEYCODE_ENTER:
+                            CommonMethod.hideKeyboard(InputFormActivity.this);
+                            mInputReadingValue.setCursorVisible(false);
+                            return true;
+                        default:
+                            break;
+                    }
+                }
+                return false;
+            }
+        });
+
         if (sensorData != null && sensorData.getPhotographic_evidence() != null && sensorData.getPhotographic_evidence().equalsIgnoreCase("true")) {
             uploadImage.setVisibility(View.VISIBLE);
             middleLine.setVisibility(View.VISIBLE);
@@ -281,6 +314,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         uploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mInputReadingValue.setCursorVisible(false);
                 customImagePicker();
             }
         });
@@ -305,9 +339,9 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             tareWeightSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if(position>0) {
+                    if (position > 0) {
                         tare_weight = tareWeightsList.get(position - 1).getValue();
-                    }else{
+                    } else {
                         tare_weight = null;
                     }
                 }
@@ -327,24 +361,23 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         submitForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    mInputReadingValue.clearFocus();
-                    //TODO Try to improve this.
-                    if (needSpinner) {
-                        if (tare_weight!=null) {
-                            saveReadingToDisk();
-                            tareWeightSpinner.setSelection(0);
-                            tare_weight = null;
-                        } else {
-                            showSnackBar(mParentLayout, "Please select tare weight");
-                        }
-                    } else {
+
+                if (needSpinner) {
+                    if (tare_weight != null) {
                         saveReadingToDisk();
+                        tareWeightSpinner.setSelection(0);
+                        tare_weight = null;
+                    } else {
+                        showSnackBar(mParentLayout, "Please select tare weight");
                     }
+                } else {
+                    saveReadingToDisk();
+                }
             }
         });
     }
 
-    private void saveReadingToDisk(){
+    private void saveReadingToDisk() {
         if (imageTaken) {
             if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
                 submitForImage();
@@ -362,7 +395,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
     }
 
-    private void submitForImage(){
+    private void submitForImage() {
         readingData = new ReadingData();
         readingData.setUtility_id(sensorData.getUtility_identifier());
         readingData.setValue(mInputReadingValue.getText().toString());
@@ -383,7 +416,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
     }
 
-    private void submitWithoutImage(){
+    private void submitWithoutImage() {
         readingData = new ReadingData();
         readingData.setUtility_id(sensorData.getUtility_identifier());
         readingData.setValue(mInputReadingValue.getText().toString());
@@ -706,5 +739,23 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
     }
 
+    public void setupUI(View view) {
 
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    CommonMethod.hideKeyboard(InputFormActivity.this);
+                    mInputReadingValue.setCursorVisible(false);
+                    return false;
+                }
+            });
+        }
+
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView);
+            }
+        }
+    }
 }
