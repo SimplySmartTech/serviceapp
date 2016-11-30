@@ -26,6 +26,7 @@ public class SensorDataRealm extends RealmObject{
     private String duration_unit;
     private String duration_type;
     private String utility_identifier;
+    private boolean tare_weight;
     private boolean isChecked;
 
     public SensorDataRealm(){}
@@ -48,6 +49,7 @@ public class SensorDataRealm extends RealmObject{
         this.duration_type = sensorData.getDuration_type();
         this.utility_identifier = sensorData.getUtility_identifier();
         this.isChecked = sensorData.isChecked();
+        this.tare_weight = sensorData.isTare_weight();
     }
 
     public static boolean alreadyExists(String sensor_name,String utility_identifier){
@@ -176,5 +178,13 @@ public class SensorDataRealm extends RealmObject{
 
     public void setChecked(boolean checked) {
         isChecked = checked;
+    }
+
+    public boolean isTare_weight() {
+        return tare_weight;
+    }
+
+    public void setTare_weight(boolean tare_weight) {
+        this.tare_weight = tare_weight;
     }
 }

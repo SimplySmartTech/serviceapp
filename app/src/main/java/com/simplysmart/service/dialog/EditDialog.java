@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.activity.InputFormActivity;
+import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
@@ -82,8 +85,33 @@ public class EditDialog extends DialogFragment {
         dialogNegativeButton.setTextColor(Color.RED);
         unit.setText(readingDataRealm.getUnit());
         newReading.setText(readingDataRealm.getValue());
-        newReading.setSelection(newReading.getText().length());
         newReading.setCursorVisible(false);
+
+        newReading.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newReading.setSelection(newReading.getText().length());
+                newReading.setCursorVisible(true);
+            }
+        });
+
+        newReading.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    switch (keyCode) {
+                        case KeyEvent.KEYCODE_DPAD_CENTER:
+                        case KeyEvent.KEYCODE_ENTER:
+                            newReading.setCursorVisible(false);
+                            CommonMethod.hideKeyboard(getActivity());
+                            return true;
+                        default:
+                            break;
+                    }
+                }
+                return false;
+            }
+        });
 
         dialogPositiveButton.setOnClickListener(new View.OnClickListener() {
             @Override

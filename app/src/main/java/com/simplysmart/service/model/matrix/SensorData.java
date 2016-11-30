@@ -23,6 +23,7 @@ public class SensorData implements Parcelable {
     private String duration_unit;
     private String duration_type;
     private String utility_identifier;
+    private boolean tare_weight;
     private boolean isChecked;
 
     public SensorData(){}
@@ -40,7 +41,9 @@ public class SensorData implements Parcelable {
         this.duration_type = sensorData.getDuration_type();
         this.utility_identifier = sensorData.getUtility_identifier();
         this.isChecked = sensorData.isChecked();
+        this.tare_weight = sensorData.isTare_weight();
     }
+
 
     protected SensorData(Parcel in) {
         site_name = in.readString();
@@ -54,6 +57,7 @@ public class SensorData implements Parcelable {
         duration_unit = in.readString();
         duration_type = in.readString();
         utility_identifier = in.readString();
+        tare_weight = in.readByte() != 0;
         isChecked = in.readByte() != 0;
     }
 
@@ -70,6 +74,7 @@ public class SensorData implements Parcelable {
         dest.writeString(duration_unit);
         dest.writeString(duration_type);
         dest.writeString(utility_identifier);
+        dest.writeByte((byte) (tare_weight ? 1 : 0));
         dest.writeByte((byte) (isChecked ? 1 : 0));
     }
 
@@ -184,5 +189,13 @@ public class SensorData implements Parcelable {
 
     public void setUtility_identifier(String utility_identifier) {
         this.utility_identifier = utility_identifier;
+    }
+
+    public boolean isTare_weight() {
+        return tare_weight;
+    }
+
+    public void setTare_weight(boolean tare_weight) {
+        this.tare_weight = tare_weight;
     }
 }

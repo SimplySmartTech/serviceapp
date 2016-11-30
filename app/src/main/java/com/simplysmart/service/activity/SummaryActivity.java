@@ -179,14 +179,25 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         summary.setAdapter(adapter);
 
         TextView no_data_found = (TextView) findViewById(R.id.no_data_found);
+        TextView add_new_data = (TextView) findViewById(R.id.add_reading_now);
+        add_new_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(SummaryActivity.this,MainActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
+
         if (summaryList.size() > 0) {
             summary.setVisibility(View.VISIBLE);
             no_data_found.setVisibility(View.GONE);
+            add_new_data.setVisibility(View.GONE);
             submit.setVisibility(View.VISIBLE);
         } else {
             summary.setVisibility(View.GONE);
-            no_data_found.setText("No data found.");
             no_data_found.setVisibility(View.VISIBLE);
+            add_new_data.setVisibility(View.VISIBLE);
             submit.setVisibility(View.GONE);
         }
     }

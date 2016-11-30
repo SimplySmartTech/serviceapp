@@ -10,7 +10,7 @@
     <color name="bw_color_light_gray">#d0d0d0</color>
     <color name="bw_color_dark_red">#FF3300</color>
     <color name="bw_color_red">#FF3333</color>
-    <color name="bw_color_dark_gray">#909090</color>
+    <color name="bw_color_dark_gray">#969595</color>
     <color name="bw_color_darker_gray">#707070</color>
     <color name="bw_color_white_semi_trans">#40FFFFFF</color>
 
@@ -29,5 +29,6 @@
     <color name="gal_color_amber">#FFC200</color>
 
     <color name="transparent">#00000000</color>
+    <color name="textColorList">#b5b4b4</color>
 
 </resources>

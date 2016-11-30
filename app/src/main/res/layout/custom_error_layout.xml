@@ -11,13 +11,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:padding="5dp"
-        android:visibility="gone"
         android:drawablePadding="10dp"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        android:textColor="@color/colorPrimary"
-        android:gravity="center_horizontal"
         android:drawableTop="@drawable/bw_no_data_found"
-        android:text="@string/error_no_data_found" />
+        android:gravity="center_horizontal"
+        android:padding="5dp"
+        android:text="@string/error_no_data_found"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/add_reading_now"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/no_data_found"
+        android:layout_centerHorizontal="true"
+        android:background="?attr/selectableItemBackground"
+        android:padding="16dp"
+        android:text="@string/add_data_now"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
 </RelativeLayout>

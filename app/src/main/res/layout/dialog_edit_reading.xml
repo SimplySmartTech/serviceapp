@@ -53,7 +53,7 @@
                 android:layout_toStartOf="@+id/unit"
                 android:gravity="start"
                 android:hint="Old value"
-                android:inputType="textEmailAddress"
+                android:inputType="numberDecimal"
                 android:padding="10dp"
                 android:textSize="15sp" />
 

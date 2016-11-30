@@ -37,7 +37,7 @@
         android:layout_alignParentBottom="true"
         android:background="@color/accent"
         android:padding="4dp"
-        android:text="Submit"
+        android:text="Confirm"
         android:textColor="@color/bw_color_white"
         android:textSize="14sp" />
 

@@ -113,7 +113,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
     private ReadingListAdapter readingListAdapter;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,7 +149,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 dialog.show(getFragmentManager(), "submitDialog");
             }
         }
-
 
         RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
         if (localDataList == null || localDataList.size() == 0) {
@@ -201,6 +199,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         if (newValue==StringConstants.NEW_VALUE) {
             readingListAdapter.notifyItemChanged(position);
         }else if(newValue == StringConstants.VALUE_DELETED){
+            ArrayList<ReadingDataRealm> readings = readingListAdapter.getReadingsList();
+            readings.remove(position);
             readingListAdapter.notifyItemRemoved(position);
         }
     }
@@ -330,7 +330,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             }
         }
 
-        if (sensorData.getSensor_name().trim().equalsIgnoreCase("net weight")) {
+        if (sensorData!=null && sensorData.isTare_weight()) {
             needSpinner = true;
             ArrayAdapter<String> tareWeightAdapter = new ArrayAdapter<String>(InputFormActivity.this, android.R.layout.simple_spinner_item, tareWeights);
             tareWeightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
