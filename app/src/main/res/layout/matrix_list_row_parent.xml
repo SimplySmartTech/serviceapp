@@ -5,18 +5,6 @@
     android:background="@drawable/card_bg"
     android:gravity="center_vertical">
 
-
-    <!--<TextView-->
-    <!--android:id="@+id/iconLabel"-->
-    <!--android:layout_width="20dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_centerVertical="true"-->
-    <!--android:layout_marginTop="2dp"-->
-    <!--android:gravity="center"-->
-    <!--android:textColor="@color/bw_color_black"-->
-    <!--android:textSize="20sp" />-->
-
-
     <LinearLayout
         android:id="@+id/parentLayout"
         android:orientation="vertical"
@@ -31,47 +19,33 @@
             android:id="@+id/typeName"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.6"
-            android:gravity="center"
-            android:padding="16dp"
-            android:inputType="textMultiLine"
+            android:layout_weight="0.45"
             android:background="@color/colorPrimaryDark"
-            android:paddingBottom="8dp"
-            android:text="Weight "
+            android:ellipsize="end"
+            android:gravity="center"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="Weight Sensor"
             android:textColor="@color/bw_color_white"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/unit"
-            android:text="Unit"
-            android:layout_weight="0.4"
-            android:gravity="center|top"
-            android:textColor="@color/bw_color_white"
+            android:text="@string/dummy_text"
+            android:layout_weight="0.55"
+            android:gravity="center"
+            android:maxLines="3"
+            android:ellipsize="end"
+            android:textColor="@color/bw_color_dark_gray"
             android:background="@color/colorPrimaryDark"
-            android:textSize="13dp"
+            android:textSize="13sp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp"
             android:layout_width="match_parent"
             android:layout_height="0dp" />
 
     </LinearLayout>
-
-    <!--<ImageView-->
-    <!--android:id="@+id/clickArrow"-->
-    <!--android:layout_width="25dp"-->
-    <!--android:layout_height="25dp"-->
-    <!--android:layout_alignParentEnd="true"-->
-    <!--android:scaleType="center"-->
-    <!--android:src="@drawable/gal_ic_arrow_down" />-->
-
-
-    <!--<View-->
-    <!--android:id="@+id/bottomSeparator"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="1dp"-->
-    <!--android:layout_marginStart="36dp"-->
-    <!--android:layout_marginEnd="36dp"-->
-    <!--android:layout_below="@id/name_layout"-->
-    <!--android:background="@color/bw_color_light_gray"-->
-    <!--android:visibility="visible"/>-->
 
 </RelativeLayout>

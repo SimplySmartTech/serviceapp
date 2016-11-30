@@ -2,78 +2,50 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
     android:background="@drawable/card_bg"
+    android:gravity="center_vertical"
     android:orientation="vertical">
-
-    <!--<TextView-->
-    <!--android:id="@+id/topSeparator"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height=".5dp"-->
-    <!--android:background="@color/bw_color_dark_gray" />-->
-
-        <!--<ImageView-->
-        <!--android:id="@+id/checkDoneImage"-->
-        <!--android:layout_width="20dp"-->
-        <!--android:layout_height="20dp"-->
-        <!--android:layout_marginStart="40dp"-->
-        <!--android:layout_marginTop="2dp"-->
-        <!--android:visibility="gone"-->
-        <!--android:src="@drawable/tick_grey" />-->
-
 
     <LinearLayout
         android:id="@+id/parentLayout"
-        android:orientation="vertical"
-        android:weightSum="1.0"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
         android:layout_centerInParent="true"
         android:background="?attr/selectableItemBackground"
-        android:layout_width="match_parent"
-        android:layout_height="120dp">
-
-        <!--<ImageView-->
-            <!--android:alpha="0.4"-->
-            <!--android:paddingStart="16dp"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:src="@drawable/ic_label_outline_black_24dp"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content" />-->
+        android:orientation="vertical"
+        android:weightSum="1.0">
 
         <TextView
             android:id="@+id/sensorName"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:ellipsize="end"
-            android:layout_weight="0.6"
-            android:gravity="center"
+            android:layout_weight="0.45"
             android:background="@color/colorPrimaryDark"
-            android:textColor="@color/bw_color_white"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
             android:text="Weight Sensor"
-            android:textStyle="bold"
-            android:textSize="16sp" />
+            android:textColor="@color/bw_color_white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/unit"
-            android:text="Unit"
-            android:layout_weight="0.4"
-            android:gravity="center|top"
-            android:textColor="@color/bw_color_white"
-            android:background="@color/colorPrimaryDark"
-            android:textSize="13dp"
             android:layout_width="match_parent"
-            android:layout_height="0dp" />
+            android:layout_height="0dp"
+            android:layout_weight="0.55"
+            android:background="@color/colorPrimaryDark"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="3"
+            android:paddingBottom="8dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="8dp"
+            android:text="@string/dummy_text"
+            android:textColor="@color/bw_color_dark_gray"
+            android:textSize="13sp" />
 
     </LinearLayout>
-
-    <!--<View-->
-        <!--android:visibility="gone"-->
-        <!--android:id="@+id/bottomSeparator"-->
-        <!--android:background="@color/bw_color_light_gray"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="1dp"/>-->
 
 </RelativeLayout>

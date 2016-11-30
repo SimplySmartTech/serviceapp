@@ -248,10 +248,13 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     }
 
     @Override
-    public void updateResult(boolean done, int position, String value) {
-        if (done) {
+    public void updateResult(int done, int position, String value) {
+        if (done == StringConstants.NEW_VALUE) {
             summaryList.get(position).setValue(value);
             adapter.notifyItemChanged(position);
+        }else if(done == StringConstants.VALUE_DELETED){
+            summaryList.remove(position);
+            adapter.notifyItemRemoved(position);
         }
     }
 

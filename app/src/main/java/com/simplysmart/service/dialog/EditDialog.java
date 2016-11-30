@@ -4,15 +4,18 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.config.GlobalData;
+import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.model.matrix.ReadingData;
 
@@ -58,6 +61,7 @@ public class EditDialog extends DialogFragment {
         final EditText newReading = (EditText) dialogView.findViewById(R.id.reading);
         Button dialogNegativeButton = (Button) dialogView.findViewById(R.id.dialogButtonNegative);
         Button dialogPositiveButton = (Button) dialogView.findViewById(R.id.dialogButtonPositive);
+        ImageView close =(ImageView) dialogView.findViewById(R.id.close);
 
         Bundle bundle = getArguments();
         String utilityId = bundle.getString(utility_id);
@@ -65,7 +69,6 @@ public class EditDialog extends DialogFragment {
         String sensorName = bundle.getString(sensor_name);
         long time = bundle.getLong(timestamp);
         final int pos = bundle.getInt(position);
-
 
         final Realm realm = Realm.getDefaultInstance();
         final ReadingDataRealm readingDataRealm = realm
@@ -75,8 +78,12 @@ public class EditDialog extends DialogFragment {
                 .equalTo("timestamp",time)
                 .findFirst();
 
+        dialogNegativeButton.setText("DELETE");
+        dialogNegativeButton.setTextColor(Color.RED);
         unit.setText(readingDataRealm.getUnit());
         newReading.setText(readingDataRealm.getValue());
+        newReading.setSelection(newReading.getText().length());
+        newReading.setCursorVisible(false);
 
         dialogPositiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,11 +98,11 @@ public class EditDialog extends DialogFragment {
                         e.printStackTrace();
                     }
                     EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                    editDialogListener.updateResult(true,pos,string+" "+readingDataRealm.getUnit());
+                    editDialogListener.updateResult(StringConstants.NEW_VALUE,pos,string+" "+readingDataRealm.getUnit());
                     dismiss();
                 }else{
                     EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                    editDialogListener.updateResult(false,pos,"");
+                    editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,pos,"");
                     dismiss();
                 }
             }
@@ -104,15 +111,33 @@ public class EditDialog extends DialogFragment {
         dialogNegativeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try{
+                    realm.beginTransaction();
+                    readingDataRealm.deleteFromRealm();
+                    realm.commitTransaction();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                EditDialogListener editDialogListener = (EditDialogListener)getActivity();
+                editDialogListener.updateResult(StringConstants.VALUE_DELETED,pos,"");
                 dismiss();
             }
         });
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
         builder.setView(dialogView);
         return builder.create();
     }
 
     public interface EditDialogListener {
-        void updateResult(boolean done,int position,String value);
+        void updateResult(int done,int position,String value);
     }
 
 }

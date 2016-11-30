@@ -9,139 +9,151 @@
         android:id="@+id/toolbar_Layout"
         layout="@layout/toolbar" />
 
-
-    <android.support.v7.widget.CardView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:background="@drawable/card_bg">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:padding="8dp">
+                android:layout_margin="4dp"
+                android:background="@drawable/card_bg">
 
-                <RelativeLayout
-                    android:id="@+id/readingLayout"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_toStartOf="@+id/submit"
-                    android:background="@drawable/rectangular_round_border_transparent"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/reading"
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginEnd="16dp"
-                        android:layout_toStartOf="@+id/photoLayout"
-                        android:background="@android:color/transparent"
-                        android:hint="Enter value"
-                        android:inputType="numberDecimal"
-                        android:cursorVisible="false"
-                        android:imeOptions="actionDone"
-                        android:padding="8dp"
-                        android:text=""
-                        android:textSize="16sp" />
+                        android:layout_gravity="center_vertical"
+                        android:padding="8dp">
 
-                    <LinearLayout
-                        android:id="@+id/photoLayout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:orientation="horizontal">
+                        <RelativeLayout
+                            android:id="@+id/readingLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@+id/submit"
+                            android:background="@drawable/rectangular_round_border_transparent"
+                            android:orientation="horizontal">
+
+                            <EditText
+                                android:id="@+id/reading"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:layout_marginEnd="16dp"
+                                android:layout_toStartOf="@+id/photoLayout"
+                                android:background="@android:color/transparent"
+                                android:cursorVisible="false"
+                                android:hint="Enter value"
+                                android:imeOptions="actionDone"
+                                android:inputType="numberDecimal"
+                                android:padding="8dp"
+                                android:text=""
+                                android:textSize="16sp" />
+
+                            <LinearLayout
+                                android:id="@+id/photoLayout"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/unit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginEnd="16dp"
+                                    android:text=""
+                                    android:textSize="16sp" />
+
+                                <View
+                                    android:id="@+id/middleSeparator"
+                                    android:layout_width="1dp"
+                                    android:layout_height="24dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:background="@color/bw_color_light_gray" />
+
+
+                                <ImageView
+                                    android:id="@+id/photo"
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center_vertical"
+                                    android:layout_marginEnd="8dp"
+                                    android:layout_marginStart="8dp"
+                                    android:alpha="0.4"
+                                    android:padding="4dp"
+                                    android:src="@drawable/ic_camera_alt_black_48dp" />
+
+                            </LinearLayout>
+
+                        </RelativeLayout>
 
                         <TextView
-                            android:id="@+id/unit"
+                            android:id="@+id/submit"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginEnd="16dp"
-                            android:text=""
-                            android:textSize="16sp" />
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="16dp"
+                            android:gravity="center_vertical|end"
+                            android:padding="16dp"
+                            android:text="@string/add"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
-                        <View
-                            android:id="@+id/middleSeparator"
-                            android:layout_width="1dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@color/bw_color_light_gray" />
+                    </RelativeLayout>
 
+                    <Spinner
+                        android:id="@+id/tare_weight_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_below="@id/submit"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="6dp"
+                        android:padding="8dp"
+                        android:visibility="visible" />
 
-                        <ImageView
-                            android:id="@+id/photo"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:layout_gravity="center_vertical"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginStart="8dp"
-                            android:alpha="0.4"
-                            android:padding="4dp"
-                            android:src="@drawable/ic_camera_alt_black_48dp" />
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
 
-                    </LinearLayout>
-
-
-                </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/submit"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/title_list"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="16dp"
-                    android:gravity="center_vertical|end"
-                    android:padding="16dp"
-                    android:text="@string/add"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Readings"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="visible" />
 
-            </RelativeLayout>
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/readingList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="4dp" />
 
-            <Spinner
-                android:id="@+id/tare_weight_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_below="@id/submit"
-                android:layout_marginBottom="8dp"
-                android:layout_marginEnd="6dp"
-                android:padding="8dp"
-                android:visibility="visible" />
+            </LinearLayout>
 
         </LinearLayout>
-    </android.support.v7.widget.CardView>
 
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/title_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:text="Readings"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:visibility="visible" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/readingList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
 
 </LinearLayout>

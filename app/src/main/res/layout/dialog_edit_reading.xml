@@ -13,14 +13,30 @@
         android:layout_marginTop="20dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/dialogTitle"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter new value"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginEnd="8dp"
+            android:orientation="horizontal"
+            android:weightSum="1.0">
+
+            <TextView
+                android:id="@+id/dialogTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.9"
+                android:text="Enter new value"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/close"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_weight="0.1"
+                android:src="@drawable/ic_close_black_24dp" />
+        </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -33,8 +49,8 @@
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_toStartOf="@+id/unit"
                 android:layout_marginTop="15dp"
+                android:layout_toStartOf="@+id/unit"
                 android:gravity="start"
                 android:hint="Old value"
                 android:inputType="textEmailAddress"
@@ -43,9 +59,9 @@
 
             <TextView
                 android:id="@+id/unit"
-                android:layout_alignParentEnd="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"

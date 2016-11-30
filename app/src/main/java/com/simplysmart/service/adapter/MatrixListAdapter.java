@@ -51,16 +51,19 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
     public void onBindViewHolder(ParentViewHolder holder, int position) {
 
         final MatrixData data = matrixData.get(position);
+        String sensorName = "";
         if(data.getType()!=null) {
-            holder.sensor_type.setText(data.getType());
+            sensorName = data.getType();
         }
+
         String unit;
         if(data.getSensors()!=null && data.getSensors().get(0)!=null && data.getSensors().get(0).getUnit()!=null) {
             unit = data.getSensors().get(0).getUnit();
         }else {
             unit = "";
         }
-        holder.unit.setText(unit);
+
+        holder.sensor_type.setText(sensorName + " ("+unit+")");
 
         holder.sensor_type.setOnClickListener(new View.OnClickListener() {
             @Override

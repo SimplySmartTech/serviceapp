@@ -41,9 +41,17 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
     @Override
     public void onBindViewHolder(ChildViewHolder holder, final int position) {
         final SensorData data = sensorData.get(position);
-        holder.sensor_name.setText(data.getSensor_name());
-        String unit = data.getUnit();
-        holder.unit.setText(unit);
+        String sensorName= "";
+        String unit;
+        if(data!=null && data.getSensor_name()!=null) {
+             sensorName = data.getSensor_name();
+        }
+        if(data!=null && data.getUnit()!=null) {
+            unit = data.getUnit();
+        }else{
+            unit = "";
+        }
+        holder.sensor_name.setText(sensorName+"( "+unit+")");
 
         holder.sensor_name.setOnClickListener(new View.OnClickListener() {
             @Override

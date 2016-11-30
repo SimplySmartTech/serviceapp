@@ -28,4 +28,9 @@ public class StringConstants {
     public static final int PERMISSION_EXTERNAL_STORAGE = 1;
     public static final int PERMISSION_CAMERA = 2;
 
+    public static final int NEW_VALUE = 0;
+    public static final int NO_NEW_VALUE = 1;
+    public static final int VALUE_DELETED = 2;
+
+
 }

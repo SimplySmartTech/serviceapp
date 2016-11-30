@@ -136,7 +136,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle("Input Reading");
+        getSupportActionBar().setTitle(sensorData.getSensor_name()+" reading");
 
         bindViews();
         Realm realm = Realm.getDefaultInstance();
@@ -197,12 +197,13 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     @Override
-    public void updateResult(boolean newValue, int position, String value) {
-        if (newValue) {
+    public void updateResult(int newValue, int position, String value) {
+        if (newValue==StringConstants.NEW_VALUE) {
             readingListAdapter.notifyItemChanged(position);
+        }else if(newValue == StringConstants.VALUE_DELETED){
+            readingListAdapter.notifyItemRemoved(position);
         }
     }
-
 
     private void bindViews() {
         mParentLayout = (LinearLayout) findViewById(R.id.parentLayout);
@@ -292,8 +293,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                     switch (keyCode) {
                         case KeyEvent.KEYCODE_DPAD_CENTER:
                         case KeyEvent.KEYCODE_ENTER:
-                            CommonMethod.hideKeyboard(InputFormActivity.this);
-                            mInputReadingValue.setCursorVisible(false);
+                            closeKeyboardAndCursor();
                             return true;
                         default:
                             break;
@@ -326,7 +326,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             tareWeights.add("--Select Tare Weight--");
             for (int i = 0; i < tareWeightsList.size(); i++) {
                 TareWeightRealm item = tareWeightsList.get(i);
-                tareWeights.add(item.getName() + " (" + item.getValue() + ")");
+                tareWeights.add(item.getName() + " (" + item.getValue() + "Kg )");
             }
         }
 
@@ -408,6 +408,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         mCurrentPhotoPath = "";
         uploadedReadingUrl = "";
         imageTaken = false;
+        uploadImage.setImageResource(R.drawable.ic_camera_alt_black_48dp);
         uploadedImage = false;
         if (NetworkUtilities.isInternet(InputFormActivity.this)) {
             Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
@@ -462,6 +463,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         readingListAdapter = new ReadingListAdapter(readingsList, this, getFragmentManager());
         readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
+        readingList.setNestedScrollingEnabled(false);
     }
 
     private void saveToDisk(ReadingData readingData) {
@@ -605,6 +607,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             try {
                 if (mCurrentPhotoPath != null) {
                     Log.d("CameraPhoto", mCurrentPhotoPath);
+                    setPic(uploadImage,mCurrentPhotoPath);
                     imageTaken = true;
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
@@ -619,6 +622,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 if (path != null) {
                     mCurrentPhotoPath = path;
                     Log.d("GalleryPhoto", mCurrentPhotoPath);
+                    setPic(uploadImage,mCurrentPhotoPath);
                     imageTaken = true;
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
@@ -629,11 +633,13 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
     }
 
-    private void setPic(ImageView view) {
+    private void setPic(ImageView view,String imageUrl) {
+        File image = new File(mCurrentPhotoPath);
 
         Picasso.with(InputFormActivity.this).load(image)
                 .placeholder(R.drawable.ic_menu_slideshow)
                 .noFade()
+                .resize(48,48)
                 .error(R.drawable.ic_menu_slideshow).into(view);
 
         view.setVisibility(View.VISIBLE);
@@ -740,12 +746,10 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     public void setupUI(View view) {
-
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
                 public boolean onTouch(View v, MotionEvent event) {
-                    CommonMethod.hideKeyboard(InputFormActivity.this);
-                    mInputReadingValue.setCursorVisible(false);
+                    closeKeyboardAndCursor();
                     return false;
                 }
             });
@@ -757,5 +761,10 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 setupUI(innerView);
             }
         }
+    }
+
+    public void closeKeyboardAndCursor(){
+        mInputReadingValue.setCursorVisible(false);
+        CommonMethod.hideKeyboard(InputFormActivity.this);
     }
 }

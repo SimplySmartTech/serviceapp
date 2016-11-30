@@ -24,5 +24,6 @@
     <string name="error_no_data_found">No data found.</string>
     <string name="edit_value">EDIT</string>
     <string name="add">ADD</string>
+    <string name="dummy_text">Weight of the empty truck — dropdown with truck number and editable field to update or add new truck number with photo</string>
 
 </resources>
