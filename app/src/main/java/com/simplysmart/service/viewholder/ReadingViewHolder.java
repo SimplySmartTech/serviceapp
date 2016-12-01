@@ -16,7 +16,7 @@ import com.simplysmart.service.R;
 public class ReadingViewHolder extends RecyclerView.ViewHolder {
 
     public TextView reading,time,edit;
-    public ImageView photo,photoDone;
+    public ImageView photo;
 
     public ReadingViewHolder(View itemView) {
         super(itemView);
@@ -24,6 +24,5 @@ public class ReadingViewHolder extends RecyclerView.ViewHolder {
         time = (TextView)itemView.findViewById(R.id.time);
         edit = (TextView) itemView.findViewById(R.id.edit);
         photo = (ImageView) itemView.findViewById(R.id.photo);
-        photoDone = (ImageView) itemView.findViewById(R.id.synched);
     }
 }

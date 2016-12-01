@@ -11,4 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <Button
+        android:text="@string/take_new_image"
+        android:background="@color/bw_color_white_semi_trans"
+        android:id="@+id/discardImage"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </RelativeLayout>

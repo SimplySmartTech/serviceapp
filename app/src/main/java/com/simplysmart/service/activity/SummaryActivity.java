@@ -86,8 +86,12 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                initializeUpload = true;
-                checkAndSubmitData();
+                if(NetworkUtilities.isInternet(SummaryActivity.this)) {
+                    initializeUpload = true;
+                    checkAndSubmitData();
+                }else {
+                    showSnackBar(mParentLayout,getString(R.string.error_no_internet_connection),false);
+                }
             }
         });
 
@@ -238,10 +242,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
             case android.R.id.home:
                 supportFinishAfterTransition();
                 return true;
-            case R.id.submit:
-                initializeUpload = true;
-                checkAndSubmitData();
-                return true;
+
             default:
                 return false;
         }

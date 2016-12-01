@@ -59,15 +59,9 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         holder.time.setText(readingDataRealm.getDate());
 
         if (imageFound) {
-            if (readingDataRealm.isUploadedImage()) {
-                holder.photoDone.setImageResource(R.drawable.tick_green);
-            } else {
-                holder.photoDone.setImageResource(R.drawable.tick_grey);
-            }
             setPic(holder.photo, image);
             holder.photo.setAlpha(1.0f);
         } else {
-            holder.photoDone.setVisibility(View.INVISIBLE);
             setPic(holder.photo, null);
             holder.photo.setAlpha(0.4f);
         }
