@@ -2,6 +2,7 @@ package com.simplysmart.service.adapter;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.activity.ImageViewActivity;
+import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.viewholder.ReadingViewHolder;
@@ -41,7 +44,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final ReadingViewHolder holder, int position) {
+    public void onBindViewHolder(final ReadingViewHolder holder, final int position) {
         final ReadingDataRealm readingDataRealm = readingsList.get(position);
         String reading = readingDataRealm.getValue() + "  " + readingDataRealm.getUnit();
         boolean imageFound = true;
@@ -76,6 +79,14 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
             }
         });
 
+        holder.photo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(mContext, ImageViewActivity.class);
+                i.putExtra(StringConstants.PHOTO_PATH,readingsList.get(position).getLocal_photo_url());
+                mContext.startActivity(i);
+            }
+        });
     }
 
     @Override

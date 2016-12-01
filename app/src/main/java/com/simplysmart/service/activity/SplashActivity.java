@@ -43,10 +43,12 @@ public class SplashActivity extends Activity {
         isLogin = UserInfo.getBoolean("isLogin", false);
 
         if (UserInfo.getBoolean("isFirstStart", true)) {
-            userInfoEdit.putBoolean("isFirstStart", false).commit();
+            userInfoEdit.putBoolean("isFirstStart", false).apply();
             Realm realm = Realm.getDefaultInstance();
             try {
+                realm.beginTransaction();
                 realm.deleteAll();
+                realm.commitTransaction();
             }catch (Exception e){
                 e.printStackTrace();
             }

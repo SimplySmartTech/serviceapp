@@ -314,11 +314,15 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         uploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mInputReadingValue.setCursorVisible(false);
-                customImagePicker();
+                if(imageTaken && mCurrentPhotoPath!=null && !mCurrentPhotoPath.equals("")){
+                    Intent intent = new Intent(InputFormActivity.this,ImageViewActivity.class);
+                    intent.putExtra(StringConstants.PHOTO_PATH,mCurrentPhotoPath);
+                    startActivity(intent);
+                }else {
+                    customImagePicker();
+                }
             }
         });
-
 
         ArrayList<String> tareWeights = new ArrayList<>();
         final RealmResults<TareWeightRealm> tareWeightsList = TareWeightRealm.getTareWeights(GlobalData.getInstance().getSelectedUnitId());
@@ -576,15 +580,12 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     private File createImageFile() throws IOException {
+
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-
-        File storageDir = new File(Environment.getExternalStorageDirectory(), StringConstants.STORAGE_DIRECTORY);
-
-        if (!storageDir.exists()) {
-            storageDir.mkdirs();
-        }
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         image = File.createTempFile(imageFileName, ".jpg", storageDir);
+
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
     }
@@ -607,8 +608,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             try {
                 if (mCurrentPhotoPath != null) {
                     Log.d("CameraPhoto", mCurrentPhotoPath);
-                    setPic(uploadImage,mCurrentPhotoPath);
-                    imageTaken = true;
+                    compressAndDeleteFile(mCurrentPhotoPath,true);
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
                 }
@@ -621,9 +621,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 String path = getPath(uri);
                 if (path != null) {
                     mCurrentPhotoPath = path;
+                    compressAndDeleteFile(mCurrentPhotoPath,false);
                     Log.d("GalleryPhoto", mCurrentPhotoPath);
-                    setPic(uploadImage,mCurrentPhotoPath);
-                    imageTaken = true;
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
                 }
@@ -633,11 +632,37 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         }
     }
 
+    private void compressAndDeleteFile(String imageUrl, boolean delete) {
+        File imageFile = new File(imageUrl);
+        String compressedPath = "";
+
+        if(imageFile.exists()) {
+            try {
+                compressedPath = compressImage(imageUrl);
+                DebugLog.d(compressedPath);
+                if(!compressedPath.equals("")) {
+                    if(delete) {
+                        imageFile.delete();
+                    }
+                }else {
+                    showSnackBar(mParentLayout, "Unable to compress image file inside.");
+                }
+            }catch (Exception e) {
+                e.printStackTrace();
+                showSnackBar(mParentLayout, "Unable to compress image file.");
+            }
+        }
+
+        mCurrentPhotoPath = compressedPath;
+        imageTaken = true;
+        setPic(uploadImage,mCurrentPhotoPath);
+    }
+
     private void setPic(ImageView view,String imageUrl) {
-        File image = new File(mCurrentPhotoPath);
+        File image = new File(imageUrl);
 
         Picasso.with(InputFormActivity.this).load(image)
-                .placeholder(R.drawable.ic_menu_slideshow)
+                .placeholder(R.drawable.ic_photo_black_48dp)
                 .noFade()
                 .resize(48,48)
                 .error(R.drawable.ic_menu_slideshow).into(view);

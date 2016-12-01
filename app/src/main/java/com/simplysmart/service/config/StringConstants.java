@@ -11,7 +11,7 @@ public class StringConstants {
     public static String LOCAL_IMAGE_URL = "LOCAL_IMAGE_URL";
     public static String TIMESTAMP = "TIMESTAMP";
     public static String SENSOR_NAME = "SENSOR_NAME";
-    public static String STORAGE_DIRECTORY = "SERVICE_APP_IMAGES";
+    public static String STORAGE_DIRECTORY = "/SERVICE_APP_IMAGES/";
     public static String UPLOAD_IMAGE = "UPLOAD_IMAGE";
     public static String ALL_DONE = "ALL_DONE";
     public static String USE_UNIT = "USE_UNIT";
@@ -19,7 +19,7 @@ public class StringConstants {
     public static String METRIC_DATA = "METRIC_DATA";
     public static String SENSOR_DATA = "SENSOR_DATA";
     public static String DATE_FOR_SUBMIT = "DATE_FOR_SUBMIT";
-
+    public static String PHOTO_PATH = "PHOTO_PATH";
 
     public static int COMRESS_WIDTH = 612;
     public static int COMPRESS_HEIGHT = 816;

@@ -17,6 +17,7 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -31,6 +32,7 @@ import android.view.WindowManager;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
+import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
@@ -47,6 +49,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -237,6 +242,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public String compressImage(String imageUri) {
 
+        DebugLog.d(imageUri);
         String filePath = getRealPathFromURI(imageUri);
         Bitmap scaledBitmap = null;
 
