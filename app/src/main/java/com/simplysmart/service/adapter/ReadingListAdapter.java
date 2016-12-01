@@ -104,7 +104,8 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         Picasso.with(mContext).load(image)
                 .placeholder(R.drawable.photo_default)
                 .noFade()
-                .resize(48, 48)
+                .fit().centerCrop()
+//                .resize(48, 48)
                 .error(R.drawable.photo_default).into(view);
 
     }

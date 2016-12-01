@@ -413,6 +413,7 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
         uploadedReadingUrl = "";
         imageTaken = false;
         uploadImage.setImageResource(R.drawable.ic_camera_alt_black_48dp);
+        uploadImage.setAlpha(0.4f);
         uploadedImage = false;
         if (NetworkUtilities.isInternet(InputFormActivity.this)) {
             Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
@@ -644,8 +645,6 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                     if(delete) {
                         imageFile.delete();
                     }
-                }else {
-                    showSnackBar(mParentLayout, "Unable to compress image file inside.");
                 }
             }catch (Exception e) {
                 e.printStackTrace();
@@ -661,14 +660,18 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     private void setPic(ImageView view,String imageUrl) {
         File image = new File(imageUrl);
 
-        Picasso.with(InputFormActivity.this).load(image)
-                .placeholder(R.drawable.ic_photo_black_48dp)
-                .noFade()
-                .resize(48,48)
-                .error(R.drawable.ic_menu_slideshow).into(view);
+        if(image.exists()) {
+            Picasso.with(InputFormActivity.this).load(image)
+                    .placeholder(R.drawable.ic_photo_black_48dp)
+                    .noFade()
+                    .fit().centerCrop()
+//                    .resize(48, 48)
+                    .error(R.drawable.ic_menu_slideshow).into(view);
 
-        view.setVisibility(View.VISIBLE);
-        view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            view.setVisibility(View.VISIBLE);
+            view.setAlpha(1.0f);
+            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
     }
 
     private void beginUpload(String filePath) {

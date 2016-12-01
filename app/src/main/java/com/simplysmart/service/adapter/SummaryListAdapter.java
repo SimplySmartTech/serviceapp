@@ -124,7 +124,8 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         Picasso.with(mContext).load(image)
                 .placeholder(R.drawable.photo_default)
                 .noFade()
-                .resize(32,32)
+                .fit().centerCrop()
+//                .resize(32,32)
                 .error(R.drawable.photo_default).into(view);
 
     }
