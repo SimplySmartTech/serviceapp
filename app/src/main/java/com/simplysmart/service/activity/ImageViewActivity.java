@@ -50,6 +50,7 @@ public class ImageViewActivity extends BaseActivity {
     private String mCurrentPhotoPath;
     private String mPreviousPhotoPath;
     private File image;
+    private boolean takeNewImage = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,7 @@ public class ImageViewActivity extends BaseActivity {
         mCurrentPhotoPath = "";
         if (getIntent() != null && getIntent().getExtras() != null) {
             mCurrentPhotoPath = getIntent().getStringExtra(StringConstants.PHOTO_PATH);
+            takeNewImage = getIntent().getBooleanExtra(StringConstants.ALLOW_NEW_IMAGE,false);
         }
 
         parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
@@ -99,6 +101,12 @@ public class ImageViewActivity extends BaseActivity {
                 customImagePicker();
             }
         });
+
+        if(takeNewImage){
+            button.setVisibility(View.VISIBLE);
+        }else{
+            button.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -283,7 +291,7 @@ public class ImageViewActivity extends BaseActivity {
 
         mCurrentPhotoPath = compressedPath;
         setPic(touchImageView,mCurrentPhotoPath);
-        finish();
+        finishActivity(StringConstants.IMAGE_CHANGED);
     }
 
     private void checkForPermissions() {

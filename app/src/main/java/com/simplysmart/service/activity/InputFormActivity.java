@@ -317,7 +317,8 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
                 if(imageTaken && mCurrentPhotoPath!=null && !mCurrentPhotoPath.equals("")){
                     Intent intent = new Intent(InputFormActivity.this,ImageViewActivity.class);
                     intent.putExtra(StringConstants.PHOTO_PATH,mCurrentPhotoPath);
-                    startActivity(intent);
+                    intent.putExtra(StringConstants.ALLOW_NEW_IMAGE,true);
+                    startActivityForResult(intent,StringConstants.IMAGE_CHANGED);
                 }else {
                     customImagePicker();
                 }
@@ -630,6 +631,16 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
+        }
+
+        if(requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED ){
+            File oldImage = new File(mCurrentPhotoPath);
+            if(oldImage.exists()){
+                oldImage.delete();
+            }
+
+            mCurrentPhotoPath = data.getStringExtra(StringConstants.PHOTO_PATH);
+            setPic(uploadImage,mCurrentPhotoPath);
         }
     }
 

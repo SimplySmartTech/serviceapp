@@ -20,6 +20,7 @@ public class StringConstants {
     public static String SENSOR_DATA = "SENSOR_DATA";
     public static String DATE_FOR_SUBMIT = "DATE_FOR_SUBMIT";
     public static String PHOTO_PATH = "PHOTO_PATH";
+    public static String ALLOW_NEW_IMAGE = "ALLOW";
 
     public static int COMRESS_WIDTH = 612;
     public static int COMPRESS_HEIGHT = 816;
@@ -32,5 +33,6 @@ public class StringConstants {
     public static final int NO_NEW_VALUE = 1;
     public static final int VALUE_DELETED = 2;
 
-
+    public static final int IMAGE_CHANGED = 1;
+    public static final int IMAGE_NOT_CHANGED = -1;
 }
