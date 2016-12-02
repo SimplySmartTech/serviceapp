@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.SummaryListAdapter;
+import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
@@ -36,6 +37,7 @@ import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.Metric;
 import com.simplysmart.service.model.matrix.Reading;
+import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.service.PhotoUploadService;
 
@@ -86,12 +88,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(NetworkUtilities.isInternet(SummaryActivity.this)) {
-                    initializeUpload = true;
                     checkAndSubmitData();
-                }else {
-                    showSnackBar(mParentLayout,getString(R.string.error_no_internet_connection),false);
-                }
             }
         });
 
@@ -104,7 +101,6 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
 
     private void setDataForSummary() {
         int count = 0;
-        ArrayList<Metric> metrics = new ArrayList<>();
         ArrayList<MatrixData> matrixList = MatrixDataRealm.getAll();
         if (matrixList != null && matrixList.size() > 0) {
             for (int i = 0; i < matrixList.size(); i++) {
@@ -116,11 +112,6 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
 
                     for (int j = 0; j < sensorList.size(); j++) {
                         SensorDataRealm sdr = sensorList.get(j);
-
-                        Metric metric = new Metric();
-                        metric.setType(data.getType());
-                        metric.setUtility_id(data.getUtility_id());
-                        metric.setSensor_name(sdr.getSensor_name());
 
                         ArrayList<Reading> readings = new ArrayList<>();
 
@@ -144,35 +135,24 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                                 summary.setType(data.getType());
                                 summary.setLocalPhotoUrl(rdr.getLocal_photo_url());
                                 summary.setTimestamp(rdr.getTimestamp());
+                                summary.setUploaded(rdr.isUploadedImage());
 
-                                Reading reading = new Reading();
-                                reading.setValue(rdr.getValue());
-                                reading.setPhotographic_evidence_url(rdr.getPhotographic_evidence_url());
-                                reading.setTimestamp(rdr.getTimestamp());
-                                reading.setTare_weight(rdr.getTare_weight());
-                                readings.add(reading);
                                 if (!rdr.isUploadedImage()) {
                                     count++;
                                 }
 
-                                Log.d("TAG", rdr.getPhotographic_evidence_url());
-
                                 summaryList.add(summary);
                             }
-
-                            metric.setReadings(readings);
-                            metrics.add(metric);
                         }
                     }
                 }
             }
         }
 
-        if (count == 0) {
-            allDone = true;
+        if(count>0){
+            allDone = false;
         }
 
-        allReadingData.setMetrics(metrics);
         setDataInList();
     }
 
@@ -210,12 +190,14 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(uploadComplete, new IntentFilter("uploadComplete"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(uploadImage, new IntentFilter("imageUploadComplete"));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(uploadComplete);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(uploadImage);
     }
 
     @Override
@@ -249,14 +231,20 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     }
 
     private void checkAndSubmitData() {
-        if (summaryList != null && summaryList.size() > 0) {
-            if (!allDone) {
-                showActivitySpinner("Uploading images . . .");
-            } else {
-                showActivitySpinner("Submitting readings . . .");
+        if(allDone){
+            if(NetworkUtilities.isInternet(this)){
                 submitData();
+            }else {
+                AllReadingsData allReadingsData = getDataToSubmit();
+                saveToDisk(allReadingsData);
             }
+        }else {
+            showImageNotUploadedDialog();
         }
+    }
+
+    private void showImageNotUploadedDialog() {
+
     }
 
     @Override
@@ -271,6 +259,7 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     }
 
     private void submitData() {
+        AllReadingsData allReadingData = getDataToSubmit();
         if (NetworkUtilities.isInternet(this)) {
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
             Call<JsonObject> submitAllReadings = apiInterface.submitAllReadings(GlobalData.getInstance().getSubDomain(), allReadingData);
@@ -300,8 +289,61 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
                 }
             });
         } else {
+            saveToDisk(allReadingData);
             showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
         }
+    }
+
+    private void saveToDisk(AllReadingsData allReadingData) {
+        //TODO
+    }
+
+    private AllReadingsData getDataToSubmit() {
+        AllReadingsData allReadingData = new AllReadingsData();
+        ArrayList<Metric> metrics = new ArrayList<>();
+        ArrayList<MatrixData> matrixList = MatrixDataRealm.getAll();
+        if (matrixList != null && matrixList.size() > 0) {
+            for (int i = 0; i < matrixList.size(); i++) {
+                MatrixData data = matrixList.get(i);
+
+                RealmList<SensorDataRealm> sensorList = SensorDataRealm.getForUtilityId(data.getUtility_id());
+
+                if (sensorList != null && sensorList.size() > 0) {
+
+                    for (int j = 0; j < sensorList.size(); j++) {
+                        SensorDataRealm sdr = sensorList.get(j);
+
+                        Metric metric = new Metric();
+                        metric.setType(data.getType());
+                        metric.setUtility_id(data.getUtility_id());
+                        metric.setSensor_name(sdr.getSensor_name());
+
+                        ArrayList<Reading> readings = new ArrayList<>();
+
+                        RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(), sdr.getSensor_name());
+
+                        if (readingsList != null && readingsList.size() > 0) {
+
+                            for (int k = 0; k < readingsList.size(); k++) {
+                                ReadingDataRealm rdr = readingsList.get(k);
+
+                                Reading reading = new Reading();
+                                reading.setValue(rdr.getValue());
+                                reading.setPhotographic_evidence_url(rdr.getPhotographic_evidence_url());
+                                reading.setTimestamp(rdr.getTimestamp());
+                                reading.setTare_weight(rdr.getTare_weight());
+                                readings.add(reading);
+                            }
+
+                            metric.setReadings(readings);
+                            metrics.add(metric);
+                        }
+                    }
+                }
+            }
+        }
+        allReadingData.setMetrics(metrics);
+        return allReadingData;
     }
 
     private void exitScreen() {
@@ -310,22 +352,43 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
         startActivity(i);
     }
 
+    private void findAndUpdateElement(ReadingDataRealm rdr) {
+        String local_photo_url = rdr.getLocal_photo_url();
+
+        for(int i=0;i<summaryList.size();i++){
+            if(summaryList.get(i).getLocalPhotoUrl()!=null && summaryList.get(i).getLocalPhotoUrl().equals(local_photo_url)){
+                adapter.getData().get(i).setUploaded(true);
+                adapter.notifyItemChanged(i);
+                DebugLog.d("Position of notifying "+ i);
+            }
+        }
+    }
 
     @Override
     protected int getStatusBarColor() {
         return 0;
     }
 
+    private BroadcastReceiver uploadImage = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            ReadingDataRealm rdr = null;
+            if(intent!=null && intent.getExtras()!=null) {
+                rdr = intent.getParcelableExtra(StringConstants.READING_DATA);
+            }
+
+            DebugLog.d("Broadcast recieved for image upload complete "+ rdr.getPhotographic_evidence_url());
+
+            if(rdr!=null){
+                findAndUpdateElement(rdr);
+            }
+        }
+    };
 
     private BroadcastReceiver uploadComplete = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             allDone = true;
-            dismissActivitySpinner();
-            if (initializeUpload) {
-                showActivitySpinner("Submitting readings . . .");
-                submitData();
-            }
         }
     };
 }

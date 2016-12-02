@@ -1,5 +1,8 @@
 package com.simplysmart.service.database;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.amazonaws.services.dynamodbv2.model.Select;
 import com.simplysmart.service.model.matrix.ReadingData;
 
@@ -15,7 +18,7 @@ import io.realm.RealmResults;
  * Created by shailendrapsp on 3/11/16.
  */
 
-public class ReadingDataRealm extends RealmObject {
+public class ReadingDataRealm extends RealmObject implements Parcelable {
 
     private String utility_id;
     private String sensor_name;
@@ -37,6 +40,52 @@ public class ReadingDataRealm extends RealmObject {
         super();
         setData(readingData);
     }
+
+    protected ReadingDataRealm(Parcel in) {
+        utility_id = in.readString();
+        sensor_name = in.readString();
+        value = in.readString();
+        photographic_evidence_url = in.readString();
+        local_photo_url = in.readString();
+        date = in.readString();
+        unit = in.readString();
+        tare_weight = in.readString();
+        timestamp = in.readLong();
+        unit_id = in.readString();
+        uploadedImage = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(utility_id);
+        dest.writeString(sensor_name);
+        dest.writeString(value);
+        dest.writeString(photographic_evidence_url);
+        dest.writeString(local_photo_url);
+        dest.writeString(date);
+        dest.writeString(unit);
+        dest.writeString(tare_weight);
+        dest.writeLong(timestamp);
+        dest.writeString(unit_id);
+        dest.writeByte((byte) (uploadedImage ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<ReadingDataRealm> CREATOR = new Creator<ReadingDataRealm>() {
+        @Override
+        public ReadingDataRealm createFromParcel(Parcel in) {
+            return new ReadingDataRealm(in);
+        }
+
+        @Override
+        public ReadingDataRealm[] newArray(int size) {
+            return new ReadingDataRealm[size];
+        }
+    };
 
     public void setData(ReadingData readingData) {
         this.utility_id = readingData.getUtility_id();

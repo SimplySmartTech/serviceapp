@@ -12,6 +12,7 @@ public class Summary {
     private String time;
     private long timestamp;
     private boolean header;
+    private boolean isUploaded;
 
     public String getName() {
         return name;
@@ -67,5 +68,13 @@ public class Summary {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public boolean isUploaded() {
+        return isUploaded;
+    }
+
+    public void setUploaded(boolean uploaded) {
+        isUploaded = uploaded;
     }
 }

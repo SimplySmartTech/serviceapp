@@ -2,6 +2,7 @@ package com.simplysmart.service.adapter;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -13,6 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.activity.ImageViewActivity;
+import com.simplysmart.service.activity.InputFormActivity;
+import com.simplysmart.service.config.NetworkUtilities;
+import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.model.matrix.Summary;
@@ -61,7 +66,7 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     @Override
     public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
-        Summary summary = data.get(position);
+        final Summary summary = data.get(position);
         if(summary.isHeader()){
 
             SummaryHeaderViewHolder viewHolder = (SummaryHeaderViewHolder)holder;
@@ -94,6 +99,15 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             if(imageFound){
                 setPic(viewHolder.photo,image);
                 viewHolder.photo.setAlpha(1.0f);
+                viewHolder.photo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext,ImageViewActivity.class);
+                        intent.putExtra(StringConstants.PHOTO_PATH,summary.getLocalPhotoUrl());
+                        intent.putExtra(StringConstants.ALLOW_NEW_IMAGE,false);
+                        mContext.startActivity(intent);
+                    }
+                });
             }else {
                 setPic(viewHolder.photo, null);
                 viewHolder.photo.setAlpha(0.4f);
@@ -110,6 +124,16 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     showEditDialog(readingDataRealm,holder.getAdapterPosition());
                 }
             });
+
+            if(summary.isUploaded()){
+                viewHolder.uploadImageBar.setVisibility(View.GONE);
+            }else {
+                if(NetworkUtilities.isInternet(mContext)) {
+                    viewHolder.uploadImageBar.setVisibility(View.VISIBLE);
+                }else {
+                    viewHolder.uploadImageBar.setVisibility(View.GONE);
+                }
+            }
 
         }
     }
@@ -143,5 +167,13 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private void showEditDialog(ReadingDataRealm readingDataRealm, int position){
         EditDialog newDialog = EditDialog.newInstance(readingDataRealm,position);
         newDialog.show(fragmentManager, "show dialog");
+    }
+
+    public ArrayList<Summary> getData() {
+        return data;
+    }
+
+    public void setData(ArrayList<Summary> data) {
+        this.data = data;
     }
 }
