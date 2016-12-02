@@ -514,10 +514,11 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     public void customImagePicker() {
+
         final Dialog dialog = new Dialog(InputFormActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_image_capture);
-//        dialog.setTitle(getString(R.string.txt_capture_image_selection));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 
         LinearLayout lLayoutCameraDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutCameraDialog);
         LinearLayout lLayoutGalleryDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutGalleryDialog);
