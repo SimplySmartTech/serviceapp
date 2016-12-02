@@ -155,7 +155,7 @@ public class ImageViewActivity extends BaseActivity {
         File image = new File(imageUrl);
         if (image.exists()) {
             Picasso.with(ImageViewActivity.this).load(image)
-                    .placeholder(R.drawable.ic_menu_slideshow)
+//                    .placeholder(R.drawable.ic_menu_slideshow)
                     .noFade()
                     .fit().centerInside()
                     .error(R.drawable.ic_menu_slideshow).into(view);
