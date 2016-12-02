@@ -1,22 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/parentLayout"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
 
-    <include layout="@layout/toolbar"/>
+    <!--<include layout="@layout/toolbar" />-->
 
     <com.simplysmart.service.custom_views.TouchImageView
         android:id="@+id/viewImage"
-        android:layout_marginTop="?attr/actionBarSize"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
 
-    <Button
-        android:text="@string/take_new_image"
-        android:background="@color/bw_color_white_semi_trans"
-        android:id="@+id/discardImage"
-        android:layout_alignParentBottom="true"
+    <TextView
+        android:id="@+id/errorLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:drawableTop="@drawable/bw_no_data_found"
+        android:gravity="center"
+        android:text="@string/no_image_found"
+        android:textColor="@color/bw_color_white"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/afterPhotoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/translucentToolbar"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        android:weightSum="1.0">
+
+        <Button
+            android:id="@+id/done"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/done"
+            android:textColor="@color/bw_color_white" />
+
+        <Button
+            android:id="@+id/newPhoto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/take_new_image"
+            android:textColor="@color/bw_color_white" />
+
+    </LinearLayout>
 
 </RelativeLayout>

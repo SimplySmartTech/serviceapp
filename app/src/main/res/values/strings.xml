@@ -26,6 +26,8 @@
     <string name="edit_value">EDIT</string>
     <string name="add">ADD</string>
     <string name="dummy_text">Weight of the empty truck — dropdown with truck number and editable field to update or add new truck number with photo</string>
-    <string name="take_new_image">TAKE NEW IMAGE</string>
+    <string name="take_new_image">NEW</string>
+    <string name="done">DONE</string>
+    <string name="no_image_found">No image found</string>
 
 </resources>

@@ -5,23 +5,22 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.DebugLog;
@@ -51,62 +50,85 @@ public class ImageViewActivity extends BaseActivity {
     private String mPreviousPhotoPath;
     private File image;
     private boolean takeNewImage = false;
+    private Button newPhoto, done;
+    private LinearLayout anotherPhotoLayout;
+    private TextView errorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_image_view);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle("View Image");
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setHomeButtonEnabled(true);
+//        getSupportActionBar().setTitle("View Image");
 
         mCurrentPhotoPath = "";
         if (getIntent() != null && getIntent().getExtras() != null) {
-            mCurrentPhotoPath = getIntent().getStringExtra(StringConstants.PHOTO_PATH);
-            takeNewImage = getIntent().getBooleanExtra(StringConstants.ALLOW_NEW_IMAGE,false);
+            mPreviousPhotoPath = getIntent().getStringExtra(StringConstants.PHOTO_PATH);
+            takeNewImage = getIntent().getBooleanExtra(StringConstants.ALLOW_NEW_IMAGE, false);
         }
 
         parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         touchImageView = (TouchImageView) findViewById(R.id.viewImage);
+        errorLayout = (TextView)findViewById(R.id.errorLayout);
 
         File image = null;
 
         try {
-            if (!mCurrentPhotoPath.equals("")) {
-                image = new File(mCurrentPhotoPath);
+            if (!mPreviousPhotoPath.equals("")) {
+                image = new File(mPreviousPhotoPath);
                 if (image.exists()) {
-                    setPic(touchImageView,image.getAbsolutePath());
+                    setPic(touchImageView, image.getAbsolutePath());
                 } else {
-                    showSnackBar(parentLayout, "Cannot find image file.");
+                    errorLayout.setVisibility(View.VISIBLE);
                 }
             } else {
-                showSnackBar(parentLayout, "Cannot find image file.");
+                errorLayout.setVisibility(View.VISIBLE);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showSnackBar(parentLayout, "Some error occured. Cannot open image file.");
+            errorLayout.setVisibility(View.VISIBLE);
         }
 
         addFunctionForButton();
     }
 
     private void addFunctionForButton() {
-        Button button = (Button)findViewById(R.id.discardImage);
-        button.setOnClickListener(new View.OnClickListener() {
+        newPhoto = (Button) findViewById(R.id.newPhoto);
+        done = (Button) findViewById(R.id.done);
+        anotherPhotoLayout = (LinearLayout) findViewById(R.id.afterPhotoLayout);
+
+        if (takeNewImage) {
+            anotherPhotoLayout.setVisibility(View.VISIBLE);
+        } else {
+            anotherPhotoLayout.setVisibility(View.GONE);
+        }
+
+        done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                customImagePicker();
+                if (!mCurrentPhotoPath.equals("")) {
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra(StringConstants.PHOTO_PATH, mCurrentPhotoPath);
+                    setResult(StringConstants.IMAGE_CHANGED, returnIntent);
+                    finish();
+                } else {
+                    finish();
+                }
             }
         });
 
-        if(takeNewImage){
-            button.setVisibility(View.VISIBLE);
-        }else{
-            button.setVisibility(View.GONE);
-        }
+        newPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                errorLayout.setVisibility(View.GONE);
+                customImagePicker();
+            }
+        });
     }
 
     @Override
@@ -119,9 +141,6 @@ public class ImageViewActivity extends BaseActivity {
         switch (item.getItemId()) {
 
             case android.R.id.home:
-                supportFinishAfterTransition();
-                finish();
-                return true;
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -139,19 +158,17 @@ public class ImageViewActivity extends BaseActivity {
             Picasso.with(ImageViewActivity.this).load(image)
                     .placeholder(R.drawable.ic_menu_slideshow)
                     .noFade()
+                    .fit().centerInside()
                     .error(R.drawable.ic_menu_slideshow).into(view);
-
-            view.setVisibility(View.VISIBLE);
-            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
     }
 
 
     public void customImagePicker() {
-
         final Dialog dialog = new Dialog(ImageViewActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_image_capture);
-        dialog.setTitle(getString(R.string.txt_capture_image_selection));
+//        dialog.setTitle(getString(R.string.txt_capture_image_selection));
 
         LinearLayout lLayoutCameraDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutCameraDialog);
         LinearLayout lLayoutGalleryDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutGalleryDialog);
@@ -244,9 +261,10 @@ public class ImageViewActivity extends BaseActivity {
             try {
                 if (mCurrentPhotoPath != null) {
                     Log.d("CameraPhoto", mCurrentPhotoPath);
-                    compressAndDeleteFile(mCurrentPhotoPath,true);
+                    compressAndDeleteFile(mCurrentPhotoPath, true);
                 } else {
-                    showSnackBar(parentLayout, "Getting error in image file.", false);
+                    errorLayout.setVisibility(View.VISIBLE);
+                    errorLayout.setText("Error in getting image file.");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -257,10 +275,11 @@ public class ImageViewActivity extends BaseActivity {
                 String path = getPath(uri);
                 if (path != null) {
                     mCurrentPhotoPath = path;
-                    compressAndDeleteFile(mCurrentPhotoPath,false);
+                    compressAndDeleteFile(mCurrentPhotoPath, false);
                     Log.d("GalleryPhoto", mCurrentPhotoPath);
                 } else {
-                    showSnackBar(parentLayout, "Getting error in image file.", false);
+                    errorLayout.setVisibility(View.VISIBLE);
+                    errorLayout.setText("Error in getting image file.");
                 }
             } catch (URISyntaxException e) {
                 e.printStackTrace();
@@ -272,26 +291,28 @@ public class ImageViewActivity extends BaseActivity {
         File imageFile = new File(imageUrl);
         String compressedPath = "";
 
-        if(imageFile.exists()) {
+        if (imageFile.exists()) {
             try {
                 compressedPath = compressImage(imageUrl);
                 DebugLog.d(compressedPath);
-                if(!compressedPath.equals("")) {
-                    if(delete) {
+                if (!compressedPath.equals("")) {
+                    if (delete) {
                         imageFile.delete();
                     }
-                }else {
-                    showSnackBar(parentLayout, "Unable to compress image file inside.");
+                } else {
+                    errorLayout.setVisibility(View.VISIBLE);
+                    errorLayout.setText("Error in getting image file.");
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-                showSnackBar(parentLayout, "Unable to compress image file.");
+                errorLayout.setVisibility(View.VISIBLE);
+                errorLayout.setText("Error in getting image file.");
             }
         }
 
         mCurrentPhotoPath = compressedPath;
-        setPic(touchImageView,mCurrentPhotoPath);
-        finishActivity(StringConstants.IMAGE_CHANGED);
+        if(!mCurrentPhotoPath.equals(""))
+        setPic(touchImageView, mCurrentPhotoPath);
     }
 
     private void checkForPermissions() {

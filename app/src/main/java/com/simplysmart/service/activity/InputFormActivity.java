@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -513,10 +514,10 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
     }
 
     public void customImagePicker() {
-
         final Dialog dialog = new Dialog(InputFormActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_image_capture);
-        dialog.setTitle(getString(R.string.txt_capture_image_selection));
+//        dialog.setTitle(getString(R.string.txt_capture_image_selection));
 
         LinearLayout lLayoutCameraDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutCameraDialog);
         LinearLayout lLayoutGalleryDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutGalleryDialog);
@@ -635,12 +636,16 @@ public class InputFormActivity extends BaseActivity implements EditDialog.EditDi
 
         if(requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED ){
             File oldImage = new File(mCurrentPhotoPath);
-            if(oldImage.exists()){
-                oldImage.delete();
+            String newPhotoPath = "";
+            if(data!=null && data.getExtras()!=null){
+                newPhotoPath = data.getStringExtra(StringConstants.PHOTO_PATH);
             }
 
-            mCurrentPhotoPath = data.getStringExtra(StringConstants.PHOTO_PATH);
-            setPic(uploadImage,mCurrentPhotoPath);
+            if(!newPhotoPath.equals("") && oldImage.exists()){
+                oldImage.delete();
+                mCurrentPhotoPath = newPhotoPath;
+                setPic(uploadImage,mCurrentPhotoPath);
+            }
         }
     }
 

@@ -30,5 +30,6 @@
 
     <color name="transparent">#00000000</color>
     <color name="textColorList">#b5b4b4</color>
+    <color name="translucentToolbar">#66607D8B</color>
 
 </resources>

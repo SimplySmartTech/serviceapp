@@ -65,7 +65,7 @@
 
         <activity android:name=".activity.ImageViewActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/ThemeStyle" />
 
         <!-- Push Notification GCM Services & Receivers -->
         <service android:name=".gcm.RegistrationIntentService" />

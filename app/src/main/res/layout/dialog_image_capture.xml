@@ -2,8 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/bw_color_white"
     android:gravity="center"
     android:orientation="vertical">
+
+    <TextView
+        android:text="@string/txt_capture_image_selection"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/bw_color_black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/lLayoutCameraDialog"
@@ -12,7 +22,10 @@
         android:background="?attr/selectableItemBackground"
         android:gravity="center|start"
         android:orientation="horizontal"
-        android:padding="18dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
         <Button
             android:layout_width="25dp"
@@ -37,9 +50,10 @@
         android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="18dp"
-        android:paddingLeft="18dp"
-        android:paddingRight="18dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
         <Button
             android:layout_width="25dp"
@@ -64,7 +78,11 @@
         android:background="?attr/selectableItemBackground"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="18dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_marginBottom="8dp">
 
         <Button
             android:layout_width="25dp"
