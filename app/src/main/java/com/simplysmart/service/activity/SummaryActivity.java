@@ -31,6 +31,7 @@ import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.dialog.EditDialog;
+import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.AllReadingsData;
@@ -52,7 +53,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements EditDialog.EditDialogListener {
+public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -244,18 +245,8 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
     }
 
     private void showImageNotUploadedDialog() {
-
-    }
-
-    @Override
-    public void updateResult(int done, int position, String value) {
-        if (done == StringConstants.NEW_VALUE) {
-            summaryList.get(position).setValue(value);
-            adapter.notifyItemChanged(position);
-        }else if(done == StringConstants.VALUE_DELETED){
-            summaryList.remove(position);
-            adapter.notifyItemRemoved(position);
-        }
+        SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert","Do you want to submit readings without images?","No","Yes");
+        submitReadingWithoutImageDialog.show(getFragmentManager(),"submitReadingWithoutImageDialog");
     }
 
     private void submitData() {
@@ -391,4 +382,9 @@ public class SummaryActivity extends BaseActivity implements EditDialog.EditDial
             allDone = true;
         }
     };
+
+    @Override
+    public void submitWithoutImage() {
+        submitData();
+    }
 }
