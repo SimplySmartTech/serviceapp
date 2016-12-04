@@ -111,7 +111,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
     }
 
     private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {
-        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position);
+        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position,true);
         newDialog.show(fragmentManager, "show dialog");
     }
 

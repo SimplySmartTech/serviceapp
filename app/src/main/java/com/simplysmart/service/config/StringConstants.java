@@ -22,6 +22,7 @@ public class StringConstants {
     public static String PHOTO_PATH = "PHOTO_PATH";
     public static String ALLOW_NEW_IMAGE = "ALLOW";
     public static String READING_DATA = "READING_DATA";
+    public static String EDIT = "EDIT";
 
     public static int COMRESS_WIDTH = 612;
     public static int COMPRESS_HEIGHT = 816;

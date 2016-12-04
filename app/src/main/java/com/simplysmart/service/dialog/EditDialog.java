@@ -20,6 +20,7 @@ import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.interfaces.EditDialogListener;
 import com.simplysmart.service.model.matrix.ReadingData;
 
 import io.realm.Realm;
@@ -32,8 +33,9 @@ public class EditDialog extends DialogFragment {
     private static String sensor_name = "SENSOR_NAME";
     private static String timestamp = "TIMESTAMP";
     private static String position = "POSITION";
+    private boolean edit = false;
 
-    public static EditDialog newInstance(ReadingDataRealm readingDataRealm, int pos) {
+    public static EditDialog newInstance(ReadingDataRealm readingDataRealm, int pos, boolean edit) {
         EditDialog f = new EditDialog();
 
         Bundle args = new Bundle();
@@ -41,6 +43,7 @@ public class EditDialog extends DialogFragment {
         args.putString(sensor_name, readingDataRealm.getSensor_name());
         args.putLong(timestamp, readingDataRealm.getTimestamp());
         args.putInt(position,pos);
+        args.putBoolean(StringConstants.EDIT,edit);
         f.setArguments(args);
 
         return f;
@@ -72,6 +75,7 @@ public class EditDialog extends DialogFragment {
         String sensorName = bundle.getString(sensor_name);
         long time = bundle.getLong(timestamp);
         final int pos = bundle.getInt(position);
+        this.edit = bundle.getBoolean(StringConstants.EDIT);
 
         final Realm realm = Realm.getDefaultInstance();
         final ReadingDataRealm readingDataRealm = realm
@@ -112,6 +116,10 @@ public class EditDialog extends DialogFragment {
                 return false;
             }
         });
+
+        if(!edit){
+            dialogNegativeButton.setVisibility(View.INVISIBLE);
+        }
 
         dialogPositiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,9 +171,4 @@ public class EditDialog extends DialogFragment {
         builder.setView(dialogView);
         return builder.create();
     }
-
-    public interface EditDialogListener {
-        void updateResult(int done,int position,String value);
-    }
-
 }

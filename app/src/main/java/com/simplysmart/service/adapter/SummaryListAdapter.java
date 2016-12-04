@@ -125,16 +125,15 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
             });
 
-            if(summary.isUploaded()){
-                viewHolder.uploadImageBar.setVisibility(View.GONE);
-            }else {
+            if(summary.getLocalPhotoUrl()!=null && !summary.getLocalPhotoUrl().equals("") && !summary.isUploaded()){
                 if(NetworkUtilities.isInternet(mContext)) {
                     viewHolder.uploadImageBar.setVisibility(View.VISIBLE);
                 }else {
                     viewHolder.uploadImageBar.setVisibility(View.GONE);
                 }
+            }else {
+                    viewHolder.uploadImageBar.setVisibility(View.GONE);
             }
-
         }
     }
 
@@ -165,7 +164,7 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private void showEditDialog(ReadingDataRealm readingDataRealm, int position){
-        EditDialog newDialog = EditDialog.newInstance(readingDataRealm,position);
+        EditDialog newDialog = EditDialog.newInstance(readingDataRealm,position,false);
         newDialog.show(fragmentManager, "show dialog");
     }
 
