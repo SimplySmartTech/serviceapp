@@ -2,7 +2,6 @@ package com.simplysmart.service.database;
 
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.model.matrix.MatrixData;
-import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.SensorData;
 
 import java.io.File;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
-import io.realm.RealmObjectSchema;
 import io.realm.RealmResults;
 
 /**
@@ -108,13 +106,13 @@ public class MatrixDataRealm extends RealmObject {
         realm.beginTransaction();
         RealmResults<ReadingDataRealm> results = realm
                 .where(ReadingDataRealm.class)
-                .equalTo("utility_id",utility_id)
+                .equalTo("utility_id", utility_id)
                 .equalTo("sensor_name", sensor_name)
                 .findAll();
 
-        for (ReadingDataRealm dataRealm:results) {
+        for (ReadingDataRealm dataRealm : results) {
             try {
-                if(dataRealm.getLocal_photo_url()!=null && !dataRealm.getLocal_photo_url().equals("")) {
+                if (dataRealm.getLocal_photo_url() != null && !dataRealm.getLocal_photo_url().equals("")) {
                     File file = new File(dataRealm.getLocal_photo_url());
                     if (file.exists()) {
                         try {
@@ -124,7 +122,7 @@ public class MatrixDataRealm extends RealmObject {
                         }
                     }
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

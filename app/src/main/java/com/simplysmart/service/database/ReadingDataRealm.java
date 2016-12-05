@@ -3,11 +3,7 @@ package com.simplysmart.service.database;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.amazonaws.services.dynamodbv2.model.Select;
 import com.simplysmart.service.model.matrix.ReadingData;
-
-import java.io.File;
-import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -130,9 +126,9 @@ public class ReadingDataRealm extends RealmObject implements Parcelable {
         }
     }
 
-    public static void deleteAllReadings(String unit_id){
+    public static void deleteAllReadings(String unit_id) {
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<ReadingDataRealm> results = realm.where(ReadingDataRealm.class).equalTo("unit_id",unit_id).findAll();
+        RealmResults<ReadingDataRealm> results = realm.where(ReadingDataRealm.class).equalTo("unit_id", unit_id).findAll();
         realm.beginTransaction();
         results.deleteAllFromRealm();
         realm.commitTransaction();

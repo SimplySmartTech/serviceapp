@@ -5,5 +5,5 @@ package com.simplysmart.service.interfaces;
  */
 
 public interface EditDialogListener {
-    void updateResult(int done,int position,String value);
+    void updateResult(int done, int position, String value);
 }

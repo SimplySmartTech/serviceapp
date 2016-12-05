@@ -2,16 +2,10 @@ package com.simplysmart.service.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.InputFormActivity;
@@ -43,7 +37,7 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
 
     @Override
     public ParentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.matrix_list_row_parent,parent,false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.matrix_list_row_parent, parent, false);
         return new ParentViewHolder(view);
     }
 
@@ -52,29 +46,29 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
 
         final MatrixData data = matrixData.get(position);
         String sensorName = "";
-        if(data.getType()!=null) {
+        if (data.getType() != null) {
             sensorName = data.getType();
         }
 
         String unit;
-        if(data.getSensors()!=null && data.getSensors().get(0)!=null && data.getSensors().get(0).getUnit()!=null) {
+        if (data.getSensors() != null && data.getSensors().get(0) != null && data.getSensors().get(0).getUnit() != null) {
             unit = data.getSensors().get(0).getUnit();
-        }else {
+        } else {
             unit = "";
         }
 
-        holder.sensor_type.setText(sensorName + " ("+unit+")");
+        holder.sensor_type.setText(sensorName + " (" + unit + ")");
 
         holder.sensor_type.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(data.getSensors()!=null && data.getSensors().size()>1) {
+                if (data.getSensors() != null && data.getSensors().size() > 1) {
                     Intent i = new Intent(mContext, SensorListActivity.class);
                     i.putExtra(StringConstants.METRIC_DATA, data);
                     mContext.startActivity(i);
-                }else{
+                } else {
                     Intent i = new Intent(mContext, InputFormActivity.class);
-                    i.putExtra(StringConstants.SENSOR_DATA,data.getSensors().get(0));
+                    i.putExtra(StringConstants.SENSOR_DATA, data.getSensors().get(0));
                     mContext.startActivity(i);
                 }
             }
@@ -83,13 +77,13 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
         holder.unit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(data.getSensors()!=null && data.getSensors().size()>1) {
+                if (data.getSensors() != null && data.getSensors().size() > 1) {
                     Intent i = new Intent(mContext, SensorListActivity.class);
                     i.putExtra(StringConstants.METRIC_DATA, data);
                     mContext.startActivity(i);
-                }else{
+                } else {
                     Intent i = new Intent(mContext, InputFormActivity.class);
-                    i.putExtra(StringConstants.SENSOR_DATA,data.getSensors().get(0));
+                    i.putExtra(StringConstants.SENSOR_DATA, data.getSensors().get(0));
                     mContext.startActivity(i);
                 }
             }

@@ -2,19 +2,16 @@ package com.simplysmart.service.database;
 
 import com.simplysmart.service.model.matrix.SensorData;
 
-import java.util.ArrayList;
-
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 /**
  * Created by shailendrapsp on 3/11/16.
  */
 
-public class SensorDataRealm extends RealmObject{
+public class SensorDataRealm extends RealmObject {
     private String site_name;
     private String metric;
     private String sensor_name;
@@ -29,14 +26,15 @@ public class SensorDataRealm extends RealmObject{
     private boolean tare_weight;
     private boolean isChecked;
 
-    public SensorDataRealm(){}
+    public SensorDataRealm() {
+    }
 
     public SensorDataRealm(SensorData sensorData) {
         super();
         setData(sensorData);
     }
 
-    public void setData(SensorData sensorData){
+    public void setData(SensorData sensorData) {
         this.site_name = sensorData.getSite_name();
         this.metric = sensorData.getMetric();
         this.sensor_name = sensorData.getSensor_name();
@@ -52,31 +50,31 @@ public class SensorDataRealm extends RealmObject{
         this.tare_weight = sensorData.isTare_weight();
     }
 
-    public static boolean alreadyExists(String sensor_name,String utility_identifier){
+    public static boolean alreadyExists(String sensor_name, String utility_identifier) {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<SensorDataRealm> results = realm
                 .where(SensorDataRealm.class)
-                .equalTo("sensor_name",sensor_name)
-                .equalTo("utility_identifier",utility_identifier)
+                .equalTo("sensor_name", sensor_name)
+                .equalTo("utility_identifier", utility_identifier)
                 .findAll();
-        if(results.size()>0){
+        if (results.size() > 0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
 
-    public static RealmList<SensorDataRealm> getForUtilityId(String utility_id){
+    public static RealmList<SensorDataRealm> getForUtilityId(String utility_id) {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<SensorDataRealm> results = realm
                 .where(SensorDataRealm.class)
-                .equalTo("utility_identifier",utility_id)
+                .equalTo("utility_identifier", utility_id)
                 .findAll();
 
         RealmList<SensorDataRealm> list = new RealmList<>();
 
-        if(results.size()>0){
-            for(int i=0;i<results.size();i++){
+        if (results.size() > 0) {
+            for (int i = 0; i < results.size(); i++) {
                 list.add(results.get(i));
             }
         }

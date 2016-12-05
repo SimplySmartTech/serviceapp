@@ -12,8 +12,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -36,8 +34,6 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * Created by shailendrapsp on 30/11/16.
@@ -63,7 +59,7 @@ public class ImageViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_image_view);
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         mCurrentPhotoPath = "";
         if (getIntent() != null && getIntent().getExtras() != null) {
@@ -73,7 +69,7 @@ public class ImageViewActivity extends BaseActivity {
 
         parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         touchImageView = (TouchImageView) findViewById(R.id.viewImage);
-        errorLayout = (TextView)findViewById(R.id.errorLayout);
+        errorLayout = (TextView) findViewById(R.id.errorLayout);
 
         File image = null;
 
@@ -131,22 +127,6 @@ public class ImageViewActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-            case android.R.id.home:
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     protected int getStatusBarColor() {
         return 0;
     }
@@ -162,12 +142,11 @@ public class ImageViewActivity extends BaseActivity {
         }
     }
 
-
     public void customImagePicker() {
         final Dialog dialog = new Dialog(ImageViewActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_image_capture);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         LinearLayout lLayoutCameraDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutCameraDialog);
         LinearLayout lLayoutGalleryDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutGalleryDialog);
@@ -310,8 +289,8 @@ public class ImageViewActivity extends BaseActivity {
         }
 
         mCurrentPhotoPath = compressedPath;
-        if(!mCurrentPhotoPath.equals(""))
-        setPic(touchImageView, mCurrentPhotoPath);
+        if (!mCurrentPhotoPath.equals(""))
+            setPic(touchImageView, mCurrentPhotoPath);
     }
 
     private void checkForPermissions() {

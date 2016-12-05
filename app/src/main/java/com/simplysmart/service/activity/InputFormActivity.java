@@ -16,9 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.renderscript.ScriptGroup;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -45,26 +43,21 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.ReadingListAdapter;
 import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
-import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
-import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.DeleteReadingDialog;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingDialog;
-import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.EditDialogListener;
-import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.SensorData;
 import com.simplysmart.service.permission.MarshmallowPermission;
@@ -85,9 +78,6 @@ import java.util.Locale;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.view.View.GONE;
 
@@ -146,7 +136,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(sensorData.getSensor_name()+" reading");
+        getSupportActionBar().setTitle(sensorData.getSensor_name() + " reading");
 
         bindViews();
         Realm realm = Realm.getDefaultInstance();
@@ -208,13 +198,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     @Override
     public void updateResult(int newValue, int position, String value) {
-        if (newValue==StringConstants.NEW_VALUE) {
+        if (newValue == StringConstants.NEW_VALUE) {
             readingListAdapter.notifyItemChanged(position);
-        }else if(newValue == StringConstants.VALUE_DELETED){
+        } else if (newValue == StringConstants.VALUE_DELETED) {
             ArrayList<ReadingDataRealm> readings = readingListAdapter.getReadingsList();
             readings.remove(position);
             readingListAdapter.notifyItemRemoved(position);
-        } else{
+        } else {
             readingListAdapter.notifyItemChanged(position);
         }
     }
@@ -328,12 +318,12 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         uploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(imageTaken && mCurrentPhotoPath!=null && !mCurrentPhotoPath.equals("")){
-                    Intent intent = new Intent(InputFormActivity.this,ImageViewActivity.class);
-                    intent.putExtra(StringConstants.PHOTO_PATH,mCurrentPhotoPath);
-                    intent.putExtra(StringConstants.ALLOW_NEW_IMAGE,true);
-                    startActivityForResult(intent,StringConstants.IMAGE_CHANGED);
-                }else {
+                if (imageTaken && mCurrentPhotoPath != null && !mCurrentPhotoPath.equals("")) {
+                    Intent intent = new Intent(InputFormActivity.this, ImageViewActivity.class);
+                    intent.putExtra(StringConstants.PHOTO_PATH, mCurrentPhotoPath);
+                    intent.putExtra(StringConstants.ALLOW_NEW_IMAGE, true);
+                    startActivityForResult(intent, StringConstants.IMAGE_CHANGED);
+                } else {
                     customImagePicker();
                 }
             }
@@ -349,7 +339,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             }
         }
 
-        if (sensorData!=null && sensorData.isTare_weight()) {
+        if (sensorData != null && sensorData.isTare_weight()) {
             needSpinner = true;
             ArrayAdapter<String> tareWeightAdapter = new ArrayAdapter<String>(InputFormActivity.this, android.R.layout.simple_spinner_item, tareWeights);
             tareWeightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -531,7 +521,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         final Dialog dialog = new Dialog(InputFormActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_image_capture);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
         LinearLayout lLayoutCameraDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutCameraDialog);
         LinearLayout lLayoutGalleryDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutGalleryDialog);
@@ -625,7 +615,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             try {
                 if (mCurrentPhotoPath != null) {
                     Log.d("CameraPhoto", mCurrentPhotoPath);
-                    compressAndDeleteFile(mCurrentPhotoPath,true);
+                    compressAndDeleteFile(mCurrentPhotoPath, true);
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
                 }
@@ -638,7 +628,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                 String path = getPath(uri);
                 if (path != null) {
                     mCurrentPhotoPath = path;
-                    compressAndDeleteFile(mCurrentPhotoPath,false);
+                    compressAndDeleteFile(mCurrentPhotoPath, false);
                     Log.d("GalleryPhoto", mCurrentPhotoPath);
                 } else {
                     showSnackBar(mParentLayout, "Getting error in image file.", false);
@@ -648,17 +638,17 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             }
         }
 
-        if(requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED ){
+        if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED) {
             File oldImage = new File(mCurrentPhotoPath);
             String newPhotoPath = "";
-            if(data!=null && data.getExtras()!=null){
+            if (data != null && data.getExtras() != null) {
                 newPhotoPath = data.getStringExtra(StringConstants.PHOTO_PATH);
             }
 
-            if(!newPhotoPath.equals("") && oldImage.exists()){
+            if (!newPhotoPath.equals("") && oldImage.exists()) {
                 oldImage.delete();
                 mCurrentPhotoPath = newPhotoPath;
-                setPic(uploadImage,mCurrentPhotoPath);
+                setPic(uploadImage, mCurrentPhotoPath);
             }
         }
     }
@@ -667,16 +657,16 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         File imageFile = new File(imageUrl);
         String compressedPath = "";
 
-        if(imageFile.exists()) {
+        if (imageFile.exists()) {
             try {
                 compressedPath = compressImage(imageUrl);
                 DebugLog.d(compressedPath);
-                if(!compressedPath.equals("")) {
-                    if(delete) {
+                if (!compressedPath.equals("")) {
+                    if (delete) {
                         imageFile.delete();
                     }
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 showSnackBar(mParentLayout, "Unable to compress image file.");
             }
@@ -684,13 +674,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
         mCurrentPhotoPath = compressedPath;
         imageTaken = true;
-        setPic(uploadImage,mCurrentPhotoPath);
+        setPic(uploadImage, mCurrentPhotoPath);
     }
 
-    private void setPic(ImageView view,String imageUrl) {
+    private void setPic(ImageView view, String imageUrl) {
         File image = new File(imageUrl);
 
-        if(image.exists()) {
+        if (image.exists()) {
             Picasso.with(InputFormActivity.this).load(image)
                     .placeholder(R.drawable.ic_photo_black_48dp)
                     .noFade()
@@ -761,48 +751,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         }
     }
 
-    private void postReadingRequest(ReadingData readingData, String subDomain) {
-
-        if (NetworkUtilities.isInternet(InputFormActivity.this)) {
-
-            showActivitySpinner();
-
-            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-            Call<JsonObject> call = apiInterface.submitReading(subDomain, readingData);
-            call.enqueue(new Callback<JsonObject>() {
-
-                @Override
-                public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
-
-                    if (response.isSuccessful()) {
-
-                        Intent i = new Intent("UPDATE_METRIC_SENSOR_LIST_ROW");
-                        i.putExtra("groupPosition", groupPosition);
-                        i.putExtra("childPosition", childPosition);
-                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-                        finish();
-
-                    } else if (response.code() == 401) {
-                        handleAuthorizationFailed();
-                    } else {
-                        APIError error = ErrorUtils.parseError(response);
-                        displayMessage(error.message());
-                    }
-                    dismissActivitySpinner();
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    dismissActivitySpinner();
-                    DebugLog.d(t.getLocalizedMessage());
-                    displayMessage(getResources().getString(R.string.error_in_network));
-                }
-            });
-        } else {
-            displayMessage(getString(R.string.error_no_internet_connection));
-        }
-    }
-
     public void setupUI(View view) {
         if (!(view instanceof EditText)) {
             view.setOnTouchListener(new View.OnTouchListener() {
@@ -821,12 +769,12 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         }
     }
 
-    public void closeKeyboardAndCursor(){
+    public void closeKeyboardAndCursor() {
         mInputReadingValue.setCursorVisible(false);
         CommonMethod.hideKeyboard(InputFormActivity.this);
     }
 
-    private void initSwipe(){
+    private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
             @Override
@@ -839,10 +787,10 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                 int position = viewHolder.getAdapterPosition();
                 ReadingDataRealm readingDataRealm = readingListAdapter.getReadingsList().get(position);
 
-                if (direction == ItemTouchHelper.LEFT){
-                    deleteItemFromRecyclerView(position,readingDataRealm);
-                }else {
-                    showEditDialog(readingDataRealm,position);
+                if (direction == ItemTouchHelper.LEFT) {
+                    deleteItemFromRecyclerView(position, readingDataRealm);
+                } else {
+                    showEditDialog(readingDataRealm, position);
                 }
             }
 
@@ -850,26 +798,26 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
 
                 Bitmap icon;
-                if(actionState == ItemTouchHelper.ACTION_STATE_SWIPE){
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
 
                     View itemView = viewHolder.itemView;
                     float height = (float) itemView.getBottom() - (float) itemView.getTop();
                     float width = height / 3;
 
-                    if(dX < 0){
+                    if (dX < 0) {
                         p.setColor(Color.parseColor("#D32F2F"));
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(),(float) itemView.getRight(), (float) itemView.getBottom());
-                        c.drawRect(background,p);
+                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                        c.drawRect(background, p);
                         icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_delete_white_24dp);
-                        RectF icon_dest = new RectF((float) itemView.getRight() - 2*width ,(float) itemView.getTop() + width,(float) itemView.getRight() - width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
-                    }else{
+                        RectF icon_dest = new RectF((float) itemView.getRight() - 2 * width, (float) itemView.getTop() + width, (float) itemView.getRight() - width, (float) itemView.getBottom() - width);
+                        c.drawBitmap(icon, null, icon_dest, p);
+                    } else {
                         p.setColor(Color.parseColor("#388E3C"));
-                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX,(float) itemView.getBottom());
-                        c.drawRect(background,p);
+                        RectF background = new RectF((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom());
+                        c.drawRect(background, p);
                         icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_mode_edit_white_24dp);
-                        RectF icon_dest = new RectF((float) itemView.getLeft() + width ,(float) itemView.getTop() + width,(float) itemView.getLeft()+ 2*width,(float)itemView.getBottom() - width);
-                        c.drawBitmap(icon,null,icon_dest,p);
+                        RectF icon_dest = new RectF((float) itemView.getLeft() + width, (float) itemView.getTop() + width, (float) itemView.getLeft() + 2 * width, (float) itemView.getBottom() - width);
+                        c.drawBitmap(icon, null, icon_dest, p);
                     }
                 }
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
@@ -879,14 +827,14 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         itemTouchHelper.attachToRecyclerView(readingList);
     }
 
-    private void deleteItemFromRecyclerView(int position,ReadingDataRealm readingDataRealm) {
-        DeleteReadingDialog deleteReadingDialog = DeleteReadingDialog.newInstance("Alert","Are you sure you want to delete this reading?","No","Yes",position,readingDataRealm);
+    private void deleteItemFromRecyclerView(int position, ReadingDataRealm readingDataRealm) {
+        DeleteReadingDialog deleteReadingDialog = DeleteReadingDialog.newInstance("Alert", "Are you sure you want to delete this reading?", "No", "Yes", position, readingDataRealm);
         deleteReadingDialog.setCancelable(false);
-        deleteReadingDialog.show(getFragmentManager(),"deleteReadingDialog");
+        deleteReadingDialog.show(getFragmentManager(), "deleteReadingDialog");
     }
 
     private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {
-        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position,true);
+        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position, true);
         newDialog.setCancelable(false);
         newDialog.show(getFragmentManager(), "show_dialog");
     }

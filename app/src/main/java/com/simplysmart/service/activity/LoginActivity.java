@@ -176,69 +176,65 @@ public class LoginActivity extends BaseActivity {
                                 startActivity(i);
                                 finish();
 
-                        } else if (response.code() == 401) {
-                            handleAuthorizationFailed();
+                            } else if (response.code() == 401) {
+                                handleAuthorizationFailed();
 
-                        } else {
-                            llCompanySpinner.setVisibility(View.VISIBLE);
+                            } else {
+                                llCompanySpinner.setVisibility(View.VISIBLE);
 
-                            ArrayList<String> arrayList = new ArrayList<>();
+                                ArrayList<String> arrayList = new ArrayList<>();
 
-                            arrayList.add(0, "Select Company");
-                            if (response.body().getCompany_list() != null && response.body().getCompany_list().size() > 0) {
+                                arrayList.add(0, "Select Company");
+                                if (response.body().getCompany_list() != null && response.body().getCompany_list().size() > 0) {
 
-                                for (int i = 0; i < response.body().getCompany_list().size(); i++) {
-                                    arrayList.add(response.body().getCompany_list().get(i).getName());
-                                }
+                                    for (int i = 0; i < response.body().getCompany_list().size(); i++) {
+                                        arrayList.add(response.body().getCompany_list().get(i).getName());
+                                    }
 
-                                ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(LoginActivity.this, android.R.layout.simple_spinner_item, arrayList);
-                                spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                companySpinner.setAdapter(spinnerArrayAdapter);
+                                    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<>(LoginActivity.this, android.R.layout.simple_spinner_item, arrayList);
+                                    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                    companySpinner.setAdapter(spinnerArrayAdapter);
 
-                                companySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                        if (position > 0) {
-                                            subDomain = response.body().getCompany_list().get(position - 1).getSubdomain();
-                                            DebugLog.d("subDomain : " + subDomain);
+                                    companySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                        @Override
+                                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                            if (position > 0) {
+                                                subDomain = response.body().getCompany_list().get(position - 1).getSubdomain();
+                                                DebugLog.d("subDomain : " + subDomain);
+                                            }
                                         }
-                                    }
 
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> parent) {
+                                        @Override
+                                        public void onNothingSelected(AdapterView<?> parent) {
 
-                                    }
-                                });
+                                        }
+                                    });
+                                }
                             }
+                        } else
+
+                        {
+                            APIError error = ErrorUtils.parseError(response);
+                            displayMessage(error.message());
                         }
+
+                        dismissActivitySpinner();
                     }
 
-                    else
-
-                    {
-                        APIError error = ErrorUtils.parseError(response);
-                        displayMessage(error.message());
+                    @Override
+                    public void onFailure(Call<LoginResponse> call, Throwable t) {
+                        dismissActivitySpinner();
+                        displayMessage(getResources().getString(R.string.error_in_network));
                     }
+                });
+            }
+        } else
 
-                    dismissActivitySpinner();
-                }
-
-                @Override
-                public void onFailure (Call < LoginResponse > call, Throwable t){
-                    dismissActivitySpinner();
-                    displayMessage(getResources().getString(R.string.error_in_network));
-                }
-            });
+        {
+            displayMessage(getString(R.string.error_no_internet_connection));
         }
+
     }
-
-    else
-
-    {
-        displayMessage(getString(R.string.error_no_internet_connection));
-    }
-
-}
 
     private void prepareCompanyLoginRequest(String gcmToken) {
 

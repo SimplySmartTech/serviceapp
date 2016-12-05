@@ -1,7 +1,5 @@
 package com.simplysmart.service.config;
 
-import com.simplysmart.service.model.matrix.SensorData;
-
 /**
  * Created by shailendrapsp on 7/11/16.
  */

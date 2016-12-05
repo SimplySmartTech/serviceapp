@@ -38,14 +38,14 @@ public class EditDialog extends DialogFragment {
         args.putString(utility_id, readingDataRealm.getUtility_id());
         args.putString(sensor_name, readingDataRealm.getSensor_name());
         args.putLong(timestamp, readingDataRealm.getTimestamp());
-        args.putInt(position,pos);
-        args.putBoolean(StringConstants.EDIT,edit);
+        args.putInt(position, pos);
+        args.putBoolean(StringConstants.EDIT, edit);
         f.setArguments(args);
 
         return f;
     }
 
-    public EditDialog(){
+    public EditDialog() {
 
     }
 
@@ -62,7 +62,7 @@ public class EditDialog extends DialogFragment {
         final EditText newReading = (EditText) dialogView.findViewById(R.id.reading);
         Button dialogNegativeButton = (Button) dialogView.findViewById(R.id.dialogButtonNegative);
         Button dialogPositiveButton = (Button) dialogView.findViewById(R.id.dialogButtonPositive);
-        ImageView close =(ImageView) dialogView.findViewById(R.id.close);
+        ImageView close = (ImageView) dialogView.findViewById(R.id.close);
 
         Bundle bundle = getArguments();
         String utilityId = bundle.getString(utility_id);
@@ -75,9 +75,9 @@ public class EditDialog extends DialogFragment {
         final Realm realm = Realm.getDefaultInstance();
         final ReadingDataRealm readingDataRealm = realm
                 .where(ReadingDataRealm.class)
-                .equalTo("utility_id",utilityId)
-                .equalTo("sensor_name",sensorName)
-                .equalTo("timestamp",time)
+                .equalTo("utility_id", utilityId)
+                .equalTo("sensor_name", sensorName)
+                .equalTo("timestamp", time)
                 .findFirst();
 
         dialogNegativeButton.setText("DELETE");
@@ -112,28 +112,28 @@ public class EditDialog extends DialogFragment {
             }
         });
 
-        if(!edit){
+        if (!edit) {
             dialogNegativeButton.setVisibility(View.INVISIBLE);
         }
 
         dialogPositiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!newReading.getText().equals("")){
+                if (!newReading.getText().equals("")) {
                     String string = newReading.getText().toString();
                     try {
                         realm.beginTransaction();
                         readingDataRealm.setValue(string);
                         realm.commitTransaction();
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                    editDialogListener.updateResult(StringConstants.NEW_VALUE,pos,string+" "+readingDataRealm.getUnit());
+                    EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                    editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingDataRealm.getUnit());
                     dismiss();
-                }else{
-                    EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                    editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,pos,"");
+                } else {
+                    EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                    editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
                     dismiss();
                 }
             }
@@ -142,16 +142,16 @@ public class EditDialog extends DialogFragment {
         dialogNegativeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
+                try {
                     realm.beginTransaction();
                     readingDataRealm.deleteFromRealm();
                     realm.commitTransaction();
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                editDialogListener.updateResult(StringConstants.VALUE_DELETED,pos,"");
+                EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                editDialogListener.updateResult(StringConstants.VALUE_DELETED, pos, "");
                 dismiss();
             }
         });
@@ -159,8 +159,8 @@ public class EditDialog extends DialogFragment {
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-                editDialogListener.updateResult(StringConstants.NEW_VALUE,pos,"");
+                EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, "");
                 dismiss();
             }
         });

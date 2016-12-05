@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.activity.MainActivity;
 import com.simplysmart.service.activity.SummaryActivity;
 
 

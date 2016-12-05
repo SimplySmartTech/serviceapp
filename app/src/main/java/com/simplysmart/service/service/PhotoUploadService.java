@@ -1,22 +1,8 @@
 package com.simplysmart.service.service;
 
-import android.annotation.SuppressLint;
 import android.app.Service;
-import android.content.ContentUris;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.media.ExifInterface;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -33,10 +19,6 @@ import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -215,8 +197,8 @@ public class PhotoUploadService extends Service {
 
     private void sendImageUploadBroadcast(ReadingDataRealm rdr) {
         Intent i = new Intent("imageUploadComplete");
-        i.putExtra(StringConstants.READING_DATA,rdr);
-        DebugLog.d("Sending image upload complete broadcast "+rdr.getPhotographic_evidence_url());
+        i.putExtra(StringConstants.READING_DATA, rdr);
+        DebugLog.d("Sending image upload complete broadcast " + rdr.getPhotographic_evidence_url());
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
     }
 }

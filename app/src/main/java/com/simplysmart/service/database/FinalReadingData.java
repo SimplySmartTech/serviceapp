@@ -1,16 +1,12 @@
 package com.simplysmart.service.database;
 
-import com.simplysmart.service.model.matrix.ReadingData;
-
-import java.util.ArrayList;
-
 import io.realm.RealmObject;
 
 /**
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class FinalReadingData extends RealmObject{
+public class FinalReadingData extends RealmObject {
 
     private String jsonToSend;
 
@@ -18,9 +14,9 @@ public class FinalReadingData extends RealmObject{
         super();
     }
 
-    public FinalReadingData(String jsonToSend){
+    public FinalReadingData(String jsonToSend) {
         super();
-        this.jsonToSend=jsonToSend;
+        this.jsonToSend = jsonToSend;
     }
 
     public String getJsonToSend() {

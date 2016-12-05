@@ -4,20 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Window;
 
-import com.google.gson.Gson;
 import com.simplysmart.service.R;
-import com.simplysmart.service.config.GlobalData;
-import com.simplysmart.service.model.user.AccessPolicy;
-import com.simplysmart.service.model.user.Unit;
-import com.simplysmart.service.model.user.User;
-
-import java.util.ArrayList;
 
 import io.realm.Realm;
 
@@ -49,7 +40,7 @@ public class SplashActivity extends Activity {
                 realm.beginTransaction();
                 realm.deleteAll();
                 realm.commitTransaction();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

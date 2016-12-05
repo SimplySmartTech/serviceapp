@@ -17,7 +17,6 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -36,7 +35,6 @@ import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
-import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 
@@ -50,9 +48,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -157,7 +152,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         CustomProgressDialog.setMessage(message);
         if (spinningDialog != null) spinningDialog.show();
     }
-
 
     protected void dismissActivitySpinner() {
         if (spinningDialog != null) spinningDialog.dismiss();
@@ -378,8 +372,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         return inSampleSize;
     }
 
-    public void logout(){
-        if(GlobalData.getInstance().getUnits()!=null && GlobalData.getInstance().getUnits().size()>0) {
+    public void logout() {
+        if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
             for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
                 removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
             }
@@ -400,13 +394,13 @@ public abstract class BaseActivity extends AppCompatActivity {
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         try {
             deleteFile(new File(Environment.getExternalStorageDirectory() + "/" + StringConstants.STORAGE_DIRECTORY));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -424,17 +418,17 @@ public abstract class BaseActivity extends AppCompatActivity {
                     deletedAll = file.delete();
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return deletedAll;
     }
 
-    public void handleAuthorizationFailed(){
+    public void handleAuthorizationFailed() {
         clearApplicationData();
-        Intent i = new Intent(this,LoginActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent i = new Intent(this, LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
     }
 

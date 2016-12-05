@@ -15,69 +15,69 @@ import com.simplysmart.service.R;
 
 public class AlertDialogStandard extends DialogFragment implements View.OnClickListener {
 
-	private static final String KEY_TITLE = "title";
-	private static final String KEY_MESSAGE = "message";
-	private static final String KEY_NEGATIVE_BUTTON = "negativeButton";
-	private static final String KEY_POSITIVE_BUTTON = "positiveButton";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_MESSAGE = "message";
+    private static final String KEY_NEGATIVE_BUTTON = "negativeButton";
+    private static final String KEY_POSITIVE_BUTTON = "positiveButton";
 
-	public static AlertDialogStandard newInstance(String title, String message, String negativeButton,
-												  String positiveButton) {
-		AlertDialogStandard f = new AlertDialogStandard();
+    public static AlertDialogStandard newInstance(String title, String message, String negativeButton,
+                                                  String positiveButton) {
+        AlertDialogStandard f = new AlertDialogStandard();
 
-		Bundle args = new Bundle();
-		args.putString(KEY_TITLE, title);
-		args.putString(KEY_MESSAGE, message);
-		args.putString(KEY_NEGATIVE_BUTTON, negativeButton);
-		args.putString(KEY_POSITIVE_BUTTON, positiveButton);
-		f.setArguments(args);
+        Bundle args = new Bundle();
+        args.putString(KEY_TITLE, title);
+        args.putString(KEY_MESSAGE, message);
+        args.putString(KEY_NEGATIVE_BUTTON, negativeButton);
+        args.putString(KEY_POSITIVE_BUTTON, positiveButton);
+        f.setArguments(args);
 
-		return f;
-	}
+        return f;
+    }
 
-	public AlertDialogStandard() {
-	}
+    public AlertDialogStandard() {
+    }
 
-	@SuppressLint("InflateParams")
-	@Override
-	public Dialog onCreateDialog(Bundle savedInstanceState) {
+    @SuppressLint("InflateParams")
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
 
 //		Typeface textTypeface = Typeface.createFromAsset(getActivity().getAssets(), ApplicationConstant.FONT_EUROSTILE_REGULAR_MID);
-		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.custom_alert_dialog_standard, null);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.custom_alert_dialog_standard, null);
 
-		TextView dialogTitle = (TextView) dialogView.findViewById(R.id.dialogTitle);
-		TextView dialogMessage = (TextView) dialogView.findViewById(R.id.dialogMessage);
-		Button dialogNegativeButton = (Button) dialogView.findViewById(R.id.dialogButtonNegative);
-		Button dialogPositiveButton = (Button) dialogView.findViewById(R.id.dialogButtonPositive);
+        TextView dialogTitle = (TextView) dialogView.findViewById(R.id.dialogTitle);
+        TextView dialogMessage = (TextView) dialogView.findViewById(R.id.dialogMessage);
+        Button dialogNegativeButton = (Button) dialogView.findViewById(R.id.dialogButtonNegative);
+        Button dialogPositiveButton = (Button) dialogView.findViewById(R.id.dialogButtonPositive);
 
-		dialogTitle.setText(getArguments().getString(KEY_TITLE));
-		dialogMessage.setText(getArguments().getString(KEY_MESSAGE));
-		dialogNegativeButton.setText(getArguments().getString(KEY_NEGATIVE_BUTTON));
-		dialogPositiveButton.setText(getArguments().getString(KEY_POSITIVE_BUTTON));
+        dialogTitle.setText(getArguments().getString(KEY_TITLE));
+        dialogMessage.setText(getArguments().getString(KEY_MESSAGE));
+        dialogNegativeButton.setText(getArguments().getString(KEY_NEGATIVE_BUTTON));
+        dialogPositiveButton.setText(getArguments().getString(KEY_POSITIVE_BUTTON));
 
 //		dialogTitle.setTypeface(textTypeface);
 //		dialogMessage.setTypeface(textTypeface);
 //		dialogNegativeButton.setTypeface(textTypeface);
 //		dialogPositiveButton.setTypeface(textTypeface);
 
-		dialogNegativeButton.setOnClickListener(this);
-		dialogPositiveButton.setOnClickListener(this);
+        dialogNegativeButton.setOnClickListener(this);
+        dialogPositiveButton.setOnClickListener(this);
 
-		builder.setView(dialogView);
-		return builder.create();
-	}
+        builder.setView(dialogView);
+        return builder.create();
+    }
 
-	@Override
-	public void onClick(View v) {
+    @Override
+    public void onClick(View v) {
 
-		if (v.getId() == R.id.dialogButtonNegative) {
-			dismiss();
-		}
-		if (v.getId() == R.id.dialogButtonPositive) {
-			dismiss();
-		}
-	}
+        if (v.getId() == R.id.dialogButtonNegative) {
+            dismiss();
+        }
+        if (v.getId() == R.id.dialogButtonPositive) {
+            dismiss();
+        }
+    }
 
 }

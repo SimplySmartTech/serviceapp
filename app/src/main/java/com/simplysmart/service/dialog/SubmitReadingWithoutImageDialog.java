@@ -21,7 +21,7 @@ public class SubmitReadingWithoutImageDialog extends DialogFragment implements V
     private static final String KEY_POSITIVE_BUTTON = "positiveButton";
 
     public static SubmitReadingWithoutImageDialog newInstance(String title, String message, String negativeButton,
-                                                  String positiveButton) {
+                                                              String positiveButton) {
         SubmitReadingWithoutImageDialog f = new SubmitReadingWithoutImageDialog();
 
         Bundle args = new Bundle();
@@ -71,13 +71,13 @@ public class SubmitReadingWithoutImageDialog extends DialogFragment implements V
             dismiss();
         }
         if (v.getId() == R.id.dialogButtonPositive) {
-            SubmitWithoutImage submitWithoutImage = (SubmitWithoutImage)getActivity();
+            SubmitWithoutImage submitWithoutImage = (SubmitWithoutImage) getActivity();
             submitWithoutImage.submitWithoutImage();
             dismiss();
         }
     }
 
-    public interface SubmitWithoutImage{
+    public interface SubmitWithoutImage {
         public abstract void submitWithoutImage();
     }
 

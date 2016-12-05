@@ -24,7 +24,7 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_NEGATIVE_BUTTON = "negativeButton";
     private static final String KEY_POSITIVE_BUTTON = "positiveButton";
-    private int position ;
+    private int position;
     private ReadingDataRealm readingDataRealm;
 
     public static DeleteReadingDialog newInstance(String title, String message, String negativeButton,
@@ -36,14 +36,15 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
         args.putString(KEY_MESSAGE, message);
         args.putString(KEY_NEGATIVE_BUTTON, negativeButton);
         args.putString(KEY_POSITIVE_BUTTON, positiveButton);
-        args.putInt(StringConstants.EDIT,position);
-        args.putParcelable(StringConstants.READING_DATA,readingDataRealm);
+        args.putInt(StringConstants.EDIT, position);
+        args.putParcelable(StringConstants.READING_DATA, readingDataRealm);
         f.setArguments(args);
 
         return f;
     }
 
     public DeleteReadingDialog() {
+
     }
 
     @SuppressLint("InflateParams")
@@ -78,10 +79,11 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
     public void onClick(View v) {
 
         if (v.getId() == R.id.dialogButtonNegative) {
-            EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-            editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,position,"");
+            EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+            editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, position, "");
             dismiss();
         }
+
         if (v.getId() == R.id.dialogButtonPositive) {
 
             Realm realm = Realm.getDefaultInstance();
@@ -89,8 +91,8 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
             readingDataRealm.deleteFromRealm();
             realm.commitTransaction();
 
-            EditDialogListener editDialogListener = (EditDialogListener)getActivity();
-            editDialogListener.updateResult(StringConstants.VALUE_DELETED,position,"");
+            EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+            editDialogListener.updateResult(StringConstants.VALUE_DELETED, position, "");
             dismiss();
         }
     }

@@ -22,7 +22,7 @@ public class SubmitWithoutInternetDialog extends DialogFragment implements View.
     private static final String KEY_POSITIVE_BUTTON = "positiveButton";
 
     public static SubmitWithoutInternetDialog newInstance(String title, String message, String negativeButton,
-                                                              String positiveButton) {
+                                                          String positiveButton) {
         SubmitWithoutInternetDialog f = new SubmitWithoutInternetDialog();
 
         Bundle args = new Bundle();

@@ -9,7 +9,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,8 +31,6 @@ import com.simplysmart.service.database.FinalReadingData;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
-import com.simplysmart.service.dialog.AlertDialogStandard;
-import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
 import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
 import com.simplysmart.service.endpint.ApiInterface;
@@ -43,7 +40,6 @@ import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.Metric;
 import com.simplysmart.service.model.matrix.Reading;
-import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.service.PhotoUploadService;
 
@@ -59,7 +55,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage,SubmitWithoutInternet {
+public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -95,7 +91,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    checkAndSubmitData();
+                checkAndSubmitData();
             }
         });
 
@@ -156,7 +152,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
             }
         }
 
-        if(count>0){
+        if (count > 0) {
             allDone = false;
         }
 
@@ -174,7 +170,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         add_new_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(SummaryActivity.this,MainActivity.class);
+                Intent i = new Intent(SummaryActivity.this, MainActivity.class);
                 startActivity(i);
                 finish();
             }
@@ -198,7 +194,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(uploadComplete, new IntentFilter("uploadComplete"));
         LocalBroadcastManager.getInstance(this).registerReceiver(uploadImage, new IntentFilter("imageUploadComplete"));
-        LocalBroadcastManager.getInstance(this).registerReceiver(uploadStarted,new IntentFilter("uploadStarted"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(uploadStarted, new IntentFilter("uploadStarted"));
     }
 
     @Override
@@ -240,17 +236,17 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     }
 
     private void checkAndSubmitData() {
-        if(allDone){
+        if (allDone) {
             submitData();
-        }else {
+        } else {
             showImageNotUploadedDialog();
         }
     }
 
     private void showImageNotUploadedDialog() {
-        SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert","All images have not been uploaded yet. Do you want to submit readings without uploading all images ?","No","Yes");
+        SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert", "All images have not been uploaded yet. Do you want to submit readings without uploading all images ?", "No", "Yes");
         submitReadingWithoutImageDialog.setCancelable(false);
-        submitReadingWithoutImageDialog.show(getFragmentManager(),"submitReadingWithoutImageDialog");
+        submitReadingWithoutImageDialog.show(getFragmentManager(), "submitReadingWithoutImageDialog");
     }
 
     private void submitData() {
@@ -264,7 +260,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
 //                        ashowSnckBar(mParentLayout, "Data successfully submitted.", true);
-                        Toast.makeText(getApplicationContext(),"Data successfully submitted.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Data successfully submitted.", Toast.LENGTH_SHORT).show();
                         removeLocalData(GlobalData.getInstance().getSelectedUnitId());
                         exitScreen();
                         dismissActivitySpinner();
@@ -285,9 +281,9 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 }
             });
         } else {
-            SubmitWithoutInternetDialog dataToSend = SubmitWithoutInternetDialog.newInstance("Alert",getString(R.string.after_internet_send),"","OK");
+            SubmitWithoutInternetDialog dataToSend = SubmitWithoutInternetDialog.newInstance("Alert", getString(R.string.after_internet_send), "", "OK");
             dataToSend.setCancelable(false);
-            dataToSend.show(getFragmentManager(),"dataToSend");
+            dataToSend.show(getFragmentManager(), "dataToSend");
         }
     }
 
@@ -361,11 +357,11 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private void findAndUpdateElement(ReadingDataRealm rdr) {
         String local_photo_url = rdr.getLocal_photo_url();
 
-        for(int i=0;i<summaryList.size();i++){
-            if(summaryList.get(i).getLocalPhotoUrl()!=null && summaryList.get(i).getLocalPhotoUrl().equals(local_photo_url)){
+        for (int i = 0; i < summaryList.size(); i++) {
+            if (summaryList.get(i).getLocalPhotoUrl() != null && summaryList.get(i).getLocalPhotoUrl().equals(local_photo_url)) {
                 adapter.getData().get(i).setUploaded(true);
                 adapter.notifyItemChanged(i);
-                DebugLog.d("Position of notifying "+ i);
+                DebugLog.d("Position of notifying " + i);
             }
         }
     }
@@ -379,13 +375,13 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         @Override
         public void onReceive(Context context, Intent intent) {
             ReadingDataRealm rdr = null;
-            if(intent!=null && intent.getExtras()!=null) {
+            if (intent != null && intent.getExtras() != null) {
                 rdr = intent.getParcelableExtra(StringConstants.READING_DATA);
             }
 
-            DebugLog.d("Broadcast recieved for image upload complete "+ rdr.getPhotographic_evidence_url());
+            DebugLog.d("Broadcast recieved for image upload complete " + rdr.getPhotographic_evidence_url());
 
-            if(rdr!=null){
+            if (rdr != null) {
                 findAndUpdateElement(rdr);
             }
         }

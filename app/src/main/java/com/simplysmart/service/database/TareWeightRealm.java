@@ -10,17 +10,17 @@ import io.realm.RealmResults;
  * Created by shailendrapsp on 17/11/16.
  */
 
-public class TareWeightRealm extends RealmObject{
+public class TareWeightRealm extends RealmObject {
     private String unit_id;
     private String name;
     private String value;
     private String info;
 
-    public TareWeightRealm(){
+    public TareWeightRealm() {
         super();
     }
 
-    public TareWeightRealm(TareWeight tareWeight,String unit_id){
+    public TareWeightRealm(TareWeight tareWeight, String unit_id) {
         super();
         this.name = tareWeight.getName();
         this.value = tareWeight.getValue();
@@ -28,9 +28,9 @@ public class TareWeightRealm extends RealmObject{
         this.unit_id = unit_id;
     }
 
-    public static RealmResults<TareWeightRealm> getTareWeights(String unit_id){
+    public static RealmResults<TareWeightRealm> getTareWeights(String unit_id) {
         Realm realm = Realm.getDefaultInstance();
-        return realm.where(TareWeightRealm.class).equalTo("unit_id",unit_id).findAll();
+        return realm.where(TareWeightRealm.class).equalTo("unit_id", unit_id).findAll();
     }
 
     public static boolean alreadyExists(TareWeight tareWeight) {
@@ -38,14 +38,14 @@ public class TareWeightRealm extends RealmObject{
         RealmResults<TareWeightRealm> results = realm
                 .where(TareWeightRealm.class)
                 .equalTo("name", tareWeight.getName())
-                .equalTo("value",tareWeight.getValue())
-                .equalTo("info",tareWeight.getInfo())
+                .equalTo("value", tareWeight.getValue())
+                .equalTo("info", tareWeight.getInfo())
                 .findAll();
 
         return results.size() > 0;
     }
 
-    public static void deleteAll(){
+    public static void deleteAll() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<TareWeightRealm> tareWeightRealms = realm.where(TareWeightRealm.class).findAll();
         realm.beginTransaction();

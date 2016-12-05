@@ -77,7 +77,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(mContext, ImageViewActivity.class);
-                i.putExtra(StringConstants.PHOTO_PATH,readingsList.get(position).getLocal_photo_url());
+                i.putExtra(StringConstants.PHOTO_PATH, readingsList.get(position).getLocal_photo_url());
                 mContext.startActivity(i);
             }
         });
@@ -111,7 +111,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
     }
 
     private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {
-        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position,true);
+        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position, true);
         newDialog.show(fragmentManager, "show dialog");
     }
 
