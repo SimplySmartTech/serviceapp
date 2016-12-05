@@ -21,6 +21,9 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
             Intent i = new Intent(context, PhotoUploadService.class);
             i.putExtra(StringConstants.USE_UNIT,false);
             context.startService(i);
+
+            Intent i2 = new Intent(context,ReadingSubmitService.class);
+            context.startService(i2);
         }
     }
 
