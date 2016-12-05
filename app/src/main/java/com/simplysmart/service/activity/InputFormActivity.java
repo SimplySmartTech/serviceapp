@@ -879,11 +879,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void deleteItemFromRecyclerView(int position,ReadingDataRealm readingDataRealm) {
         DeleteReadingDialog deleteReadingDialog = DeleteReadingDialog.newInstance("Alert","Are you sure you want to delete this reading?","No","Yes",position,readingDataRealm);
+        deleteReadingDialog.setCancelable(false);
         deleteReadingDialog.show(getFragmentManager(),"deleteReadingDialog");
     }
 
     private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {
         EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position,true);
+        newDialog.setCancelable(false);
         newDialog.show(getFragmentManager(), "show_dialog");
     }
 

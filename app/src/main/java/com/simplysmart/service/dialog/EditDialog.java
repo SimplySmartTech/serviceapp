@@ -159,6 +159,8 @@ public class EditDialog extends DialogFragment {
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EditDialogListener editDialogListener = (EditDialogListener)getActivity();
+                editDialogListener.updateResult(StringConstants.NEW_VALUE,pos,"");
                 dismiss();
             }
         });
