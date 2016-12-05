@@ -214,6 +214,8 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             ArrayList<ReadingDataRealm> readings = readingListAdapter.getReadingsList();
             readings.remove(position);
             readingListAdapter.notifyItemRemoved(position);
+        } else{
+            readingListAdapter.notifyItemChanged(position);
         }
     }
 
