@@ -51,7 +51,12 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
         } else {
             unit = "";
         }
-        holder.sensor_name.setText(sensorName + "( " + unit + ")");
+
+        if(unit.contains("\\")){
+            holder.sensor_name.setText(sensorName+"( "+"\u00B0"+" C)");
+        }else {
+            holder.sensor_name.setText(sensorName + "( " + unit + ")");
+        }
 
         holder.sensor_name.setOnClickListener(new View.OnClickListener() {
             @Override

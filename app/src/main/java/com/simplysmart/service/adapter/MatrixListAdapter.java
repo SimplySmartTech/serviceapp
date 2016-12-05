@@ -3,6 +3,7 @@ package com.simplysmart.service.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.viewholder.ParentViewHolder;
 
 import java.util.ArrayList;
+
+import okio.ByteString;
 
 /**
  * Created by shekhar on 20/10/16.
@@ -57,7 +60,19 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
             unit = "";
         }
 
-        holder.sensor_type.setText(sensorName + " (" + unit + ")");
+        String unicodeUnit = "";
+        boolean isUnicode = false;
+        for(int i=0;i<unit.length();i++){
+            if(unit.contains("\\")){
+                isUnicode = true;
+            }
+        }
+
+        if(isUnicode) {
+            holder.sensor_type.setText(sensorName+"( "+"\u00B0"+ " C)");
+        }else {
+            holder.sensor_type.setText(sensorName + " (" +unit +")");
+        }
 
         holder.sensor_type.setOnClickListener(new View.OnClickListener() {
             @Override

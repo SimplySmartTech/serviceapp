@@ -225,16 +225,20 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         try {
             Realm realm = Realm.getDefaultInstance();
             for (int i = 0; i < matrixDataArrayList.size(); i++) {
+
                 MatrixData matrixData = matrixDataArrayList.get(i);
                 MatrixDataRealm matrixDataRealm = new MatrixDataRealm(matrixData);
                 RealmList<SensorDataRealm> sensorDataRealmList = new RealmList<>();
+
                 for (int j = 0; j < matrixData.getSensors().size(); j++) {
                     SensorDataRealm data;
+
                     if (!SensorDataRealm.alreadyExists(matrixData.getSensors().get(j).getSensor_name(), matrixData.getUtility_id())) {
                         realm.beginTransaction();
                         data = realm.createObject(SensorDataRealm.class);
                         data.setData(matrixData.getSensors().get(j));
                         realm.commitTransaction();
+
                     } else {
                         realm.beginTransaction();
                         data = realm.where(SensorDataRealm.class)

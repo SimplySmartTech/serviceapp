@@ -65,6 +65,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private boolean allDone = false;
     private boolean initializeUpload = false;
     private Button submit;
+    private TextView no_data_found,add_new_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,13 +166,11 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
-        TextView no_data_found = (TextView) findViewById(R.id.no_data_found);
-        TextView add_new_data = (TextView) findViewById(R.id.add_reading_now);
+        no_data_found = (TextView) findViewById(R.id.no_data_found);
+        add_new_data = (TextView) findViewById(R.id.add_reading_now);
         add_new_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(SummaryActivity.this, MainActivity.class);
-                startActivity(i);
                 finish();
             }
         });
@@ -259,11 +258,9 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
-//                        ashowSnckBar(mParentLayout, "Data successfully submitted.", true);
-                        Toast.makeText(getApplicationContext(), "Data successfully submitted.", Toast.LENGTH_SHORT).show();
                         removeLocalData(GlobalData.getInstance().getSelectedUnitId());
-                        exitScreen();
                         dismissActivitySpinner();
+                        hideList();
                     } else if (response.code() == 401) {
                         handleAuthorizationFailed();
                         dismissActivitySpinner();
@@ -287,6 +284,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         }
     }
 
+
+
     private void saveToDisk(AllReadingsData allReadingData) {
         String jsonToSend = new Gson().toJson(allReadingData);
         DebugLog.d(jsonToSend);
@@ -297,7 +296,12 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         realm.commitTransaction();
 
         removeLocalData(GlobalData.getInstance().getSelectedUnitId());
-        finish();
+        hideList();
+    }
+
+    private void hideList() {
+        summary.setVisibility(View.GONE);
+        no_data_found.setText(getString(R.string.readings_submitted));
     }
 
     private AllReadingsData getDataToSubmit() {
@@ -346,12 +350,6 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         }
         allReadingData.setMetrics(metrics);
         return allReadingData;
-    }
-
-    private void exitScreen() {
-        Intent i = new Intent(this, MainActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
     }
 
     private void findAndUpdateElement(ReadingDataRealm rdr) {
@@ -409,6 +407,5 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     @Override
     public void submitWithoutInternet() {
         saveToDisk(getDataToSubmit());
-        finish();
     }
 }

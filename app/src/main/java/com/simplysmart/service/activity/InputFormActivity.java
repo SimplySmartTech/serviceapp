@@ -218,7 +218,12 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingList = (RecyclerView) findViewById(R.id.readingList);
         middleLine = findViewById(R.id.middleSeparator);
         tareWeightSpinner = (Spinner) findViewById(R.id.tare_weight_spinner);
-        unit.setText(sensorData.getUnit());
+        String unitOfSensor = sensorData.getUnit();
+        if(unitOfSensor.contains("\\")){
+            unit.setText("\u00B0 C");
+        }else {
+            unit.setText(sensorData.getUnit());
+        }
 
         mInputReadingValue.clearFocus();
         CommonMethod.hideKeyboard(this);

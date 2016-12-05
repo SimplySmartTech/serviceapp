@@ -110,6 +110,8 @@
 
         <service android:name=".service.PhotoUploadService" />
 
+        <service android:name=".service.ReadingSubmitService" />
+
         <!-- Google play service version -->
         <meta-data
             android:name="com.google.android.gms.version"
