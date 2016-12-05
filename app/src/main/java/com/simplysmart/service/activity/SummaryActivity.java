@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.SummaryListAdapter;
@@ -27,9 +28,11 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
+import com.simplysmart.service.database.FinalReadingData;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
+import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
 import com.simplysmart.service.endpint.ApiInterface;
@@ -44,6 +47,7 @@ import com.simplysmart.service.service.PhotoUploadService;
 
 import java.util.ArrayList;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -245,13 +249,14 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     }
 
     private void showImageNotUploadedDialog() {
-        SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert","Do you want to submit readings without images?","No","Yes");
+        SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert","All images have not been uploaded yet. Do you want to submit readings without uploading all images ?","No","Yes");
         submitReadingWithoutImageDialog.show(getFragmentManager(),"submitReadingWithoutImageDialog");
     }
 
     private void submitData() {
         AllReadingsData allReadingData = getDataToSubmit();
         if (NetworkUtilities.isInternet(this)) {
+            showActivitySpinner();
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
             Call<JsonObject> submitAllReadings = apiInterface.submitAllReadings(GlobalData.getInstance().getSubDomain(), allReadingData);
             submitAllReadings.enqueue(new Callback<JsonObject>() {
@@ -281,12 +286,22 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
             });
         } else {
             saveToDisk(allReadingData);
-            showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection), false);
+            AlertDialogStandard dataToSend = AlertDialogStandard.newInstance("Alert",getString(R.string.after_internet_send),"","OK");
+            dataToSend.show(getFragmentManager(),"dataToSend");
         }
     }
 
     private void saveToDisk(AllReadingsData allReadingData) {
-        //TODO
+        String jsonToSend = new Gson().toJson(allReadingData);
+        DebugLog.d(jsonToSend);
+        FinalReadingData finalReadingData = new FinalReadingData(jsonToSend);
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.copyToRealm(finalReadingData);
+        realm.commitTransaction();
+
+        removeLocalData(GlobalData.getInstance().getSelectedUnitId());
+        finish();
     }
 
     private AllReadingsData getDataToSubmit() {

@@ -29,5 +29,6 @@
     <string name="take_new_image">NEW</string>
     <string name="done">DONE</string>
     <string name="no_image_found">No image found</string>
+    <string name="after_internet_send">Data has been submitted. It will be sent as soon as device is connected to internet.</string>
 
 </resources>

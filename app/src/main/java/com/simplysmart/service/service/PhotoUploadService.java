@@ -65,8 +65,6 @@ public class PhotoUploadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-//        Toast.makeText(getApplicationContext(), "Network Available : UploadingPhoto", Toast.LENGTH_LONG).show();
-//        Log.d("TAG","Reached photo upload service.");
         transferUtility = Util.getTransferUtility(getApplicationContext());
         try {
             if (intent != null && intent.getExtras() != null) {
