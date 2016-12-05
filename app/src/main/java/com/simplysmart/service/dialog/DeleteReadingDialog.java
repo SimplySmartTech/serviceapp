@@ -78,6 +78,8 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
     public void onClick(View v) {
 
         if (v.getId() == R.id.dialogButtonNegative) {
+            EditDialogListener editDialogListener = (EditDialogListener)getActivity();
+            editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,position,"");
             dismiss();
         }
         if (v.getId() == R.id.dialogButtonPositive) {
