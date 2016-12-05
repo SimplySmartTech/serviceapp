@@ -37,6 +37,7 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
 import com.simplysmart.service.database.MatrixDataRealm;
+import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 
 import org.json.JSONException;
@@ -438,7 +439,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void removeLocalData(String unit_id) {
-        MatrixDataRealm.removeUnitData(unit_id);
+        ReadingDataRealm.deleteAllReadings(unit_id);
     }
 }
 

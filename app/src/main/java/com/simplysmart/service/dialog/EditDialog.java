@@ -15,17 +15,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.activity.InputFormActivity;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.interfaces.EditDialogListener;
-import com.simplysmart.service.model.matrix.ReadingData;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
-
 
 public class EditDialog extends DialogFragment {
 
@@ -57,7 +53,6 @@ public class EditDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
-//		Typeface textTypeface = Typeface.createFromAsset(getActivity().getAssets(), ApplicationConstant.FONT_EUROSTILE_REGULAR_MID);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         LayoutInflater inflater = getActivity().getLayoutInflater();

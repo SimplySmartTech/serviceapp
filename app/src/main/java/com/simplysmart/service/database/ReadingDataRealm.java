@@ -130,6 +130,14 @@ public class ReadingDataRealm extends RealmObject implements Parcelable {
         }
     }
 
+    public static void deleteAllReadings(String unit_id){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<ReadingDataRealm> results = realm.where(ReadingDataRealm.class).equalTo("unit_id",unit_id).findAll();
+        realm.beginTransaction();
+        results.deleteAllFromRealm();
+        realm.commitTransaction();
+    }
+
 
     public String getUtility_id() {
         return utility_id;

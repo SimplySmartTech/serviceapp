@@ -31,6 +31,11 @@ import retrofit2.Response;
  */
 
 public class ReadingSubmitService extends Service {
+
+    public ReadingSubmitService(){
+        super();
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -40,15 +45,17 @@ public class ReadingSubmitService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         RealmResults<FinalReadingData> finalReadingDatas = Realm.getDefaultInstance().where(FinalReadingData.class).findAll();
+
         for(int i=0;i<finalReadingDatas.size();i++){
             Gson gson = new Gson();
             AllReadingsData allReadingsData = gson.fromJson(finalReadingDatas.get(i).getJsonToSend(),AllReadingsData.class);
-            submitData(allReadingsData);
+            submitData(allReadingsData,finalReadingDatas.get(i));
         }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void submitData(AllReadingsData allReadingsData) {
+    private void submitData(AllReadingsData allReadingsData, final FinalReadingData finalReadingData) {
         if (NetworkUtilities.isInternet(this)) {
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
             Call<JsonObject> submitAllReadings = apiInterface.submitAllReadings(GlobalData.getInstance().getSubDomain(), allReadingsData);
@@ -57,7 +64,10 @@ public class ReadingSubmitService extends Service {
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(getApplicationContext(),"Data successfully submitted.",Toast.LENGTH_SHORT).show();
-                        MatrixDataRealm.removeUnitData(GlobalData.getInstance().getSelectedUnitId());
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
+                        finalReadingData.deleteFromRealm();
+                        realm.commitTransaction();
                     }
                 }
 

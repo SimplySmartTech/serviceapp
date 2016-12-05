@@ -35,7 +35,9 @@ import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
+import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
 import com.simplysmart.service.endpint.ApiInterface;
+import com.simplysmart.service.interfaces.SubmitWithoutInternet;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixData;
@@ -57,7 +59,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage {
+public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage,SubmitWithoutInternet {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -196,6 +198,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(uploadComplete, new IntentFilter("uploadComplete"));
         LocalBroadcastManager.getInstance(this).registerReceiver(uploadImage, new IntentFilter("imageUploadComplete"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(uploadStarted,new IntentFilter("uploadStarted"));
     }
 
     @Override
@@ -203,6 +206,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         super.onDestroy();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(uploadComplete);
         LocalBroadcastManager.getInstance(this).unregisterReceiver(uploadImage);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(uploadStarted);
     }
 
     @Override
@@ -237,12 +241,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private void checkAndSubmitData() {
         if(allDone){
-            if(NetworkUtilities.isInternet(this)){
-                submitData();
-            }else {
-                AllReadingsData allReadingsData = getDataToSubmit();
-                saveToDisk(allReadingsData);
-            }
+            submitData();
         }else {
             showImageNotUploadedDialog();
         }
@@ -250,6 +249,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private void showImageNotUploadedDialog() {
         SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert","All images have not been uploaded yet. Do you want to submit readings without uploading all images ?","No","Yes");
+        submitReadingWithoutImageDialog.setCancelable(false);
         submitReadingWithoutImageDialog.show(getFragmentManager(),"submitReadingWithoutImageDialog");
     }
 
@@ -285,8 +285,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 }
             });
         } else {
-            saveToDisk(allReadingData);
-            AlertDialogStandard dataToSend = AlertDialogStandard.newInstance("Alert",getString(R.string.after_internet_send),"","OK");
+            SubmitWithoutInternetDialog dataToSend = SubmitWithoutInternetDialog.newInstance("Alert",getString(R.string.after_internet_send),"","OK");
+            dataToSend.setCancelable(false);
             dataToSend.show(getFragmentManager(),"dataToSend");
         }
     }
@@ -398,8 +398,21 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         }
     };
 
+    private BroadcastReceiver uploadStarted = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            adapter.notifyDataSetChanged();
+        }
+    };
+
     @Override
     public void submitWithoutImage() {
         submitData();
+    }
+
+    @Override
+    public void submitWithoutInternet() {
+        saveToDisk(getDataToSubmit());
+        finish();
     }
 }
