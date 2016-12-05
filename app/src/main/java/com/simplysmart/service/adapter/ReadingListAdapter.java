@@ -60,10 +60,8 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
 
         if (imageFound) {
             setPic(holder.photo, image);
-            holder.photo.setAlpha(1.0f);
         } else {
             setPic(holder.photo, null);
-            holder.photo.setAlpha(0.4f);
         }
 
         holder.edit.setOnClickListener(new View.OnClickListener() {

@@ -27,7 +27,6 @@
                     android:id="@+id/photo"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:alpha="0.4"
                     android:background="@drawable/rounded_border_rectangle"
                     android:src="@drawable/photo_default" />
 

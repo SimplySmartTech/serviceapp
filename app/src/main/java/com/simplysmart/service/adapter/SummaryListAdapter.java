@@ -106,7 +106,6 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 });
             } else {
                 setPic(viewHolder.photo, null);
-                viewHolder.photo.setAlpha(0.4f);
             }
 
             viewHolder.edit.setOnClickListener(new View.OnClickListener() {

@@ -43,6 +43,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.transform.SimpleTypeJsonUnmarshallers;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.ReadingListAdapter;
 import com.simplysmart.service.aws.AWSConstants;
@@ -376,19 +377,38 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             @Override
             public void onClick(View v) {
 
-                if (needSpinner) {
-                    if (tare_weight != null) {
-                        saveReadingToDisk();
+                if(validateFields()){
+                    saveReadingToDisk();
+
+                    if (needSpinner) {
                         tareWeightSpinner.setSelection(0);
                         tare_weight = null;
-                    } else {
-                        showSnackBar(mParentLayout, "Please select tare weight");
                     }
-                } else {
-                    saveReadingToDisk();
                 }
             }
         });
+    }
+
+    private boolean validateFields(){
+        if (mInputReadingValue.getText() == null || mInputReadingValue.getText().toString().equals("")) {
+            showSnackBar(mParentLayout,"Please enter reading.",false);
+            return false;
+        }
+
+        if(needSpinner) {
+            if (tare_weight == null || tare_weight.equals("")) {
+                showSnackBar(mParentLayout, "Please select tare weight.", false);
+                return false;
+            }
+
+            int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(tare_weight);
+            if (weight <= 0) {
+                showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void saveReadingToDisk() {
