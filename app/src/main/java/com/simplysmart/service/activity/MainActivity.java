@@ -459,9 +459,15 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         Menu menu = navigationView.getMenu();
         units = GlobalData.getInstance().getUnits();
         for (int i = 0; i < units.size(); i++) {
+            menu.add(i, i, i, "");
+        }
+
+        menu = navigationView.getMenu();
+        for(int i=0;i<menu.size();i++){
             MenuItem item = menu.getItem(i);
             MenuItemCompat.setActionView(item,R.layout.nav_item_view);
-            menu.add(i, i, i, units.get(i).getName());
+            TextView plantName = (TextView)MenuItemCompat.getActionView(item).findViewById(R.id.plant_name);
+            plantName.setText(units.get(i).getName());
         }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
@@ -525,12 +531,13 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 drawer.closeDrawers();
                 int id = item.getItemId();
                 Unit unit = units.get(id);
+
                 uncheckAllMenuItems(navigationView);
                 item.setChecked(true);
                 GlobalData.getInstance().setSelectedUnitId(unit.getId());
-                GlobalData.getInstance().setSelectedUnit(item.getTitle().toString());
+                GlobalData.getInstance().setSelectedUnit(unit.getName());
 
-                getSupportActionBar().setTitle(item.getTitle().toString());
+                getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
                 if (NetworkUtilities.isInternet(getApplicationContext())) {
                     swipeRefreshLayout.post(new Runnable() {
                         @Override
