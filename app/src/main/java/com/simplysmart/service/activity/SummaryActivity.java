@@ -301,6 +301,9 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private void hideList() {
         summary.setVisibility(View.GONE);
+        submit.setVisibility(View.GONE);
+        add_new_data.setVisibility(View.VISIBLE);
+        no_data_found.setVisibility(View.VISIBLE);
         no_data_found.setText(getString(R.string.readings_submitted));
     }
 

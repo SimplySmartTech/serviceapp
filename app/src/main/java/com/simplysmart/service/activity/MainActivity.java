@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -458,6 +459,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         Menu menu = navigationView.getMenu();
         units = GlobalData.getInstance().getUnits();
         for (int i = 0; i < units.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            MenuItemCompat.setActionView(item,R.layout.nav_item_view);
             menu.add(i, i, i, units.get(i).getName());
         }
 
