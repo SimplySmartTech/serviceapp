@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.view.Window;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.config.GlobalData;
 
 import io.realm.Realm;
 
@@ -33,19 +34,19 @@ public class SplashActivity extends Activity {
         SharedPreferences.Editor userInfoEdit = UserInfo.edit();
         isLogin = UserInfo.getBoolean("isLogin", false);
 
-        if (UserInfo.getBoolean("isFirstStart", true)) {
-            userInfoEdit.putBoolean("isFirstStart", false).apply();
+        if (UserInfo.getBoolean("DataChanged", true)) {
+            userInfoEdit.putBoolean("DataChanged", false).apply();
             Realm realm = Realm.getDefaultInstance();
             try {
-                realm.beginTransaction();
-                realm.deleteAll();
-                realm.commitTransaction();
+                realm.close();
+                Realm.deleteRealm(realm.getConfiguration());
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            logout();
+        }else {
+            switchToNextActivity();
         }
-
-        switchToNextActivity();
     }
 
     private void switchToNextActivity() {
@@ -67,6 +68,25 @@ public class SplashActivity extends Activity {
                 finish();
             }
         }, SPLASH_TIME_OUT);
+    }
+
+    public void logout() {
+        if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
+            for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
+                Realm realm = Realm.getDefaultInstance();
+                realm.close();
+                Realm.deleteRealm(realm.getConfiguration());
+//                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
+            }
+        }
+
+        handleAuthorizationFailed();
+    }
+
+    public void handleAuthorizationFailed() {
+        Intent i = new Intent(this, LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 
 }

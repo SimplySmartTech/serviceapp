@@ -374,7 +374,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return inSampleSize;
     }
 
-    public void logout(Context mContext) {
+    public void logout() {
         if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
             for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
                 Realm realm = Realm.getDefaultInstance();
