@@ -4,24 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -64,7 +57,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet,MandatoryReading {
+public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet, MandatoryReading {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -73,7 +66,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private SummaryListAdapter adapter;
     private boolean allDone = false;
     private boolean initializeUpload = false;
-    private Button submit,add_new_data;
+    private Button submit, add_new_data;
     private TextView no_data_found;
 
     @Override
@@ -104,7 +97,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 String mandatory = checkAllMandatoryReadings();
                 if (mandatory.equals("")) {
                     checkAndSubmitData();
-                }else {
+                } else {
                     showMandatoryDialog(mandatory);
                 }
             }
@@ -305,7 +298,6 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     }
 
 
-
     private void saveToDisk(AllReadingsData allReadingData) {
         String jsonToSend = new Gson().toJson(allReadingData);
         DebugLog.d(jsonToSend);
@@ -439,7 +431,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private String checkAllMandatoryReadings() {
 
-        String mandatory="\n";
+        String mandatory = "\n";
         Realm realm = Realm.getDefaultInstance();
         RealmResults<MatrixDataRealm> mandatoryReadings = realm
                 .where(MatrixDataRealm.class)
@@ -457,7 +449,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                     for (SensorDataRealm sensorDataRealm : sensorResults) {
                         RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(data.getUtility_id(), sensorDataRealm.getSensor_name());
                         if (readingsList == null || readingsList.size() == 0) {
-                            mandatory+="\n "+data.getType()+" : " +sensorDataRealm.getSensor_name();
+                            mandatory += "\n " + data.getType() + " : " + sensorDataRealm.getSensor_name();
                         }
                     }
                 }

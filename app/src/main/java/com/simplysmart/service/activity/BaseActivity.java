@@ -37,7 +37,6 @@ import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
-import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 
 import org.json.JSONException;

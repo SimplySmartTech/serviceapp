@@ -55,17 +55,17 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
         }
 
         String tooltip = "";
-        if(data!=null && data.getTooltip()!=null && !data.getTooltip().equals("")){
+        if (data != null && data.getTooltip() != null && !data.getTooltip().equals("")) {
             tooltip = data.getTooltip();
             holder.unit.setText(data.getTooltip());
-        }else{
+        } else {
             holder.unit.setVisibility(View.GONE);
             holder.sensor_name.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         }
 
-        if(unit.contains("\\")){
-            holder.sensor_name.setText(sensorName+"( "+"\u00B0"+" C)");
-        }else {
+        if (unit.contains("\\")) {
+            holder.sensor_name.setText(sensorName + "( " + "\u00B0" + " C)");
+        } else {
             holder.sensor_name.setText(sensorName + "( " + unit + ")");
         }
 

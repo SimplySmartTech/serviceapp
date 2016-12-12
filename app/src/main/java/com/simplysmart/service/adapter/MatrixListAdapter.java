@@ -59,9 +59,9 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
             unit = "";
         }
 
-        if(data.getSensors()!=null && data.getSensors().get(0)!=null && data.getSensors().get(0).getTooltip()!=null){
+        if (data.getSensors() != null && data.getSensors().get(0) != null && data.getSensors().get(0).getTooltip() != null) {
             tooltip = data.getSensors().get(0).getTooltip();
-        }else{
+        } else {
             tooltip = "";
         }
 
@@ -73,10 +73,10 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
             }
         }
 
-        if(tooltip.equals("")){
+        if (tooltip.equals("")) {
             holder.unit.setVisibility(View.GONE);
             holder.sensor_type.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        }else{
+        } else {
             holder.unit.setText(tooltip);
         }
 
