@@ -120,7 +120,6 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private void showMandatoryDialog(String mandatory) {
 
         AlertDialogMandatory alertDialogMandatory = AlertDialogMandatory.newInstance("Alert", "We strongly recommend you enter the mandatory readings :" + mandatory, "", "OK");
-        alertDialogMandatory.setCancelable(false);
         alertDialogMandatory.show(getFragmentManager(), "alertDialogMandatory");
     }
 
