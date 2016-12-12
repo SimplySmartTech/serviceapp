@@ -5,13 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.view.Window;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.config.GlobalData;
+import com.simplysmart.service.config.StringConstants;
+import com.simplysmart.service.database.MatrixDataRealm;
+import com.simplysmart.service.database.ReadingDataRealm;
+
+import java.io.File;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 
 /**
@@ -34,19 +41,12 @@ public class SplashActivity extends Activity {
         SharedPreferences.Editor userInfoEdit = UserInfo.edit();
         isLogin = UserInfo.getBoolean("isLogin", false);
 
-        if (UserInfo.getBoolean("DataChanged", true)) {
-            userInfoEdit.putBoolean("DataChanged", false).apply();
-            Realm realm = Realm.getDefaultInstance();
-            try {
-                realm.close();
-                Realm.deleteRealm(realm.getConfiguration());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            logout();
-        }else {
-            switchToNextActivity();
-        }
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(config);
+
+        switchToNextActivity();
     }
 
     private void switchToNextActivity() {
@@ -69,24 +69,4 @@ public class SplashActivity extends Activity {
             }
         }, SPLASH_TIME_OUT);
     }
-
-    public void logout() {
-        if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
-            for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
-                Realm realm = Realm.getDefaultInstance();
-                realm.close();
-                Realm.deleteRealm(realm.getConfiguration());
-//                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
-            }
-        }
-
-        handleAuthorizationFailed();
-    }
-
-    public void handleAuthorizationFailed() {
-        Intent i = new Intent(this, LoginActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
-    }
-
 }

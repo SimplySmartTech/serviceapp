@@ -35,7 +35,9 @@ import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
+import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 
 import org.json.JSONException;
@@ -118,7 +120,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     //method used to show error messages
     protected void displayMessage(String errorString) {
-        showMyDialog(context.getString(R.string.app_name), errorString, context.getString(R.string.ok_button));
+        if (context != null) {
+            showMyDialog(context.getString(R.string.app_name), errorString, context.getString(R.string.ok_button));
+        }
     }
 
     //show common alert dialog
@@ -375,12 +379,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void logout() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.close();
+        Realm.deleteRealm(realm.getConfiguration());
         if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
             for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
-                Realm realm = Realm.getDefaultInstance();
-                realm.close();
-                Realm.deleteRealm(realm.getConfiguration());
-//                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
+                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
             }
         }
 
@@ -388,6 +392,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void clearApplicationData() {
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.deleteAll();
+        realm.commitTransaction();
+
         File cacheDirectory = getCacheDir();
         File applicationDirectory = new File(cacheDirectory.getParent());
         try {
@@ -438,6 +448,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void removeLocalData(String unit_id) {
+        MatrixDataRealm.removeUnitData(unit_id);
         ReadingDataRealm.deleteAllReadings(unit_id);
     }
 }

@@ -33,6 +33,7 @@ public class GlobalData extends Application {
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
+
     }
 
     @Override

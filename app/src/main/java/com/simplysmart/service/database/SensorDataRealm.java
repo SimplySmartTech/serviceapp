@@ -81,6 +81,13 @@ public class SensorDataRealm extends RealmObject {
         return list;
     }
 
+    public static void deleteAllReadings(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<SensorDataRealm> results = realm.where(SensorDataRealm.class).findAll();
+        realm.beginTransaction();
+        results.deleteAllFromRealm();
+        realm.commitTransaction();
+    }
 
     public String getSite_name() {
         return site_name;
