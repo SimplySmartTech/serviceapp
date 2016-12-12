@@ -44,7 +44,6 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.transform.SimpleTypeJsonUnmarshallers;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.ReadingListAdapter;
 import com.simplysmart.service.aws.AWSConstants;
@@ -93,8 +92,8 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private TransferUtility transferUtility;
     private LinearLayout mParentLayout;
     private RelativeLayout mCustomTareWeightLayout;
-    private EditText mInputReadingValue,mTareWeightEditText;
-    private TextView unit, submitForm, titleList,mTareWeightUnit;
+    private EditText mInputReadingValue, mTareWeightEditText;
+    private TextView unit, submitForm, titleList, mTareWeightUnit;
     private ImageView uploadImage;
     private Spinner tareWeightSpinner;
     //    private ImageView photoDone;
@@ -221,13 +220,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingList = (RecyclerView) findViewById(R.id.readingList);
         middleLine = findViewById(R.id.middleSeparator);
         tareWeightSpinner = (Spinner) findViewById(R.id.tare_weight_spinner);
-        mCustomTareWeightLayout = (RelativeLayout)findViewById(R.id.custom_tare_weight_layout);
+        mCustomTareWeightLayout = (RelativeLayout) findViewById(R.id.custom_tare_weight_layout);
         mTareWeightEditText = (EditText) findViewById(R.id.tare_weight_edittext);
-        mTareWeightUnit = (TextView)findViewById(R.id.tare_weight_unit);
+        mTareWeightUnit = (TextView) findViewById(R.id.tare_weight_unit);
         String unitOfSensor = sensorData.getUnit();
-        if(unitOfSensor.contains("\\")){
+        if (unitOfSensor.contains("\\")) {
             unit.setText("\u00B0 C");
-        }else {
+        } else {
             unit.setText(sensorData.getUnit());
         }
 
@@ -360,10 +359,11 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             tareWeightSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0 && position < tareWeights.size()-1) {
+                    if (position > 0 && position < tareWeights.size() - 1) {
                         tare_weight = tareWeightsList.get(position - 1).getValue();
-                    } else if(position == tareWeights.size()-1){
+                    } else if (position == tareWeights.size() - 1) {
                         mCustomTareWeightLayout.setVisibility(View.VISIBLE);
+                        mTareWeightUnit.setText(sensorData.getUnit());
                     } else {
                         tare_weight = null;
                     }
@@ -386,7 +386,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             @Override
             public void onClick(View v) {
 
-                if(validateFields()){
+                if (validateFields()) {
                     saveReadingToDisk();
 
                     if (needSpinner) {
@@ -399,22 +399,42 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         });
     }
 
-    private boolean validateFields(){
+    private boolean validateFields() {
         if (mInputReadingValue.getText() == null || mInputReadingValue.getText().toString().equals("")) {
-            showSnackBar(mParentLayout,"Please enter reading.",false);
+            showSnackBar(mParentLayout, "Please enter reading.", false);
             return false;
         }
 
-        if(needSpinner) {
-            if (tare_weight == null || tare_weight.equals("")) {
+        if (needSpinner) {
+            if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE && mTareWeightEditText.getText().toString().equals("")) {
+                showSnackBar(mParentLayout, "Please enter tare weight.", false);
+            } else if (tare_weight == null || tare_weight.equals("")) {
                 showSnackBar(mParentLayout, "Please select tare weight.", false);
                 return false;
             }
 
-            int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(tare_weight);
-            if (weight <= 0) {
-                showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
-                return false;
+            if (mCustomTareWeightLayout.getVisibility() != View.VISIBLE) {
+                int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(tare_weight);
+                if (weight <= 0) {
+                    showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+                    return false;
+                }
+            } else {
+                if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
+                    int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
+                    if (weight <= 0) {
+                        showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+                        return false;
+                    }
+                } else {
+                    if (mInputReadingValue.getText() == null) {
+                        showSnackBar(mParentLayout, "Please enter reading.", false);
+                        return false;
+                    } else if (mTareWeightEditText.getText() == null) {
+                        showSnackBar(mParentLayout, "Please enter tare weight.", false);
+                        return false;
+                    }
+                }
             }
         }
 
@@ -446,10 +466,10 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingData.setPhotographic_evidence_url(uploadedReadingUrl);
         readingData.setSensor_name(sensorData.getSensor_name());
 
-        if(mCustomTareWeightLayout.getVisibility()==View.VISIBLE) {
+        if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE) {
             tare_weight = mTareWeightEditText.getText().toString();
             readingData.setTare_weight(tare_weight);
-        }else {
+        } else {
             readingData.setTare_weight(tare_weight);
         }
 
@@ -462,6 +482,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         uploadImage.setImageResource(R.drawable.ic_camera_alt_black_48dp);
         uploadImage.setAlpha(0.4f);
         uploadedImage = false;
+        mCustomTareWeightLayout.setVisibility(View.GONE);
         if (NetworkUtilities.isInternet(InputFormActivity.this)) {
             Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
             i.putExtra(StringConstants.USE_UNIT, false);
@@ -731,7 +752,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                     .error(R.drawable.ic_menu_slideshow).into(view);
 
             view.setVisibility(View.VISIBLE);
-            view.setAlpha(1.0f);
             view.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
     }

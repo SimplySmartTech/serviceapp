@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 
+import io.realm.Realm;
+
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -372,10 +374,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         return inSampleSize;
     }
 
-    public void logout() {
+    public void logout(Context mContext) {
         if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
             for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
-                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
+                Realm realm = Realm.getDefaultInstance();
+                realm.close();
+                Realm.deleteRealm(realm.getConfiguration());
+//                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
             }
         }
 

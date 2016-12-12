@@ -153,6 +153,15 @@ public class MatrixDataRealm extends RealmObject {
         realm.commitTransaction();
     }
 
+    public void setData(MatrixDataRealm matrixData){
+        this.type = matrixData.getType();
+        this.utility_id = matrixData.getUtility_id();
+        this.icon = matrixData.getIcon();
+        this.order = matrixData.getOrder();
+        this.mandatory = matrixData.isMandatory();
+        this.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
+    }
+
     public String getType() {
         return type;
     }
@@ -191,5 +200,21 @@ public class MatrixDataRealm extends RealmObject {
 
     public void setUnit_id(String unit_id) {
         this.unit_id = unit_id;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
     }
 }

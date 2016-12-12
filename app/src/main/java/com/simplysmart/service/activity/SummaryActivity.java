@@ -4,11 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,9 +37,11 @@ import com.simplysmart.service.database.FinalReadingData;
 import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorDataRealm;
+import com.simplysmart.service.dialog.AlertDialogMandatory;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
 import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
 import com.simplysmart.service.endpint.ApiInterface;
+import com.simplysmart.service.interfaces.MandatoryReading;
 import com.simplysmart.service.interfaces.SubmitWithoutInternet;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.AllReadingsData;
@@ -47,6 +55,7 @@ import java.util.ArrayList;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -55,7 +64,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet {
+public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet,MandatoryReading {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -92,7 +101,12 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkAndSubmitData();
+                String mandatory = checkAllMandatoryReadings();
+                if (mandatory.equals("")) {
+                    checkAndSubmitData();
+                }else {
+                    showMandatoryDialog(mandatory);
+                }
             }
         });
 
@@ -101,6 +115,13 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         showActivitySpinner();
         setDataForSummary();
         dismissActivitySpinner();
+    }
+
+    private void showMandatoryDialog(String mandatory) {
+
+        AlertDialogMandatory alertDialogMandatory = AlertDialogMandatory.newInstance("Alert", "We strongly recommend you enter the mandatory readings :" + mandatory, "", "OK");
+        alertDialogMandatory.setCancelable(false);
+        alertDialogMandatory.show(getFragmentManager(), "alertDialogMandatory");
     }
 
     private void setDataForSummary() {
@@ -410,5 +431,44 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     @Override
     public void submitWithoutInternet() {
         saveToDisk(getDataToSubmit());
+    }
+
+    @Override
+    public void continueAhead() {
+        checkAndSubmitData();
+    }
+
+    private String checkAllMandatoryReadings() {
+
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<MatrixDataRealm> mandatoryReadings = realm
+                .where(MatrixDataRealm.class)
+                .equalTo("mandatory", true)
+                .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
+                .findAll();
+
+        if (mandatoryReadings.size() > 0) {
+            for (MatrixDataRealm data : mandatoryReadings) {
+                RealmResults<SensorDataRealm> sensorResults = realm
+                        .where(SensorDataRealm.class)
+                        .equalTo("utility_identifier", data.getUtility_id())
+                        .findAll();
+                if (sensorResults.size() > 0) {
+                    for (SensorDataRealm sensorDataRealm : sensorResults) {
+                        RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(data.getUtility_id(), sensorDataRealm.getSensor_name());
+                        if (readingsList == null || readingsList.size() == 0) {
+                            String mandatory = "";
+                            for(MatrixDataRealm matrixDataRealm : mandatoryReadings){
+                                mandatory+=matrixDataRealm.getType()+", ";
+                            }
+                            mandatory+=".";
+                            return mandatory;
+                        }
+                    }
+                }
+            }
+        }
+
+        return "";
     }
 }
