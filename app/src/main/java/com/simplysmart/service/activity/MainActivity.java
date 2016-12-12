@@ -304,6 +304,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                     matrixData.setIcon(result.get(i).getIcon());
                     matrixData.setType(result.get(i).getType());
                     matrixData.setUtility_id(result.get(i).getUtility_id());
+                    matrixData.setOrder(result.get(i).getOrder());
+                    matrixData.setMandatory(result.get(i).isMandatory());
                     ArrayList<SensorData> sensors = new ArrayList<>();
                     for (int j = 0; j < result.get(i).getSensors().size(); j++) {
                         SensorData sensorData = new SensorData(result.get(i).getSensors().get(j));
@@ -360,6 +362,9 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 matrixData.setIcon(result.get(i).getIcon());
                 matrixData.setType(result.get(i).getType());
                 matrixData.setUtility_id(result.get(i).getUtility_id());
+                matrixData.setOrder(result.get(i).getOrder());
+                matrixData.setMandatory(result.get(i).isMandatory());
+
                 ArrayList<SensorData> sensors = new ArrayList<>();
 
                 RealmList<SensorDataRealm> sensorResult = SensorDataRealm.getForUtilityId(matrixData.getUtility_id());
@@ -378,6 +383,13 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             sgtz = false;
             no_data_found.setText("No data found.");
         }
+
+        Collections.sort(adapterData, new Comparator<MatrixData>() {
+            @Override
+            public int compare(MatrixData o1, MatrixData o2) {
+                return o1.getOrder() - o2.getOrder();
+            }
+        });
 
         matrixListAdapter = new MatrixListAdapter(this, adapterData);
 
@@ -463,10 +475,10 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
 
         menu = navigationView.getMenu();
-        for(int i=0;i<menu.size();i++){
+        for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
-            MenuItemCompat.setActionView(item,R.layout.nav_item_view);
-            TextView plantName = (TextView)MenuItemCompat.getActionView(item).findViewById(R.id.plant_name);
+            MenuItemCompat.setActionView(item, R.layout.nav_item_view);
+            TextView plantName = (TextView) MenuItemCompat.getActionView(item).findViewById(R.id.plant_name);
             plantName.setText(units.get(i).getName());
         }
 

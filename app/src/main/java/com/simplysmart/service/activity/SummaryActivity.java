@@ -73,8 +73,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private SummaryListAdapter adapter;
     private boolean allDone = false;
     private boolean initializeUpload = false;
-    private Button submit;
-    private TextView no_data_found,add_new_data;
+    private Button submit,add_new_data;
+    private TextView no_data_found;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,7 +188,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         summary.setAdapter(adapter);
 
         no_data_found = (TextView) findViewById(R.id.no_data_found);
-        add_new_data = (TextView) findViewById(R.id.add_reading_now);
+        add_new_data = (Button) findViewById(R.id.add_reading_now);
         add_new_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -440,6 +440,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private String checkAllMandatoryReadings() {
 
+        String mandatory="\n";
         Realm realm = Realm.getDefaultInstance();
         RealmResults<MatrixDataRealm> mandatoryReadings = realm
                 .where(MatrixDataRealm.class)
@@ -457,18 +458,13 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                     for (SensorDataRealm sensorDataRealm : sensorResults) {
                         RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(data.getUtility_id(), sensorDataRealm.getSensor_name());
                         if (readingsList == null || readingsList.size() == 0) {
-                            String mandatory = "";
-                            for(MatrixDataRealm matrixDataRealm : mandatoryReadings){
-                                mandatory+=matrixDataRealm.getType()+", ";
-                            }
-                            mandatory+=".";
-                            return mandatory;
+                            mandatory+="\n "+data.getType()+" : " +sensorDataRealm.getSensor_name();
                         }
                     }
                 }
             }
         }
 
-        return "";
+        return mandatory;
     }
 }

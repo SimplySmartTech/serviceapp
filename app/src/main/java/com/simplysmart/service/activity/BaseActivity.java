@@ -379,14 +379,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void logout() {
-        Realm realm = Realm.getDefaultInstance();
-        realm.close();
-        Realm.deleteRealm(realm.getConfiguration());
         if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
             for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
                 removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
             }
         }
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.deleteAll();
+        realm.commitTransaction();
 
         handleAuthorizationFailed();
     }

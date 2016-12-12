@@ -3,10 +3,10 @@ package com.simplysmart.service.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.InputFormActivity;
@@ -16,8 +16,6 @@ import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.viewholder.ParentViewHolder;
 
 import java.util.ArrayList;
-
-import okio.ByteString;
 
 /**
  * Created by shekhar on 20/10/16.
@@ -53,25 +51,39 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
             sensorName = data.getType();
         }
 
-        String unit;
+        String unit = "";
+        String tooltip = "";
         if (data.getSensors() != null && data.getSensors().get(0) != null && data.getSensors().get(0).getUnit() != null) {
             unit = data.getSensors().get(0).getUnit();
         } else {
             unit = "";
         }
 
+        if(data.getSensors()!=null && data.getSensors().get(0)!=null && data.getSensors().get(0).getTooltip()!=null){
+            tooltip = data.getSensors().get(0).getTooltip();
+        }else{
+            tooltip = "";
+        }
+
         String unicodeUnit = "";
         boolean isUnicode = false;
-        for(int i=0;i<unit.length();i++){
-            if(unit.contains("\\")){
+        for (int i = 0; i < unit.length(); i++) {
+            if (unit.contains("\\")) {
                 isUnicode = true;
             }
         }
 
-        if(isUnicode) {
-            holder.sensor_type.setText(sensorName+"( "+"\u00B0"+ " C)");
-        }else {
-            holder.sensor_type.setText(sensorName + " (" +unit +")");
+        if(tooltip.equals("")){
+            holder.unit.setVisibility(View.GONE);
+            holder.sensor_type.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        }else{
+            holder.unit.setText(tooltip);
+        }
+
+        if (isUnicode) {
+            holder.sensor_type.setText(sensorName + "( " + "\u00B0" + " C)");
+        } else {
+            holder.sensor_type.setText(sensorName + " (" + unit + ")");
         }
 
         holder.sensor_type.setOnClickListener(new View.OnClickListener() {

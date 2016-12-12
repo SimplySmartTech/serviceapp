@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.InputFormActivity;
@@ -46,10 +47,20 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
         if (data != null && data.getSensor_name() != null) {
             sensorName = data.getSensor_name();
         }
+
         if (data != null && data.getUnit() != null) {
             unit = data.getUnit();
         } else {
             unit = "";
+        }
+
+        String tooltip = "";
+        if(data!=null && data.getTooltip()!=null && !data.getTooltip().equals("")){
+            tooltip = data.getTooltip();
+            holder.unit.setText(data.getTooltip());
+        }else{
+            holder.unit.setVisibility(View.GONE);
+            holder.sensor_name.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         }
 
         if(unit.contains("\\")){
