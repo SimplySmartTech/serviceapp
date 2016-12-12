@@ -44,7 +44,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final ReadingViewHolder holder, final int position) {
+    public void onBindViewHolder(final ReadingViewHolder holder, int position) {
         final ReadingDataRealm readingDataRealm = readingsList.get(position);
         String reading = readingDataRealm.getValue() + "  " + readingDataRealm.getUnit();
         boolean imageFound = true;
@@ -75,7 +75,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(mContext, ImageViewActivity.class);
-                i.putExtra(StringConstants.PHOTO_PATH, readingsList.get(position).getLocal_photo_url());
+                i.putExtra(StringConstants.PHOTO_PATH, readingDataRealm.getLocal_photo_url());
                 mContext.startActivity(i);
             }
         });
