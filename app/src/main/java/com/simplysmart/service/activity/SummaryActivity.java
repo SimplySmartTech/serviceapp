@@ -34,6 +34,7 @@ import com.simplysmart.service.dialog.AlertDialogMandatory;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
 import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
 import com.simplysmart.service.endpint.ApiInterface;
+import com.simplysmart.service.interfaces.EditDialogListener;
 import com.simplysmart.service.interfaces.MandatoryReading;
 import com.simplysmart.service.interfaces.SubmitWithoutInternet;
 import com.simplysmart.service.model.common.APIError;
@@ -57,7 +58,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet, MandatoryReading {
+public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet, MandatoryReading ,EditDialogListener{
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -457,5 +458,15 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         }
 
         return mandatory;
+    }
+
+    @Override
+    public void updateResult(int done, int position, String value) {
+        if (done == StringConstants.NEW_VALUE) {
+            adapter.getData().get(position).setValue(value);
+            adapter.notifyItemChanged(position);
+        } else {
+            adapter.notifyItemChanged(position);
+        }
     }
 }
