@@ -34,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,8 +92,9 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private File image;
     private TransferUtility transferUtility;
     private LinearLayout mParentLayout;
-    private EditText mInputReadingValue;
-    private TextView unit, submitForm, titleList;
+    private RelativeLayout mCustomTareWeightLayout;
+    private EditText mInputReadingValue,mTareWeightEditText;
+    private TextView unit, submitForm, titleList,mTareWeightUnit;
     private ImageView uploadImage;
     private Spinner tareWeightSpinner;
     //    private ImageView photoDone;
@@ -219,6 +221,9 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingList = (RecyclerView) findViewById(R.id.readingList);
         middleLine = findViewById(R.id.middleSeparator);
         tareWeightSpinner = (Spinner) findViewById(R.id.tare_weight_spinner);
+        mCustomTareWeightLayout = (RelativeLayout)findViewById(R.id.custom_tare_weight_layout);
+        mTareWeightEditText = (EditText) findViewById(R.id.tare_weight_edittext);
+        mTareWeightUnit = (TextView)findViewById(R.id.tare_weight_unit);
         String unitOfSensor = sensorData.getUnit();
         if(unitOfSensor.contains("\\")){
             unit.setText("\u00B0 C");
@@ -335,7 +340,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             }
         });
 
-        ArrayList<String> tareWeights = new ArrayList<>();
+        final ArrayList<String> tareWeights = new ArrayList<>();
         final RealmResults<TareWeightRealm> tareWeightsList = TareWeightRealm.getTareWeights(GlobalData.getInstance().getSelectedUnitId());
         if (tareWeightsList.size() > 0) {
             tareWeights.add("--Select Tare Weight--");
@@ -343,6 +348,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                 TareWeightRealm item = tareWeightsList.get(i);
                 tareWeights.add(item.getName() + " (" + item.getValue() + "Kg )");
             }
+            tareWeights.add("Enter tare weight manually");
         }
 
         if (sensorData != null && sensorData.isTare_weight()) {
@@ -354,8 +360,10 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             tareWeightSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if (position > 0) {
+                    if (position > 0 && position < tareWeights.size()-1) {
                         tare_weight = tareWeightsList.get(position - 1).getValue();
+                    } else if(position == tareWeights.size()-1){
+                        mCustomTareWeightLayout.setVisibility(View.VISIBLE);
                     } else {
                         tare_weight = null;
                     }
@@ -370,6 +378,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         } else {
             needSpinner = false;
             tareWeightSpinner.setVisibility(View.GONE);
+            mCustomTareWeightLayout.setVisibility(View.GONE);
             tare_weight = null;
         }
 
@@ -382,6 +391,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
                     if (needSpinner) {
                         tareWeightSpinner.setSelection(0);
+                        mCustomTareWeightLayout.setVisibility(View.GONE);
                         tare_weight = null;
                     }
                 }
@@ -435,7 +445,14 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingData.setValue(mInputReadingValue.getText().toString());
         readingData.setPhotographic_evidence_url(uploadedReadingUrl);
         readingData.setSensor_name(sensorData.getSensor_name());
-        readingData.setTare_weight(tare_weight);
+
+        if(mCustomTareWeightLayout.getVisibility()==View.VISIBLE) {
+            tare_weight = mTareWeightEditText.getText().toString();
+            readingData.setTare_weight(tare_weight);
+        }else {
+            readingData.setTare_weight(tare_weight);
+        }
+
         saveToDisk(readingData);
 
         mInputReadingValue.setText("");
