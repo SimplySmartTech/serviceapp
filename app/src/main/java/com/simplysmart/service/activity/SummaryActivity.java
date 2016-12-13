@@ -240,6 +240,9 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
         switch (id) {
             case android.R.id.home:
+                Intent i = new Intent(this,MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
                 supportFinishAfterTransition();
                 return true;
 

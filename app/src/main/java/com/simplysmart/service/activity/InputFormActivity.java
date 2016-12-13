@@ -533,6 +533,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         uploadedReadingUrl = "";
         imageTaken = false;
         uploadedImage = false;
+        uploadImage.setAlpha(0.4f);
     }
 
     private void setList(ReadingDataRealm dataRealm) {
@@ -780,7 +781,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                     .fit().centerCrop()
 //                    .resize(48, 48)
                     .error(R.drawable.ic_menu_slideshow).into(view);
-
+            view.setAlpha(1.0f);
             view.setVisibility(View.VISIBLE);
             view.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
