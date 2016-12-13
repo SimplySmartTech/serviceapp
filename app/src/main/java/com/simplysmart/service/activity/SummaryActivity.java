@@ -465,8 +465,6 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         if (done == StringConstants.NEW_VALUE) {
             adapter.getData().get(position).setValue(value);
             adapter.notifyItemChanged(position);
-        } else {
-            adapter.notifyItemChanged(position);
         }
     }
 }

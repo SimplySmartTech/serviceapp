@@ -155,7 +155,6 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else {
             return TYPE_ITEM;
         }
-
     }
 
     private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {

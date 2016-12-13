@@ -74,9 +74,13 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         holder.photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(mContext, ImageViewActivity.class);
-                i.putExtra(StringConstants.PHOTO_PATH, readingDataRealm.getLocal_photo_url());
-                mContext.startActivity(i);
+
+                if(readingDataRealm.getLocal_photo_url()!=null && !readingDataRealm.getLocal_photo_url().equals("")) {
+                    Intent i = new Intent(mContext, ImageViewActivity.class);
+                    i.putExtra(StringConstants.PHOTO_PATH, readingDataRealm.getLocal_photo_url());
+                    mContext.startActivity(i);
+                }
+
             }
         });
     }

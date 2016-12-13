@@ -149,6 +149,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
             if (!oldDate.equals(newDate)) {
                 SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
+                dialog.setCancelable(false);
                 dialog.show(getFragmentManager(), "submitDialog");
             }
         }
@@ -345,7 +346,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             tareWeights.add("Enter tare weight manually");
             for (int i = 0; i < tareWeightsList.size(); i++) {
                 TareWeightRealm item = tareWeightsList.get(i);
-                tareWeights.add(item.getName() + " (" + item.getValue() + "Kg )");
+                tareWeights.add(item.getName() + " (" + item.getValue() + " Kg)");
             }
 
         }
