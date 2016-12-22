@@ -35,6 +35,13 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         this.readingsList = readingsList;
         this.mContext = mContext;
         this.fragmentManager = fragmentManager;
+
+        Collections.sort(readingsList, new Comparator<ReadingTable>() {
+            @Override
+            public int compare(ReadingTable lhs, ReadingTable rhs) {
+                return (int)(rhs.timestamp-lhs.timestamp);
+            }
+        });
     }
 
     @Override

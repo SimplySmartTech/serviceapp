@@ -213,7 +213,9 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     @Override
     public void updateResult(int newValue, int position, String value) {
         if (newValue == StringConstants.NEW_VALUE) {
-            readingListAdapter.notifyItemChanged(position);
+            readingListAdapter = new ReadingListAdapter(ReadingTable.getReadings(sensorData.utility_identifier,sensorData.sensor_name),this,getFragmentManager());
+            readingList.setAdapter(readingListAdapter);
+            readingListAdapter.notifyDataSetChanged();
         } else if (newValue == StringConstants.VALUE_DELETED) {
             readingListAdapter.getReadingsList().remove(position);
             readingListAdapter.notifyItemRemoved(position);
