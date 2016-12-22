@@ -53,16 +53,14 @@ import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
-import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.dialog.DeleteReadingDialog;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingDialog;
 import com.simplysmart.service.interfaces.EditDialogListener;
 import com.simplysmart.service.model.matrix.ReadingData;
-import com.simplysmart.service.model.matrix.SensorData;
 import com.simplysmart.service.permission.MarshmallowPermission;
 import com.simplysmart.service.service.PhotoUploadService;
 import com.squareup.picasso.Picasso;
@@ -78,10 +76,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import io.realm.Realm;
-import io.realm.RealmList;
-import io.realm.RealmResults;
 
 import static android.view.View.GONE;
 
@@ -106,7 +100,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private String uploadedReadingUrl = "";
     private String tare_weight = "";
-    private String utility_id= "";
+    private String utility_id = "";
     private String sensor_name = "";
 
     private SensorTable sensorData;
@@ -118,6 +112,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private boolean uploadedImage = false;
     private boolean needSpinner = false;
 
+    private List<ReadingTable> readings;
     private ReadingListAdapter readingListAdapter;
     private Paint p = new Paint();
 
@@ -138,7 +133,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             childPosition = -1;
         }
 
-        sensorData = SensorTable.getSensorInfo(utility_id,sensor_name);
+        sensorData = SensorTable.getSensorInfo(utility_id, sensor_name);
         transferUtility = Util.getTransferUtility(this);
         titleList = (TextView) findViewById(R.id.title_list);
 
@@ -149,22 +144,38 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         getSupportActionBar().setTitle(sensorData.sensor_name + " reading");
 
         bindViews();
-        Realm realm = Realm.getDefaultInstance();
-        ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
-        if (readingDataRealm != null) {
-            String oldDate = getDate(readingDataRealm.getTimestamp(), "dd-MM-yyyy");
-            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
 
+        List<ReadingTable> readings = ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name);
+        if (readings != null && readings.size() > 0) {
+            String oldDate = getDate(readings.get(0).timestamp, "dd-MM-yyyy");
+            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
             if (!oldDate.equals(newDate)) {
                 SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
                 dialog.setCancelable(false);
                 dialog.show(getFragmentManager(), "submitDialog");
             }
+
+            setDataInList(readings);
         }
 
         initialiseViews();
         setupUI(mParentLayout);
         initSwipe();
+    }
+
+    private void setDataInList(List<ReadingTable> readings) {
+        Collections.sort(readings, new Comparator<ReadingTable>() {
+            @Override
+            public int compare(ReadingTable lhs, ReadingTable rhs) {
+                return (int) (rhs.timestamp - lhs.timestamp);
+            }
+        });
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        readingListAdapter = new ReadingListAdapter(readings, this, getFragmentManager());
+        readingList.setLayoutManager(linearLayoutManager);
+        readingList.setAdapter(readingListAdapter);
+        readingList.setVisibility(View.VISIBLE);
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {
@@ -204,8 +215,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         if (newValue == StringConstants.NEW_VALUE) {
             readingListAdapter.notifyItemChanged(position);
         } else if (newValue == StringConstants.VALUE_DELETED) {
-            ArrayList<ReadingDataRealm> readings = readingListAdapter.getReadingsList();
-            readings.remove(position);
+            readingListAdapter.getReadingsList().remove(position);
             readingListAdapter.notifyItemRemoved(position);
         } else {
             readingListAdapter.notifyItemChanged(position);
@@ -482,20 +492,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     }
 
     private void submitForImage() {
-        readingData = new ReadingData();
-        readingData.setUtility_id(sensorData.utility_identifier);
-        readingData.setValue(mInputReadingValue.getText().toString());
-        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-        readingData.setSensor_name(sensorData.sensor_name);
-
-        if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE) {
-            tare_weight = mTareWeightEditText.getText().toString();
-            readingData.setTare_weight(tare_weight);
-        } else {
-            readingData.setTare_weight(tare_weight);
-        }
-
-        saveToDisk(readingData);
+        saveToDisk();
 
         mInputReadingValue.setText("");
         mCurrentPhotoPath = "";
@@ -513,20 +510,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     }
 
     private void submitWithoutImage() {
-        readingData = new ReadingData();
-        readingData.setUtility_id(sensorData.utility_identifier);
-        readingData.setValue(mInputReadingValue.getText().toString());
-        readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-        readingData.setSensor_name(sensorData.sensor_name);
-
-        if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE) {
-            tare_weight = mTareWeightEditText.getText().toString();
-            readingData.setTare_weight(tare_weight);
-        } else {
-            readingData.setTare_weight(tare_weight);
-        }
-
-        saveToDisk(readingData);
+        saveToDisk();
 
         mInputReadingValue.setText("");
         mCurrentPhotoPath = "";
@@ -536,80 +520,50 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         uploadImage.setAlpha(0.4f);
     }
 
-    private void setList(ReadingDataRealm dataRealm) {
-        titleList.setVisibility(View.VISIBLE);
-
-        ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
-        readingsList.add(dataRealm);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        readingListAdapter = new ReadingListAdapter(readingsList, this, getFragmentManager());
-        readingList.setLayoutManager(linearLayoutManager);
-        readingList.setAdapter(readingListAdapter);
-
-    }
-
-    private void setList(RealmList<ReadingDataRealm> localDataList) {
-        RealmList<ReadingDataRealm> list = ReadingDataRealm.findExistingReading(sensorData.utility_identifier, sensorData.sensor_name);
-        ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
-
-        for (int i = 0; i < list.size(); i++) {
-            readingsList.add(list.get(i));
-        }
-
-        Collections.sort(readingsList, new Comparator<ReadingDataRealm>() {
-            @Override
-            public int compare(ReadingDataRealm o1, ReadingDataRealm o2) {
-                return (int) (o2.getTimestamp() - o1.getTimestamp());
-            }
-        });
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        readingListAdapter = new ReadingListAdapter(readingsList, this, getFragmentManager());
-        readingList.setLayoutManager(linearLayoutManager);
-        readingList.setAdapter(readingListAdapter);
-        readingList.setNestedScrollingEnabled(false);
-    }
-
-    private void saveToDisk(ReadingData readingData) {
+    private void saveToDisk() {
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.getDefault());
         String time = simpleDateFormat.format(calendar.getTimeInMillis());
 
-        Realm realm = Realm.getDefaultInstance();
-        ReadingDataRealm readingDataRealm;
-
-        realm.beginTransaction();
-        readingDataRealm = realm.createObject(ReadingDataRealm.class);
-        readingDataRealm.setData(readingData);
-        readingDataRealm.setDate(time);
-        readingDataRealm.setTimestamp(calendar.getTimeInMillis());
-        readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
-        readingDataRealm.setUnit(sensorData.unit);
-        readingDataRealm.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
-
-        if (tare_weight != null && !tare_weight.equalsIgnoreCase("")) {
-            readingDataRealm.setTare_weight(tare_weight);
-        }
+        ReadingTable readingTable = new ReadingTable();
+        readingTable.utility_id = sensorData.utility_identifier;
+        readingTable.sensor_name = sensorData.sensor_name;
+        readingTable.value = mInputReadingValue.getText().toString();
 
         if (uploadedImage) {
-            readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);
-            readingDataRealm.setUploadedImage(true);
+            readingTable.photographic_evidence_url = uploadedReadingUrl;
+            readingTable.uploadedImage = true;
         } else {
-            readingDataRealm.setPhotographic_evidence_url("");
-            readingDataRealm.setUploadedImage(false);
+            readingTable.photographic_evidence_url = "";
+            readingTable.uploadedImage = false;
         }
-        realm.commitTransaction();
-        updateList(readingDataRealm);
 
+        readingTable.local_photo_url = mCurrentPhotoPath;
+        readingTable.date = time;
+        readingTable.unit = sensorData.unit;
+
+        if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE) {
+            tare_weight = mTareWeightEditText.getText().toString();
+            readingTable.tare_weight = tare_weight;
+        } else {
+            readingTable.tare_weight = tare_weight;
+        }
+
+        readingTable.timestamp = calendar.getTimeInMillis();
+        readingTable.unit_id = GlobalData.getInstance().getSelectedUnitId();
+        readingTable.save();
+
+        updateList(readingTable);
     }
 
-    private void updateList(ReadingDataRealm dataRealm) {
+    private void updateList(ReadingTable readingTable) {
         if (readingListAdapter != null) {
-            readingListAdapter.addElement(dataRealm);
+            readingListAdapter.addElement(readingTable);
             readingList.scrollToPosition(0);
         } else {
-            setList(dataRealm);
+            List<ReadingTable> list = ReadingTable.getReadings(utility_id, sensor_name);
+            setDataInList(list);
         }
     }
 
@@ -881,12 +835,12 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                ReadingDataRealm readingDataRealm = readingListAdapter.getReadingsList().get(position);
+                ReadingTable readingTable = readingListAdapter.getReadingsList().get(position);
 
                 if (direction == ItemTouchHelper.LEFT) {
-                    deleteItemFromRecyclerView(position, readingDataRealm);
+                    deleteItemFromRecyclerView(position, readingTable);
                 } else {
-                    showEditDialog(readingDataRealm, position);
+                    showEditDialog(readingTable, position);
                 }
             }
 
@@ -923,14 +877,14 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         itemTouchHelper.attachToRecyclerView(readingList);
     }
 
-    private void deleteItemFromRecyclerView(int position, ReadingDataRealm readingDataRealm) {
-        DeleteReadingDialog deleteReadingDialog = DeleteReadingDialog.newInstance("Alert", "Are you sure you want to delete this reading?", "No", "Yes", position, readingDataRealm);
+    private void deleteItemFromRecyclerView(int position, ReadingTable readingTable) {
+        DeleteReadingDialog deleteReadingDialog = DeleteReadingDialog.newInstance("Alert", "Are you sure you want to delete this reading?", "No", "Yes", position, readingTable);
         deleteReadingDialog.setCancelable(false);
         deleteReadingDialog.show(getFragmentManager(), "deleteReadingDialog");
     }
 
-    private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {
-        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position, true);
+    private void showEditDialog(ReadingTable readingTable, int position) {
+        EditDialog newDialog = EditDialog.newInstance(readingTable, position, true);
         newDialog.setCancelable(false);
         newDialog.show(getFragmentManager(), "show_dialog");
     }

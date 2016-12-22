@@ -16,12 +16,8 @@ import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ReadingDataRealm;
 
 import java.io.File;
-
-import io.realm.Realm;
-import io.realm.RealmResults;
 
 import static android.content.ContentValues.TAG;
 
@@ -72,133 +68,133 @@ public class PhotoUploadService extends Service {
     private void uploadImage() {
         //TODO : Remove toast.
 //        Toast.makeText(getApplicationContext(), "Network Available : uploadImage", Toast.LENGTH_LONG).show();
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<ReadingDataRealm> readingsList = realm
-                .where(ReadingDataRealm.class)
-                .equalTo("uploadedImage", false)
-                .findAll();
-
-        for (ReadingDataRealm reading : readingsList) {
-            if (reading.getLocal_photo_url() != null && !reading.getLocal_photo_url().equals("")) {
-                DebugLog.d("Got photo URL : " + reading.getLocal_photo_url());
-                beginUpload(reading);
-            } else {
-                DebugLog.d("No photo URL");
-            }
-        }
+//        Realm realm = Realm.getDefaultInstance();
+//        RealmResults<ReadingDataRealm> readingsList = realm
+//                .where(ReadingDataRealm.class)
+//                .equalTo("uploadedImage", false)
+//                .findAll();
+//
+//        for (ReadingDataRealm reading : readingsList) {
+//            if (reading.getLocal_photo_url() != null && !reading.getLocal_photo_url().equals("")) {
+//                DebugLog.d("Got photo URL : " + reading.getLocal_photo_url());
+//                beginUpload(reading);
+//            } else {
+//                DebugLog.d("No photo URL");
+//            }
+//        }
     }
 
     private void uploadImage(String unit_id) {
         //TODO : Remove toast.
 //        Toast.makeText(getApplicationContext(), "Network Available : uploadImage", Toast.LENGTH_LONG).show();
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<ReadingDataRealm> readingsList = realm
-                .where(ReadingDataRealm.class)
-                .equalTo("uploadedImage", false)
-                .equalTo("unit_id", unit_id)
-                .findAll();
-
-        for (ReadingDataRealm reading : readingsList) {
-            if (reading.getLocal_photo_url() != null && !reading.getLocal_photo_url().equals("")) {
-                beginUpload(reading);
-            } else {
-                sendUploadCompleteBroadcast();
-            }
-        }
+//        Realm realm = Realm.getDefaultInstance();
+//        RealmResults<ReadingDataRealm> readingsList = realm
+//                .where(ReadingDataRealm.class)
+//                .equalTo("uploadedImage", false)
+//                .equalTo("unit_id", unit_id)
+//                .findAll();
+//
+//        for (ReadingDataRealm reading : readingsList) {
+//            if (reading.getLocal_photo_url() != null && !reading.getLocal_photo_url().equals("")) {
+//                beginUpload(reading);
+//            } else {
+//                sendUploadCompleteBroadcast();
+//            }
+//        }
     }
 
-    private void beginUpload(ReadingDataRealm readingDataRealm) {
-        Log.d("Local photo url:", readingDataRealm.getLocal_photo_url());
-        String filePath = readingDataRealm.getLocal_photo_url();
-        try {
-            try {
-                File file = new File(filePath);
-                TransferObserver observer = transferUtility.upload(
-                        AWSConstants.BUCKET_NAME,
-                        AWSConstants.PATH_FOLDER + file.getName(),
-                        file, CannedAccessControlList.PublicRead);
+//    private void beginUpload(ReadingDataRealm readingDataRealm) {
+//        Log.d("Local photo url:", readingDataRealm.getLocal_photo_url());
+//        String filePath = readingDataRealm.getLocal_photo_url();
+//        try {
+//            try {
+//                File file = new File(filePath);
+//                TransferObserver observer = transferUtility.upload(
+//                        AWSConstants.BUCKET_NAME,
+//                        AWSConstants.PATH_FOLDER + file.getName(),
+//                        file, CannedAccessControlList.PublicRead);
+//
+//                observer.setTransferListener(new UploadListener(readingDataRealm.getTimestamp(), file.getName(), readingDataRealm));
+//                count++;
+////            Toast.makeText(getApplicationContext(), "Network Available : Set for uploading"+filePath, Toast.LENGTH_LONG).show();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            count--;
+//            if (count == 0) {
+//                sendUploadCompleteBroadcast();
+//            }
+//        }
+//    }
 
-                observer.setTransferListener(new UploadListener(readingDataRealm.getTimestamp(), file.getName(), readingDataRealm));
-                count++;
-//            Toast.makeText(getApplicationContext(), "Network Available : Set for uploading"+filePath, Toast.LENGTH_LONG).show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            count--;
-            if (count == 0) {
-                sendUploadCompleteBroadcast();
-            }
-        }
-    }
+//    public void onUploadComplete(ReadingDataRealm readingDataRealm, String aws_url) {
+//        Realm realm = Realm.getDefaultInstance();
+//        realm.beginTransaction();
+//        readingDataRealm.setPhotographic_evidence_url(aws_url);
+//        readingDataRealm.setUploadedImage(true);
+//        realm.commitTransaction();
+//        DebugLog.d("URL:" + readingDataRealm.getPhotographic_evidence_url());
+//
+//        sendImageUploadBroadcast(readingDataRealm);
+//    }
 
-    public void onUploadComplete(ReadingDataRealm readingDataRealm, String aws_url) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        readingDataRealm.setPhotographic_evidence_url(aws_url);
-        readingDataRealm.setUploadedImage(true);
-        realm.commitTransaction();
-        DebugLog.d("URL:" + readingDataRealm.getPhotographic_evidence_url());
+//    class UploadListener implements TransferListener {
+//
+//        private String fileName;
+//        private long timestamp;
+//        private ReadingDataRealm rdr;
+//
+//        UploadListener(long timestamp, String fileName, ReadingDataRealm rdr) {
+//            this.fileName = fileName;
+//            this.timestamp = timestamp;
+//            this.rdr = rdr;
+//        }
+//
+//        @Override
+//        public void onError(int id, Exception e) {
+//            Log.e(TAG, "Error during upload: " + id, e);
+//            count--;
+//            if (count == 0) {
+//                sendUploadCompleteBroadcast();
+//            }
+//
+//            sendImageUploadBroadcast(rdr);
+//        }
+//
+//        @Override
+//        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+//            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d", id, bytesTotal, bytesCurrent));
+//        }
+//
+//        @Override
+//        public void onStateChanged(int id, TransferState newState) {
+//            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
+//
+//            if (newState == TransferState.COMPLETED) {
+//
+//                String url = AWSConstants.S3_URL
+//                        + AWSConstants.BUCKET_NAME + "/"
+//                        + AWSConstants.PATH_FOLDER
+//                        + fileName;
+//
+//                DebugLog.d("URL :::: " + url);
+//
+//                count--;
+//                Log.d("COUNT : ", count + "");
+//                if (count == 0) {
+//                    sendUploadCompleteBroadcast();
+//                }
+//                onUploadComplete(rdr, url);
+//            }
+//        }
+//    }
 
-        sendImageUploadBroadcast(readingDataRealm);
-    }
-
-    class UploadListener implements TransferListener {
-
-        private String fileName;
-        private long timestamp;
-        private ReadingDataRealm rdr;
-
-        UploadListener(long timestamp, String fileName, ReadingDataRealm rdr) {
-            this.fileName = fileName;
-            this.timestamp = timestamp;
-            this.rdr = rdr;
-        }
-
-        @Override
-        public void onError(int id, Exception e) {
-            Log.e(TAG, "Error during upload: " + id, e);
-            count--;
-            if (count == 0) {
-                sendUploadCompleteBroadcast();
-            }
-
-            sendImageUploadBroadcast(rdr);
-        }
-
-        @Override
-        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d", id, bytesTotal, bytesCurrent));
-        }
-
-        @Override
-        public void onStateChanged(int id, TransferState newState) {
-            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
-
-            if (newState == TransferState.COMPLETED) {
-
-                String url = AWSConstants.S3_URL
-                        + AWSConstants.BUCKET_NAME + "/"
-                        + AWSConstants.PATH_FOLDER
-                        + fileName;
-
-                DebugLog.d("URL :::: " + url);
-
-                count--;
-                Log.d("COUNT : ", count + "");
-                if (count == 0) {
-                    sendUploadCompleteBroadcast();
-                }
-                onUploadComplete(rdr, url);
-            }
-        }
-    }
-
-    private void sendImageUploadBroadcast(ReadingDataRealm rdr) {
-        Intent i = new Intent("imageUploadComplete");
-        i.putExtra(StringConstants.READING_DATA, rdr);
-        DebugLog.d("Sending image upload complete broadcast " + rdr.getPhotographic_evidence_url());
-        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
-    }
+//    private void sendImageUploadBroadcast(ReadingDataRealm rdr) {
+//        Intent i = new Intent("imageUploadComplete");
+//        i.putExtra(StringConstants.READING_DATA, rdr);
+//        DebugLog.d("Sending image upload complete broadcast " + rdr.getPhotographic_evidence_url());
+//        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+//    }
 }

@@ -19,10 +19,8 @@ import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.interfaces.EditDialogListener;
-
-import io.realm.Realm;
 
 public class EditDialog extends DialogFragment {
 
@@ -32,13 +30,13 @@ public class EditDialog extends DialogFragment {
     private static String position = "POSITION";
     private boolean edit = false;
 
-    public static EditDialog newInstance(ReadingDataRealm readingDataRealm, int pos, boolean edit) {
+    public static EditDialog newInstance(ReadingTable readingTable, int pos, boolean edit) {
         EditDialog f = new EditDialog();
 
         Bundle args = new Bundle();
-        args.putString(utility_id, readingDataRealm.getUtility_id());
-        args.putString(sensor_name, readingDataRealm.getSensor_name());
-        args.putLong(timestamp, readingDataRealm.getTimestamp());
+        args.putString(utility_id, readingTable.utility_id);
+        args.putString(sensor_name, readingTable.sensor_name);
+        args.putLong(timestamp, readingTable.timestamp);
         args.putInt(position, pos);
         args.putBoolean(StringConstants.EDIT, edit);
         f.setArguments(args);
@@ -78,18 +76,12 @@ public class EditDialog extends DialogFragment {
         final int pos = bundle.getInt(position);
         this.edit = bundle.getBoolean(StringConstants.EDIT);
 
-        final Realm realm = Realm.getDefaultInstance();
-        final ReadingDataRealm readingDataRealm = realm
-                .where(ReadingDataRealm.class)
-                .equalTo("utility_id", utilityId)
-                .equalTo("sensor_name", sensorName)
-                .equalTo("timestamp", time)
-                .findFirst();
+        final ReadingTable readingTable = ReadingTable.getReading(utility_id,sensorName,time);
 
         dialogNegativeButton.setText("DELETE");
         dialogNegativeButton.setTextColor(Color.RED);
-        unit.setText(readingDataRealm.getUnit());
-        newReading.setText(readingDataRealm.getValue());
+        unit.setText(readingTable.unit);
+        newReading.setText(readingTable.value);
         newReading.setCursorVisible(false);
 
         dialogPositiveButton.setText("NEXT");
@@ -133,14 +125,13 @@ public class EditDialog extends DialogFragment {
                     if (!newReading.getText().equals("")) {
                         String string = newReading.getText().toString();
                         try {
-                            realm.beginTransaction();
-                            readingDataRealm.setValue(string);
-                            realm.commitTransaction();
+                            readingTable.value=string;
+                            readingTable.save();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                         EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                        editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingDataRealm.getUnit());
+                        editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingTable.unit);
                         dismiss();
                     } else {
                         EditDialogListener editDialogListener = (EditDialogListener) getActivity();
@@ -162,9 +153,7 @@ public class EditDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 try {
-                    realm.beginTransaction();
-                    readingDataRealm.deleteFromRealm();
-                    realm.commitTransaction();
+                    readingTable.delete();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

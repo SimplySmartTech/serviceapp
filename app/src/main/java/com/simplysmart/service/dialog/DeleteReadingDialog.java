@@ -12,11 +12,8 @@ import android.widget.TextView;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.interfaces.EditDialogListener;
-
-import io.realm.Realm;
-
 
 public class DeleteReadingDialog extends DialogFragment implements View.OnClickListener {
 
@@ -25,10 +22,12 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
     private static final String KEY_NEGATIVE_BUTTON = "negativeButton";
     private static final String KEY_POSITIVE_BUTTON = "positiveButton";
     private int position;
-    private ReadingDataRealm readingDataRealm;
+    private String utility_id;
+    private String sensor_name;
+    private long timestamp;
 
     public static DeleteReadingDialog newInstance(String title, String message, String negativeButton,
-                                                  String positiveButton, int position, ReadingDataRealm readingDataRealm) {
+                                                  String positiveButton, int position, ReadingTable readingTable) {
         DeleteReadingDialog f = new DeleteReadingDialog();
 
         Bundle args = new Bundle();
@@ -37,7 +36,9 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
         args.putString(KEY_NEGATIVE_BUTTON, negativeButton);
         args.putString(KEY_POSITIVE_BUTTON, positiveButton);
         args.putInt(StringConstants.EDIT, position);
-        args.putParcelable(StringConstants.READING_DATA, readingDataRealm);
+        args.putString(StringConstants.UTILITY_ID,readingTable.utility_id);
+        args.putString(StringConstants.SENSOR_NAME,readingTable.sensor_name);
+        args.putLong(StringConstants.TIMESTAMP,readingTable.timestamp);
         f.setArguments(args);
 
         return f;
@@ -65,8 +66,11 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
         dialogMessage.setText(getArguments().getString(KEY_MESSAGE));
         dialogNegativeButton.setText(getArguments().getString(KEY_NEGATIVE_BUTTON));
         dialogPositiveButton.setText(getArguments().getString(KEY_POSITIVE_BUTTON));
+
         this.position = getArguments().getInt(StringConstants.EDIT);
-        this.readingDataRealm = getArguments().getParcelable(StringConstants.READING_DATA);
+        this.utility_id = getArguments().getString(StringConstants.UTILITY_ID);
+        this.sensor_name = getArguments().getString(StringConstants.SENSOR_NAME);
+        this.timestamp = getArguments().getLong(StringConstants.TIMESTAMP);
 
         dialogNegativeButton.setOnClickListener(this);
         dialogPositiveButton.setOnClickListener(this);
@@ -86,10 +90,8 @@ public class DeleteReadingDialog extends DialogFragment implements View.OnClickL
 
         if (v.getId() == R.id.dialogButtonPositive) {
 
-            Realm realm = Realm.getDefaultInstance();
-            realm.beginTransaction();
-            readingDataRealm.deleteFromRealm();
-            realm.commitTransaction();
+            ReadingTable readingTable = ReadingTable.getReading(utility_id,sensor_name,timestamp);
+            readingTable.delete();
 
             EditDialogListener editDialogListener = (EditDialogListener) getActivity();
             editDialogListener.updateResult(StringConstants.VALUE_DELETED, position, "");

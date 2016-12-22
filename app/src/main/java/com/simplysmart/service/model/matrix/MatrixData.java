@@ -5,8 +5,6 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 
-import io.realm.RealmObject;
-
 /**
  * Created by shekhar on 20/10/16.
  */

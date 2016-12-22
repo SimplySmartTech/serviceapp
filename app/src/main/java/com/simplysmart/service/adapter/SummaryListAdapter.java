@@ -15,7 +15,7 @@ import com.simplysmart.service.R;
 import com.simplysmart.service.activity.ImageViewActivity;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.viewholder.SummaryHeaderViewHolder;
@@ -24,8 +24,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import io.realm.Realm;
 
 /**
  * Created by shailendrapsp on 4/11/16.
@@ -111,12 +109,8 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Realm realm = Realm.getDefaultInstance();
-                    ReadingDataRealm readingDataRealm = realm
-                            .where(ReadingDataRealm.class)
-                            .equalTo("timestamp", time)
-                            .findFirst();
-                    showEditDialog(readingDataRealm, holder.getAdapterPosition());
+                    ReadingTable readingTable = ReadingTable.getReading(time);
+                    showEditDialog(readingTable, holder.getAdapterPosition());
                 }
             });
 
@@ -157,8 +151,8 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
     }
 
-    private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {
-        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position, false);
+    private void showEditDialog(ReadingTable readingTable, int position) {
+        EditDialog newDialog = EditDialog.newInstance(readingTable, position, false);
         newDialog.show(fragmentManager, "show dialog");
     }
 

@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -35,7 +34,6 @@ import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
-import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 
 import org.json.JSONException;
@@ -48,8 +46,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-
-import io.realm.Realm;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -383,20 +379,15 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
 
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        realm.deleteAll();
-        realm.commitTransaction();
+//        Realm realm = Realm.getDefaultInstance();
+//        realm.beginTransaction();
+//        realm.deleteAll();
+//        realm.commitTransaction();
 
         handleAuthorizationFailed();
     }
 
     public void clearApplicationData() {
-
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        realm.deleteAll();
-        realm.commitTransaction();
 
         File cacheDirectory = getCacheDir();
         File applicationDirectory = new File(cacheDirectory.getParent());
@@ -442,13 +433,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void handleAuthorizationFailed() {
         clearApplicationData();
-        Intent i = new Intent(this, LoginActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(i);
+//        Intent i = new Intent(this, LoginActivity.class);
+//        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        startActivity(i);
     }
 
     protected void removeLocalData(String unit_id) {
-        ReadingDataRealm.deleteAllReadings(unit_id);
+//        ReadingDataRealm.deleteAllReadings(unit_id);
     }
 }
 

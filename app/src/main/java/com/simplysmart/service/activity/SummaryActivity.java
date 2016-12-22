@@ -26,10 +26,7 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.FinalReadingData;
-import com.simplysmart.service.database.MatrixDataRealm;
-import com.simplysmart.service.database.ReadingDataRealm;
-import com.simplysmart.service.database.SensorDataRealm;
+import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.dialog.AlertDialogMandatory;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
 import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
@@ -47,9 +44,6 @@ import com.simplysmart.service.service.PhotoUploadService;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
-import io.realm.RealmList;
-import io.realm.RealmResults;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -119,53 +113,6 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private void setDataForSummary() {
         int count = 0;
-        ArrayList<MatrixData> matrixList = MatrixDataRealm.getAll();
-        if (matrixList != null && matrixList.size() > 0) {
-            for (int i = 0; i < matrixList.size(); i++) {
-                MatrixData data = matrixList.get(i);
-
-                RealmList<SensorDataRealm> sensorList = SensorDataRealm.getForUtilityId(data.getUtility_id());
-
-                if (sensorList != null && sensorList.size() > 0) {
-
-                    for (int j = 0; j < sensorList.size(); j++) {
-                        SensorDataRealm sdr = sensorList.get(j);
-
-                        ArrayList<Reading> readings = new ArrayList<>();
-
-                        RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(), sdr.getSensor_name());
-
-                        if (readingsList != null && readingsList.size() > 0) {
-
-                            Summary header = new Summary();
-                            header.setName(data.getType());
-                            header.setValue(data.getIcon());
-                            header.setHeader(true);
-                            summaryList.add(header);
-
-                            for (int k = 0; k < readingsList.size(); k++) {
-                                ReadingDataRealm rdr = readingsList.get(k);
-                                Summary summary = new Summary();
-
-                                summary.setName(rdr.getSensor_name());
-                                summary.setValue(rdr.getValue() + " " + rdr.getUnit());
-                                summary.setTime(rdr.getDate());
-                                summary.setType(data.getType());
-                                summary.setLocalPhotoUrl(rdr.getLocal_photo_url());
-                                summary.setTimestamp(rdr.getTimestamp());
-                                summary.setUploaded(rdr.isUploadedImage());
-
-                                if (!rdr.isUploadedImage()) {
-                                    count++;
-                                }
-
-                                summaryList.add(summary);
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         if (count > 0) {
             allDone = false;
@@ -305,11 +252,6 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private void saveToDisk(AllReadingsData allReadingData) {
         String jsonToSend = new Gson().toJson(allReadingData);
         DebugLog.d(jsonToSend);
-        FinalReadingData finalReadingData = new FinalReadingData(jsonToSend);
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        realm.copyToRealm(finalReadingData);
-        realm.commitTransaction();
 
         removeLocalData(GlobalData.getInstance().getSelectedUnitId());
         hideList();
@@ -326,53 +268,13 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private AllReadingsData getDataToSubmit() {
         AllReadingsData allReadingData = new AllReadingsData();
         ArrayList<Metric> metrics = new ArrayList<>();
-        ArrayList<MatrixData> matrixList = MatrixDataRealm.getAll();
-        if (matrixList != null && matrixList.size() > 0) {
-            for (int i = 0; i < matrixList.size(); i++) {
-                MatrixData data = matrixList.get(i);
 
-                RealmList<SensorDataRealm> sensorList = SensorDataRealm.getForUtilityId(data.getUtility_id());
-
-                if (sensorList != null && sensorList.size() > 0) {
-
-                    for (int j = 0; j < sensorList.size(); j++) {
-                        SensorDataRealm sdr = sensorList.get(j);
-
-                        Metric metric = new Metric();
-                        metric.setType(data.getType());
-                        metric.setUtility_id(data.getUtility_id());
-                        metric.setSensor_name(sdr.getSensor_name());
-
-                        ArrayList<Reading> readings = new ArrayList<>();
-
-                        RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(sdr.getUtility_identifier(), sdr.getSensor_name());
-
-                        if (readingsList != null && readingsList.size() > 0) {
-
-                            for (int k = 0; k < readingsList.size(); k++) {
-                                ReadingDataRealm rdr = readingsList.get(k);
-
-                                Reading reading = new Reading();
-                                reading.setValue(rdr.getValue());
-                                reading.setPhotographic_evidence_url(rdr.getPhotographic_evidence_url());
-                                reading.setTimestamp(rdr.getTimestamp());
-                                reading.setTare_weight(rdr.getTare_weight());
-                                readings.add(reading);
-                            }
-
-                            metric.setReadings(readings);
-                            metrics.add(metric);
-                        }
-                    }
-                }
-            }
-        }
         allReadingData.setMetrics(metrics);
         return allReadingData;
     }
 
-    private void findAndUpdateElement(ReadingDataRealm rdr) {
-        String local_photo_url = rdr.getLocal_photo_url();
+    private void findAndUpdateElement( ReadingTable table) {
+        String local_photo_url = table.local_photo_url;
 
         for (int i = 0; i < summaryList.size(); i++) {
             if (summaryList.get(i).getLocalPhotoUrl() != null && summaryList.get(i).getLocalPhotoUrl().equals(local_photo_url)) {
@@ -391,12 +293,12 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private BroadcastReceiver uploadImage = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ReadingDataRealm rdr = null;
+            ReadingTable rdr = null;
             if (intent != null && intent.getExtras() != null) {
                 rdr = intent.getParcelableExtra(StringConstants.READING_DATA);
             }
 
-            DebugLog.d("Broadcast recieved for image upload complete " + rdr.getPhotographic_evidence_url());
+            DebugLog.d("Broadcast recieved for image upload complete " + rdr.photographic_evidence_url);
 
             if (rdr != null) {
                 findAndUpdateElement(rdr);
@@ -436,29 +338,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private String checkAllMandatoryReadings() {
 
         String mandatory = "\n";
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<MatrixDataRealm> mandatoryReadings = realm
-                .where(MatrixDataRealm.class)
-                .equalTo("mandatory", true)
-                .equalTo("unit_id", GlobalData.getInstance().getSelectedUnitId())
-                .findAll();
-
-        if (mandatoryReadings.size() > 0) {
-            for (MatrixDataRealm data : mandatoryReadings) {
-                RealmResults<SensorDataRealm> sensorResults = realm
-                        .where(SensorDataRealm.class)
-                        .equalTo("utility_identifier", data.getUtility_id())
-                        .findAll();
-                if (sensorResults.size() > 0) {
-                    for (SensorDataRealm sensorDataRealm : sensorResults) {
-                        RealmList<ReadingDataRealm> readingsList = ReadingDataRealm.findAllForThisSensor(data.getUtility_id(), sensorDataRealm.getSensor_name());
-                        if (readingsList == null || readingsList.size() == 0) {
-                            mandatory += "\n " + data.getType() + " : " + sensorDataRealm.getSensor_name();
-                        }
-                    }
-                }
-            }
-        }
+        //TODO CHECK all mandatory.
 
         return mandatory;
     }

@@ -9,9 +9,6 @@ import com.simplysmart.service.model.user.Unit;
 
 import java.util.ArrayList;
 
-import io.realm.Realm;
-
-
 /**
  * Created by shekhar on 17/8/15.
  */
@@ -33,7 +30,6 @@ public class GlobalData extends com.activeandroid.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Realm.init(this);
         ActiveAndroid.initialize(this);
     }
 

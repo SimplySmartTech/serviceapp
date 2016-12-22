@@ -12,26 +12,26 @@ import android.widget.ImageView;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.ImageViewActivity;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.viewholder.ReadingViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by shailendrapsp on 4/11/16.
  */
 
 public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> {
-    private ArrayList<ReadingDataRealm> readingsList;
+    private List<ReadingTable> readingsList;
     private Context mContext;
     private FragmentManager fragmentManager;
 
-    public ReadingListAdapter(ArrayList<ReadingDataRealm> readingsList, Context mContext, FragmentManager fragmentManager) {
+    public ReadingListAdapter(List<ReadingTable> readingsList, Context mContext, FragmentManager fragmentManager) {
         this.readingsList = readingsList;
         this.mContext = mContext;
         this.fragmentManager = fragmentManager;
@@ -45,18 +45,18 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
 
     @Override
     public void onBindViewHolder(final ReadingViewHolder holder, int position) {
-        final ReadingDataRealm readingDataRealm = readingsList.get(position);
-        String reading = readingDataRealm.getValue() + "  " + readingDataRealm.getUnit();
+        final ReadingTable readingTable = readingsList.get(position);
+        String reading = readingTable.value + "  " + readingTable.unit;
         boolean imageFound = true;
         File image = null;
         try {
-            image = new File(readingsList.get(position).getLocal_photo_url());
+            image = new File(readingTable.local_photo_url);
         } catch (Exception e) {
             imageFound = false;
         }
 
         holder.reading.setText(reading);
-        holder.time.setText(readingDataRealm.getDate());
+        holder.time.setText(readingTable.date);
 
         if (imageFound) {
             setPic(holder.photo, image);
@@ -67,7 +67,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         holder.edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showEditDialog(readingDataRealm, holder.getAdapterPosition());
+                showEditDialog(readingTable, holder.getAdapterPosition());
             }
         });
 
@@ -75,9 +75,9 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
             @Override
             public void onClick(View v) {
 
-                if(readingDataRealm.getLocal_photo_url()!=null && !readingDataRealm.getLocal_photo_url().equals("")) {
+                if (readingTable.local_photo_url != null && !readingTable.local_photo_url.equals("")) {
                     Intent i = new Intent(mContext, ImageViewActivity.class);
-                    i.putExtra(StringConstants.PHOTO_PATH, readingDataRealm.getLocal_photo_url());
+                    i.putExtra(StringConstants.PHOTO_PATH, readingTable.local_photo_url);
                     mContext.startActivity(i);
                 }
 
@@ -90,14 +90,16 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         return readingsList.size();
     }
 
-    public void addElement(ReadingDataRealm dataRealm) {
-        readingsList.add(dataRealm);
-        Collections.sort(readingsList, new Comparator<ReadingDataRealm>() {
+    public void addElement(ReadingTable readingTable) {
+        readingsList.add(readingTable);
+
+        Collections.sort(readingsList, new Comparator<ReadingTable>() {
             @Override
-            public int compare(ReadingDataRealm o1, ReadingDataRealm o2) {
-                return (int) (o2.getTimestamp() - o1.getTimestamp());
+            public int compare(ReadingTable lhs, ReadingTable rhs) {
+                return (int) (rhs.timestamp - lhs.timestamp);
             }
         });
+
         notifyItemInserted(0);
     }
 
@@ -112,16 +114,16 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
 
     }
 
-    private void showEditDialog(ReadingDataRealm readingDataRealm, int position) {
-        EditDialog newDialog = EditDialog.newInstance(readingDataRealm, position, true);
+    private void showEditDialog(ReadingTable readingTable, int position) {
+        EditDialog newDialog = EditDialog.newInstance(readingTable, position, true);
         newDialog.show(fragmentManager, "show dialog");
     }
 
-    public ArrayList<ReadingDataRealm> getReadingsList() {
+    public List<ReadingTable> getReadingsList() {
         return readingsList;
     }
 
-    public void setReadingsList(ArrayList<ReadingDataRealm> readingsList) {
+    public void setReadingsList(List<ReadingTable> readingsList) {
         this.readingsList = readingsList;
     }
 }

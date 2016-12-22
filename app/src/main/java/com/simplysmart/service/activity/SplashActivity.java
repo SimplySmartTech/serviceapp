@@ -12,12 +12,8 @@ import android.view.Window;
 import com.simplysmart.service.R;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.ReadingDataRealm;
 
 import java.io.File;
-
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
 
 
 /**
@@ -39,11 +35,6 @@ public class SplashActivity extends Activity {
         SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor userInfoEdit = UserInfo.edit();
         isLogin = UserInfo.getBoolean("isLogin", false);
-
-        RealmConfiguration config = new RealmConfiguration.Builder()
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(config);
 
         switchToNextActivity();
     }

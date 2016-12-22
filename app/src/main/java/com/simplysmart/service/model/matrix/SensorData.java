@@ -3,10 +3,6 @@ package com.simplysmart.service.model.matrix;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.simplysmart.service.database.SensorDataRealm;
-
-import io.realm.RealmObject;
-
 /**
  * Created by shekhar on 20/10/16.
  */
@@ -28,24 +24,6 @@ public class SensorData implements Parcelable {
     private boolean isChecked;
 
     public SensorData(){}
-
-    public SensorData(SensorDataRealm sensorData){
-        this.site_name = sensorData.getSite_name();
-        this.metric = sensorData.getMetric();
-        this.sensor_name = sensorData.getSensor_name();
-        this.mandatory = sensorData.getMandatory();
-        this.unit = sensorData.getUnit();
-        this.data_type = sensorData.getData_type();
-        this.photographic_evidence = sensorData.getPhotographic_evidence();
-        this.no_of_times = sensorData.getNo_of_times();
-        this.duration_unit = sensorData.getDuration_unit();
-        this.duration_type = sensorData.getDuration_type();
-        this.utility_identifier = sensorData.getUtility_identifier();
-        this.isChecked = sensorData.isChecked();
-        this.tooltip = sensorData.getTooltip();
-        this.tare_weight = sensorData.isTare_weight();
-    }
-
 
     protected SensorData(Parcel in) {
         site_name = in.readString();

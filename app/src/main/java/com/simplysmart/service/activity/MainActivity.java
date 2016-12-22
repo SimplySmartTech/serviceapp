@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixListAdapter;
@@ -38,7 +39,7 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.database.MatrixTable;
-import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.dialog.AlertDialogLogout;
@@ -49,7 +50,6 @@ import com.simplysmart.service.interfaces.LogoutListener;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
-import com.simplysmart.service.model.matrix.SensorData;
 import com.simplysmart.service.model.matrix.TareWeight;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
@@ -66,10 +66,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import io.realm.Realm;
-import io.realm.RealmList;
-import io.realm.RealmResults;
-import io.realm.exceptions.RealmException;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -256,12 +252,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
     private void deleteAllMatrixData() {
         List<MatrixTable> matrixTables = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
-        for(int i =0;i<matrixTables.size();i++){
-            new Delete().from(SensorTable.class).where("utility_identifier = ?",matrixTables.get(i).utility_id).execute();
+        for (int i = 0; i < matrixTables.size(); i++) {
+            new Delete().from(SensorTable.class).where("utility_identifier = ?", matrixTables.get(i).utility_id).execute();
         }
 
         new Delete().from(MatrixTable.class).where("unit_id = ?", GlobalData.getInstance().getSelectedUnitId()).execute();
-        new Delete().from(TareWeightTable.class).where("unit_id = ?",GlobalData.getInstance().getSelectedUnitId()).execute();
+        new Delete().from(TareWeightTable.class).where("unit_id = ?", GlobalData.getInstance().getSelectedUnitId()).execute();
     }
 
     //Set matrix data to list
@@ -275,14 +271,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 matrixTable.save();
 
                 //Save sensors for this metric.
-                for(int j = 0;j<matrixDataArrayList.get(i).getSensors().size();j++){
+                for (int j = 0; j < matrixDataArrayList.get(i).getSensors().size(); j++) {
                     SensorTable sensorTable = new SensorTable(matrixDataArrayList.get(i).getSensors().get(j));
                     sensorTable.save();
                 }
             }
 
-            for(int i = 0 ;i<tareWeights.size();i++){
-                TareWeightTable tareWeightTable = new TareWeightTable(tareWeights.get(i),GlobalData.getInstance().getSelectedUnitId());
+            for (int i = 0; i < tareWeights.size(); i++) {
+                TareWeightTable tareWeightTable = new TareWeightTable(tareWeights.get(i), GlobalData.getInstance().getSelectedUnitId());
                 tareWeightTable.save();
             }
 
@@ -300,11 +296,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         Collections.sort(list, new Comparator<MatrixTable>() {
             @Override
             public int compare(MatrixTable lhs, MatrixTable rhs) {
-                return lhs.order-rhs.order;
+                return lhs.order - rhs.order;
             }
         });
 
-        MatrixTableAdapter adapter = new MatrixTableAdapter(this,list);
+        MatrixTableAdapter adapter = new MatrixTableAdapter(this, list);
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
         matrixList.setLayoutManager(gridLayoutManager);
         matrixList.setAdapter(adapter);
@@ -395,18 +391,24 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         int dateOfMonth = calendar.get(Calendar.DATE);
         buttonText = "Submit readings for " + dateOfMonth + " " + month;
 
-        Realm realm = Realm.getDefaultInstance();
-        ReadingDataRealm readingDataRealm = realm.where(ReadingDataRealm.class).findFirst();
-        if (readingDataRealm != null) {
-            String oldDate = getDate(readingDataRealm.getTimestamp(), "dd-MM-yyyy");
+        ReadingTable readings = new Select().from(ReadingTable.class).executeSingle();
+        if (readings != null) {
+            String oldDate = getDate(readings.timestamp, "dd-MM-yyyy");
             String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
-
             if (!oldDate.equals(newDate)) {
                 calendar.setTimeInMillis(time - 86400000);
                 month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
                 dateOfMonth = calendar.get(Calendar.DATE);
                 buttonText = "Submit readings for " + dateOfMonth + " " + month;
+            } else {
+                month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
+                dateOfMonth = calendar.get(Calendar.DATE);
+                buttonText = "Submit readings for " + dateOfMonth + " " + month;
             }
+        } else {
+            month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
+            dateOfMonth = calendar.get(Calendar.DATE);
+            buttonText = "Submit readings for " + dateOfMonth + " " + month;
         }
 
         submitButton.setText(buttonText);
