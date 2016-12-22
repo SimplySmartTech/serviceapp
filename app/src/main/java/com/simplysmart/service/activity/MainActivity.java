@@ -40,6 +40,7 @@ import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorTable;
+import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.dialog.AlertDialogUpdateVersion;
@@ -255,12 +256,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
     private void deleteAllMatrixData() {
         List<MatrixTable> matrixTables = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
-
         for(int i =0;i<matrixTables.size();i++){
             new Delete().from(SensorTable.class).where("utility_identifier = ?",matrixTables.get(i).utility_id).execute();
         }
 
         new Delete().from(MatrixTable.class).where("unit_id = ?", GlobalData.getInstance().getSelectedUnitId()).execute();
+        new Delete().from(TareWeightTable.class).where("unit_id = ?",GlobalData.getInstance().getSelectedUnitId()).execute();
     }
 
     //Set matrix data to list
@@ -279,6 +280,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                     sensorTable.save();
                 }
             }
+
+            for(int i = 0 ;i<tareWeights.size();i++){
+                TareWeightTable tareWeightTable = new TareWeightTable(tareWeights.get(i),GlobalData.getInstance().getSelectedUnitId());
+                tareWeightTable.save();
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

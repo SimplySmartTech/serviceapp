@@ -56,6 +56,7 @@ import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightRealm;
+import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.dialog.DeleteReadingDialog;
 import com.simplysmart.service.dialog.EditDialog;
 import com.simplysmart.service.dialog.SubmitReadingDialog;
@@ -75,6 +76,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import io.realm.Realm;
@@ -159,20 +161,11 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                 dialog.show(getFragmentManager(), "submitDialog");
             }
         }
+
+        initialiseViews();
+        setupUI(mParentLayout);
+        initSwipe();
     }
-//
-//        RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
-//        if (localDataList == null || localDataList.size() == 0) {
-//            titleList.setVisibility(View.INVISIBLE);
-//        } else {
-//            titleList.setVisibility(View.VISIBLE);
-//            setList(localDataList);
-//        }
-//
-//        initialiseViews();
-//        setupUI(mParentLayout);
-//        initSwipe();
-//    }
 
     public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
@@ -348,14 +341,19 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         });
 
         final ArrayList<String> tareWeights = new ArrayList<>();
-        final RealmResults<TareWeightRealm> tareWeightsList = TareWeightRealm.getTareWeights(GlobalData.getInstance().getSelectedUnitId());
-        if (tareWeightsList.size() > 0) {
-            tareWeights.add("Enter tare weight manually");
-            for (int i = 0; i < tareWeightsList.size(); i++) {
-                TareWeightRealm item = tareWeightsList.get(i);
-                tareWeights.add(item.getName() + " (" + item.getValue() + " Kg)");
+        final List<TareWeightTable> tareWeightTableList = TareWeightTable.getTareWeights(GlobalData.getInstance().getSelectedUnitId());
+        Collections.sort(tareWeightTableList, new Comparator<TareWeightTable>() {
+            @Override
+            public int compare(TareWeightTable lhs, TareWeightTable rhs) {
+                return lhs.name.compareToIgnoreCase(rhs.name);
             }
+        });
 
+        if (tareWeightTableList.size() > 0) {
+            tareWeights.add("Enter tare weight manually");
+            for (int i = 0; i < tareWeightTableList.size(); i++) {
+                tareWeights.add(tareWeightTableList.get(i).name + " (" + tareWeightTableList.get(i).value + " Kg)");
+            }
         }
 
         if (sensorData != null && sensorData.tare_weight) {
@@ -368,7 +366,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     if (position > 0 && position < tareWeights.size() - 1) {
-                        tare_weight = tareWeightsList.get(position - 1).getValue();
+                        tare_weight = tareWeightTableList.get(position - 1).value;
                         mCustomTareWeightLayout.setVisibility(View.GONE);
                     } else if (position == 0) {
                         tare_weight = "";

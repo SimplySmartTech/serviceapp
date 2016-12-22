@@ -78,6 +78,10 @@ public class SensorTable extends Model {
         if(sensorData.getTooltip()!=null) {
             this.tooltip = sensorData.getTooltip();
         }
+
+        if(sensorData.isTare_weight()){
+            this.tare_weight = sensorData.isTare_weight();
+        }
     }
 
     public static SensorTable getSensorInfo(String utility_identifier,String sensor_name){

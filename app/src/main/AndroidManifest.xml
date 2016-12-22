@@ -132,7 +132,7 @@
 
         <meta-data
             android:name="AA_MODELS"
-            android:value="com.simplysmart.service.database.MatrixTable,com.simplysmart.service.database.SensorTable" />
+            android:value="com.simplysmart.service.database.MatrixTable,com.simplysmart.service.database.SensorTable,com.simplysmart.service.database.TareWeightTable" />
 
     </application>
 
