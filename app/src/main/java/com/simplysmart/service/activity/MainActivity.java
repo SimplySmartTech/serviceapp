@@ -37,11 +37,9 @@ import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
-import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingDataRealm;
-import com.simplysmart.service.database.SensorDataRealm;
-import com.simplysmart.service.database.TareWeightRealm;
+import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.dialog.AlertDialogUpdateVersion;
@@ -268,6 +266,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             for (int i = 0; i < matrixDataArrayList.size(); i++) {
                 MatrixTable matrixTable = new MatrixTable(matrixDataArrayList.get(i), GlobalData.getInstance().getSelectedUnitId());
                 matrixTable.save();
+
+                //Save sensors for this metric.
+                for(int j = 0;j<matrixDataArrayList.get(i).getSensors().size();j++){
+                    SensorTable sensorTable = new SensorTable(matrixDataArrayList.get(i).getSensors().get(j));
+                    sensorTable.save();
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

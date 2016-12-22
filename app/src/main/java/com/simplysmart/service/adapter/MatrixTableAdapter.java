@@ -13,6 +13,7 @@ import com.simplysmart.service.activity.InputFormActivity;
 import com.simplysmart.service.activity.SensorListActivity;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.MatrixTable;
+import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.viewholder.ParentViewHolder;
 
@@ -27,14 +28,11 @@ public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
     private Context mContext;
     private List<MatrixTable> matrixData;
     private final LayoutInflater inflater;
-//    private Typeface textTypeface;
 
     public MatrixTableAdapter(Context context, List<MatrixTable> data) {
         inflater = LayoutInflater.from(context);
         mContext = context;
         matrixData = data;
-
-//        textTypeface = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
     }
 
     @Override
@@ -52,8 +50,14 @@ public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
             sensorName = data.type;
         }
 
-        String unit = "";
+        final List<SensorTable> sensorTable = SensorTable.getSensorList(data.utility_id);
+        String unit = sensorTable.get(0).unit;
+
         String tooltip = "";
+        if(sensorTable.get(0).tooltip!=null && sensorTable.get(0).tooltip.equalsIgnoreCase("")) {
+            tooltip = sensorTable.get(0).tooltip;
+        }
+
         String unicodeUnit = "";
         boolean isUnicode = false;
         for (int i = 0; i < unit.length(); i++) {
@@ -78,14 +82,30 @@ public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
         holder.sensor_type.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (sensorTable != null && sensorTable.size() > 1) {
+                    Intent i = new Intent(mContext, SensorListActivity.class);
+                    i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
+                    mContext.startActivity(i);
+                } else {
+                    Intent i = new Intent(mContext, InputFormActivity.class);
+                    i.putExtra(StringConstants.SENSOR_DATA, data.utility_id);
+                    mContext.startActivity(i);
+                }
             }
         });
 
         holder.unit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (sensorTable != null && sensorTable.size() > 1) {
+                    Intent i = new Intent(mContext, SensorListActivity.class);
+                    i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
+                    mContext.startActivity(i);
+                } else {
+                    Intent i = new Intent(mContext, InputFormActivity.class);
+                    i.putExtra(StringConstants.SENSOR_DATA, data.utility_id);
+                    mContext.startActivity(i);
+                }
             }
         });
     }

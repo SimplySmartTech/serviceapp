@@ -12,7 +12,6 @@ import android.view.Window;
 import com.simplysmart.service.R;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.MatrixDataRealm;
 import com.simplysmart.service.database.ReadingDataRealm;
 
 import java.io.File;
