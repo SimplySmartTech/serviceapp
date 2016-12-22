@@ -11,7 +11,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 23
         versionCode 5       //Current Version is 5
-        versionName "1.2.0"  //Playstore current is 1.2.1
+        versionName "1.2.1"  //Playstore current is 1.2.1
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 

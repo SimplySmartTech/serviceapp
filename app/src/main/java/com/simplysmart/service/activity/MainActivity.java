@@ -140,6 +140,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     protected void onResume() {
         super.onResume();
         isRunning = true;
+        GetVersionCode getVersionCode = new GetVersionCode();
+        getVersionCode.execute();
     }
 
     @Override
@@ -651,7 +653,9 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 int result = cmp.compare(onlineVersion, currentVersion);
 
                 if (result > 0 && isRunning) {
-                    AlertDialogUpdateVersion.newInstance("New update available!", getResources().getString(R.string.update_app_message), "Later", "Update").show(getFragmentManager(), "Show update dialog");
+                    AlertDialogUpdateVersion update = AlertDialogUpdateVersion.newInstance("New update available!", getResources().getString(R.string.update_app_message), "Later", "Update");
+                    update.setCancelable(false);
+                    update.show(getFragmentManager(), "Show update dialog");
                 }
             }
         }

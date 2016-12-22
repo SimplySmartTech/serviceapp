@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -56,12 +58,21 @@ public class AlertDialogUpdateVersion extends DialogFragment implements View.OnC
         dialogNegativeButton.setText(getArguments().getString(NEGATIVE_BUTTON));
         dialogPositiveButton.setText(getArguments().getString(POSITIVE_BUTTON));
 
-        dialogNegativeButton.setOnClickListener(this);
         dialogPositiveButton.setOnClickListener(this);
-
+        dialogNegativeButton.setVisibility(View.GONE);
         dialogMessage.setLineSpacing(2.0f,1.25f);
 
         builder.setView(dialogView);
+
+        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                if (getActivity() != null) {
+                    getActivity().finish();
+                }
+                return true;
+            }
+        });
 
         return builder.create();
     }

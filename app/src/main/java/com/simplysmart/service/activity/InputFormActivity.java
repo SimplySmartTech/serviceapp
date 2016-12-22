@@ -411,24 +411,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             return false;
         }
 
-        if(tare_weight==null || tare_weight.equalsIgnoreCase("")) {
-            if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
-                int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
-                if (weight <= 0) {
-                    showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
-                    return false;
-                }
-            }
-        }else {
-            if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("")) {
-                int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(tare_weight);
-                if (weight <= 0) {
-                    showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
-                    return false;
-                }
-            }
-        }
-
 //        if (needSpinner) {
 //
 //            if (mCustomTareWeightLayout.getVisibility() != View.VISIBLE) {
@@ -471,8 +453,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 //            }
 //
 //        }
-
-
 
         return true;
     }
