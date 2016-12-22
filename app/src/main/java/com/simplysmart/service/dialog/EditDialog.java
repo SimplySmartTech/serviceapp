@@ -30,6 +30,7 @@ public class EditDialog extends DialogFragment {
     private static String position = "POSITION";
     private boolean edit = false;
 
+    private ReadingTable readingTable;
     public static EditDialog newInstance(ReadingTable readingTable, int pos, boolean edit) {
         EditDialog f = new EditDialog();
 
@@ -76,7 +77,7 @@ public class EditDialog extends DialogFragment {
         final int pos = bundle.getInt(position);
         this.edit = bundle.getBoolean(StringConstants.EDIT);
 
-        final ReadingTable readingTable = ReadingTable.getReading(utility_id,sensorName,time);
+        readingTable = ReadingTable.getReading(time);
 
         dialogNegativeButton.setText("DELETE");
         dialogNegativeButton.setTextColor(Color.RED);
