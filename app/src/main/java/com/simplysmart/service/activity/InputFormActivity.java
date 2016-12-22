@@ -410,55 +410,49 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             return false;
         }
 
-        if (needSpinner) {
-//            if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE && mTareWeightEditText.getText().toString().equals("")) {
-//                showSnackBar(mParentLayout, "Please enter tare weight.", false);
-//                return false;
-//            } else if (tare_weight == null || tare_weight.equals("")) {
-//                showSnackBar(mParentLayout, "Please select tare weight.", false);
-//                return false;
+//        if (needSpinner) {
+//
+//            if (mCustomTareWeightLayout.getVisibility() != View.VISIBLE) {
+//                if (tare_weight == null || tare_weight.equals("")) {
+//                    showSnackBar(mParentLayout, "Please select tare weight.", false);
+//                    return false;
+//                }
+//                int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(tare_weight);
+//                if (weight <= 0) {
+//                    showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+//                    return false;
+//                }
+//            } else {
+//
+//                if (mTareWeightEditText.getText() == null) {
+//                    showSnackBar(mParentLayout, "Please enter tare weight.", false);
+//                    return false;
+//                }
+//
+//                if (mTareWeightEditText.getText().toString().equals("")) {
+//                    showSnackBar(mParentLayout, "Please enter tare weight.", false);
+//                    return false;
+//                }
+//
+//                if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
+//                    int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
+//                    if (weight <= 0) {
+//                        showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+//                        return false;
+//                    }
+//                } else {
+//                    if (mInputReadingValue.getText() == null) {
+//                        showSnackBar(mParentLayout, "Please enter reading.", false);
+//                        return false;
+//                    } else if (mTareWeightEditText.getText() == null) {
+//                        showSnackBar(mParentLayout, "Please enter tare weight.", false);
+//                        return false;
+//                    }
+//                }
 //            }
+//
+//        }
 
-            if (mCustomTareWeightLayout.getVisibility() != View.VISIBLE) {
-                if (tare_weight == null || tare_weight.equals("")) {
-                    showSnackBar(mParentLayout, "Please select tare weight.", false);
-                    return false;
-                }
-                int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(tare_weight);
-                if (weight <= 0) {
-                    showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
-                    return false;
-                }
-            } else {
-
-                if (mTareWeightEditText.getText() == null) {
-                    showSnackBar(mParentLayout, "Please enter tare weight.", false);
-                    return false;
-                }
-
-                if (mTareWeightEditText.getText().toString().equals("")) {
-                    showSnackBar(mParentLayout, "Please enter tare weight.", false);
-                    return false;
-                }
-
-                if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
-                    int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
-                    if (weight <= 0) {
-                        showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
-                        return false;
-                    }
-                } else {
-                    if (mInputReadingValue.getText() == null) {
-                        showSnackBar(mParentLayout, "Please enter reading.", false);
-                        return false;
-                    } else if (mTareWeightEditText.getText() == null) {
-                        showSnackBar(mParentLayout, "Please enter tare weight.", false);
-                        return false;
-                    }
-                }
-            }
-
-        }
         return true;
     }
 
@@ -587,7 +581,10 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
         readingDataRealm.setUnit(sensorData.getUnit());
         readingDataRealm.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
-        readingDataRealm.setTare_weight(tare_weight);
+
+        if (tare_weight != null && !tare_weight.equalsIgnoreCase("")) {
+            readingDataRealm.setTare_weight(tare_weight);
+        }
 
         if (uploadedImage) {
             readingDataRealm.setPhotographic_evidence_url(uploadedReadingUrl);
