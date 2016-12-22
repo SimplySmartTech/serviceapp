@@ -13,14 +13,19 @@ public class Reading implements Parcelable{
     private String value;
     private String photographic_evidence_url;
     private long timestamp;
+    private String remark;
+    private long updatedAt = 0;
 
     public Reading(){}
+
 
     protected Reading(Parcel in) {
         tare_weight = in.readString();
         value = in.readString();
         photographic_evidence_url = in.readString();
         timestamp = in.readLong();
+        remark = in.readString();
+        updatedAt = in.readLong();
     }
 
     @Override
@@ -29,6 +34,8 @@ public class Reading implements Parcelable{
         dest.writeString(value);
         dest.writeString(photographic_evidence_url);
         dest.writeLong(timestamp);
+        dest.writeString(remark);
+        dest.writeLong(updatedAt);
     }
 
     @Override
@@ -78,5 +85,21 @@ public class Reading implements Parcelable{
 
     public void setTare_weight(String tare_weight) {
         this.tare_weight = tare_weight;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

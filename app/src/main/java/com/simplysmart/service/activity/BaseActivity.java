@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.FragmentManager;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -28,13 +29,21 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.activeandroid.query.Delete;
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
+import com.simplysmart.service.database.FinalReadingTable;
+import com.simplysmart.service.database.MatrixTable;
+import com.simplysmart.service.database.ReadingTable;
+import com.simplysmart.service.database.SensorTable;
+import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.dialog.AlertDialogStandard;
+import com.simplysmart.service.model.matrix.Reading;
+import com.simplysmart.service.model.matrix.TareWeight;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.List;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -379,10 +389,11 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
 
-//        Realm realm = Realm.getDefaultInstance();
-//        realm.beginTransaction();
-//        realm.deleteAll();
-//        realm.commitTransaction();
+        new Delete().from(MatrixTable.class).execute();
+        new Delete().from(SensorTable.class).execute();
+        new Delete().from(ReadingTable.class).execute();
+        new Delete().from(FinalReadingTable.class).execute();
+        new Delete().from(TareWeightTable.class).execute();
 
         handleAuthorizationFailed();
     }
@@ -433,13 +444,13 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     public void handleAuthorizationFailed() {
         clearApplicationData();
-//        Intent i = new Intent(this, LoginActivity.class);
-//        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(i);
+        Intent i = new Intent(this, LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
     }
 
     protected void removeLocalData(String unit_id) {
-//        ReadingDataRealm.deleteAllReadings(unit_id);
+        new Delete().from(ReadingTable.class).where("unit_id = ?",unit_id).execute();
     }
 }
 

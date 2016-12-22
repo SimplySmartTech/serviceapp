@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,8 @@ import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.interfaces.EditDialogListener;
 
+import java.util.Calendar;
+
 public class EditDialog extends DialogFragment {
 
     private static String utility_id = "UTILITY_ID";
@@ -31,6 +35,7 @@ public class EditDialog extends DialogFragment {
     private boolean edit = false;
 
     private ReadingTable readingTable;
+
     public static EditDialog newInstance(ReadingTable readingTable, int pos, boolean edit) {
         EditDialog f = new EditDialog();
 
@@ -63,11 +68,12 @@ public class EditDialog extends DialogFragment {
         Button dialogNegativeButton = (Button) dialogView.findViewById(R.id.dialogButtonNegative);
         final Button dialogPositiveButton = (Button) dialogView.findViewById(R.id.dialogButtonPositive);
         ImageView close = (ImageView) dialogView.findViewById(R.id.close);
-        final Button backButton = (Button)dialogView.findViewById(R.id.backButton);
-        final EditText remarks = (EditText)dialogView.findViewById(R.id.remarks);
+        final Button backButton = (Button) dialogView.findViewById(R.id.backButton);
+        final EditText remarks = (EditText) dialogView.findViewById(R.id.remarks);
+        final TextView remark_mandatory_text = (TextView) dialogView.findViewById(R.id.enter_remark);
 
-        final RelativeLayout readingLayout = (RelativeLayout)dialogView.findViewById(R.id.readingLayout);
-        final RelativeLayout remarksLayout = (RelativeLayout)dialogView.findViewById(R.id.remarksLayout);
+        final RelativeLayout readingLayout = (RelativeLayout) dialogView.findViewById(R.id.readingLayout);
+        final RelativeLayout remarksLayout = (RelativeLayout) dialogView.findViewById(R.id.remarksLayout);
 
         Bundle bundle = getArguments();
         String utilityId = bundle.getString(utility_id);
@@ -78,6 +84,25 @@ public class EditDialog extends DialogFragment {
         this.edit = bundle.getBoolean(StringConstants.EDIT);
 
         readingTable = ReadingTable.getReading(time);
+
+        remarks.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length()>0){
+                    remark_mandatory_text.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         dialogNegativeButton.setText("DELETE");
         dialogNegativeButton.setTextColor(Color.RED);
@@ -120,25 +145,23 @@ public class EditDialog extends DialogFragment {
         dialogPositiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(dialogPositiveButton.getText().toString().equalsIgnoreCase("NEXT")){
+                if (dialogPositiveButton.getText().toString().equalsIgnoreCase("NEXT")) {
                     addRemarks();
-                }else {
-                    if (!newReading.getText().equals("")) {
-                        String string = newReading.getText().toString();
-                        try {
-                            readingTable.value=string;
-                            readingTable.save();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                        editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingTable.unit);
-                        dismiss();
-                    } else {
-                        EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                        editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
-                        dismiss();
+                } else if (!newReading.getText().equals("") && remarks.getText() != null && !remarks.getText().toString().equalsIgnoreCase("")) {
+                    String string = newReading.getText().toString();
+                    try {
+                        readingTable.value = string;
+                        readingTable.remark = remarks.getText().toString();
+                        readingTable.updated_at = Calendar.getInstance().getTimeInMillis();
+                        readingTable.save();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                    EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                    editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingTable.unit);
+                    dismiss();
+                }else {
+                    remark_mandatory_text.setVisibility(View.VISIBLE);
                 }
             }
 

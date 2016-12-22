@@ -81,4 +81,19 @@ public class ReadingTable extends Model {
                 .executeSingle();
     }
 
+    public static List<ReadingTable> getReadings(boolean imagesUploaded){
+        return new Select()
+                .from(ReadingTable.class)
+                .where("uploadedImage = ?",imagesUploaded)
+                .execute();
+    }
+
+    public static List<ReadingTable> getReadings(String unit_id,boolean imagesUploaded){
+        return new Select()
+                .from(ReadingTable.class)
+                .where("unit_id = ?",unit_id)
+                .where("uploadedImage = ?",imagesUploaded)
+                .execute();
+    }
+
 }

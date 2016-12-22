@@ -26,7 +26,10 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
+import com.simplysmart.service.database.FinalReadingTable;
+import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingTable;
+import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.dialog.AlertDialogMandatory;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
 import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
@@ -43,6 +46,7 @@ import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.service.PhotoUploadService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,7 +56,7 @@ import retrofit2.Response;
  * Created by shailendrapsp on 4/11/16.
  */
 
-public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet, MandatoryReading ,EditDialogListener{
+public class SummaryActivity extends BaseActivity implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet, MandatoryReading, EditDialogListener {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -113,6 +117,40 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private void setDataForSummary() {
         int count = 0;
+        List<MatrixTable> matrixTableList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
+        if (matrixTableList != null && matrixTableList.size() > 0) {
+            for (MatrixTable matrixTable : matrixTableList) {
+                List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
+                if (sensorTableList != null && sensorTableList.size() > 0) {
+                    for (SensorTable sensorTable : sensorTableList) {
+                        List<ReadingTable> readingsList = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name);
+                        if (readingsList.size() > 0) {
+                            Summary header = new Summary();
+                            header.setName(matrixTable.type);
+                            header.setValue(matrixTable.icon);
+                            header.setHeader(true);
+                            summaryList.add(header);
+
+                            for(ReadingTable readingTable:readingsList){
+                                Summary summary = new Summary();
+
+                                summary.setName(readingTable.sensor_name);
+                                summary.setValue(readingTable.value + " " + readingTable.unit);
+                                summary.setTime(readingTable.date);
+                                summary.setType(matrixTable.type);
+                                summary.setLocalPhotoUrl(readingTable.local_photo_url);
+                                summary.setTimestamp(readingTable.timestamp);
+                                summary.setUploaded(readingTable.uploadedImage);
+                                if (!readingTable.uploadedImage) {
+                                    count++;
+                                }
+                                summaryList.add(summary);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         if (count > 0) {
             allDone = false;
@@ -187,8 +225,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
         switch (id) {
             case android.R.id.home:
-                Intent i = new Intent(this,MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Intent i = new Intent(this, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 supportFinishAfterTransition();
                 return true;
@@ -252,7 +290,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private void saveToDisk(AllReadingsData allReadingData) {
         String jsonToSend = new Gson().toJson(allReadingData);
         DebugLog.d(jsonToSend);
-
+        FinalReadingTable finalReadingTable = new FinalReadingTable(jsonToSend);
+        finalReadingTable.save();
         removeLocalData(GlobalData.getInstance().getSelectedUnitId());
         hideList();
     }
@@ -269,11 +308,55 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         AllReadingsData allReadingData = new AllReadingsData();
         ArrayList<Metric> metrics = new ArrayList<>();
 
+        List<MatrixTable> matrixTableList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
+        if (matrixTableList != null && matrixTableList.size() > 0) {
+
+            for (MatrixTable matrixTable : matrixTableList) {
+                List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
+                if (sensorTableList != null && sensorTableList.size() > 0) {
+                    for (SensorTable sensorTable : sensorTableList) {
+
+                        List<ReadingTable> readings = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name);
+                        if (readings != null && readings.size() > 0) {
+
+                            ArrayList<Reading> readingToSend = new ArrayList<>();
+                            for (ReadingTable readingTable : readings) {
+                                Reading reading = new Reading();
+                                if (readingTable.tare_weight != null && !readingTable.tare_weight.equalsIgnoreCase("")) {
+                                    reading.setTare_weight(readingTable.tare_weight);
+                                }
+                                reading.setValue(readingTable.value);
+                                reading.setPhotographic_evidence_url(readingTable.photographic_evidence_url);
+                                reading.setTimestamp(readingTable.timestamp);
+                                if (readingTable.updated_at != 0) {
+                                    reading.setUpdatedAt(readingTable.updated_at);
+                                }
+
+                                if (readingTable.remark != null && !readingTable.remark.equalsIgnoreCase("")) {
+                                    reading.setRemark(readingTable.remark);
+                                }
+
+                                readingToSend.add(reading);
+                            }
+
+                            Metric metric = new Metric();
+                            metric.setType(matrixTable.type);
+                            metric.setSensor_name(sensorTable.sensor_name);
+                            metric.setUtility_id(sensorTable.utility_identifier);
+                            metric.setReadings(readingToSend);
+                            metrics.add(metric);
+                        }
+                    }
+                }
+            }
+        }
+
         allReadingData.setMetrics(metrics);
         return allReadingData;
     }
 
-    private void findAndUpdateElement( ReadingTable table) {
+
+    private void findAndUpdateElement(ReadingTable table) {
         String local_photo_url = table.local_photo_url;
 
         for (int i = 0; i < summaryList.size(); i++) {
@@ -295,10 +378,11 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         public void onReceive(Context context, Intent intent) {
             ReadingTable rdr = null;
             if (intent != null && intent.getExtras() != null) {
-                rdr = intent.getParcelableExtra(StringConstants.READING_DATA);
+                long timestamp = intent.getLongExtra(StringConstants.TIMESTAMP,0);
+                if(timestamp!=0){
+                    rdr = ReadingTable.getReading(timestamp);
+                }
             }
-
-            DebugLog.d("Broadcast recieved for image upload complete " + rdr.photographic_evidence_url);
 
             if (rdr != null) {
                 findAndUpdateElement(rdr);
@@ -338,7 +422,20 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private String checkAllMandatoryReadings() {
 
         String mandatory = "\n";
-        //TODO CHECK all mandatory.
+        List<MatrixTable> matrixMandatoryTables = MatrixTable.getMandatoryList(GlobalData.getInstance().getSelectedUnitId());
+        if (matrixMandatoryTables != null && matrixMandatoryTables.size() > 0) {
+            for (MatrixTable matrixTable : matrixMandatoryTables) {
+                List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
+                if (sensorTableList != null && sensorTableList.size() > 0) {
+                    for (SensorTable sensorTable : sensorTableList) {
+                        List<ReadingTable> readings = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name);
+                        if (readings == null || readings.size() == 0) {
+                            mandatory += "\n" + matrixTable.type + " : " + sensorTable.sensor_name;
+                        }
+                    }
+                }
+            }
+        }
 
         return mandatory;
     }

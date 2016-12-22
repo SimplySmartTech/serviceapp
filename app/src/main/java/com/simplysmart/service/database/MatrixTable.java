@@ -63,4 +63,12 @@ public class MatrixTable extends Model {
                 .where("unit_id = ?",unit_id)
                 .execute();
     }
+
+    public static List<MatrixTable> getMandatoryList(String unit_id){
+        return new Select()
+                .from(MatrixTable.class)
+                .where("unit_id = ?",unit_id)
+                .where("mandatory = ?",true)
+                .execute();
+    }
 }

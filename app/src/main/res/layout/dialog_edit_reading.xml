@@ -75,16 +75,16 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:visibility="gone"
             android:id="@+id/remarksLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone">
 
             <EditText
                 android:id="@+id/remarks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:layout_marginTop="15dp"
@@ -92,6 +92,18 @@
                 android:hint="Enter remarks."
                 android:padding="10dp"
                 android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/enter_remark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/remarks"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:paddingStart="10dp"
+                android:text="@string/please_enter_remark"
+                android:textColor="@color/bw_color_dark_red"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
@@ -104,13 +116,13 @@
                 style="@style/Base.Widget.AppCompat.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
+                android:layout_toStartOf="@+id/dialogButtonPositive"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:text="DELETE"
-                android:layout_centerVertical="true"
-                android:layout_toStartOf="@+id/dialogButtonPositive"
                 android:textAllCaps="true"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="14sp" />
@@ -120,13 +132,13 @@
                 style="@style/Base.Widget.AppCompat.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="4dp"
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:text="UPDATE"
-                android:layout_alignParentEnd="true"
                 android:textAllCaps="true"
-                android:layout_centerVertical="true"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="14sp" />
 
@@ -135,14 +147,14 @@
                 style="@style/Base.Widget.AppCompat.ActionButton"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:layout_marginStart="-16dp"
                 android:layout_centerVertical="true"
-                android:text="BACK"
+                android:layout_marginStart="-16dp"
                 android:drawableStart="@drawable/ic_keyboard_arrow_left_black_24dp"
+                android:text="BACK"
                 android:textAllCaps="true"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="14sp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </RelativeLayout>
     </LinearLayout>

@@ -231,7 +231,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         no_data_found.setText(getResources().getString(R.string.error_in_network));
                         no_data_found.setVisibility(View.VISIBLE);
                     }
-                    swipeRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
@@ -290,6 +289,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         matrixList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
 
         setDataInList(matrixList);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void setDataInList(List<MatrixTable> list) {

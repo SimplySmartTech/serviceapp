@@ -33,5 +33,6 @@
     <string name="after_internet_send">Data has been submitted. It will be sent as soon as device is connected to internet.</string>
     <string name="enter_tare_weight">Enter Tare Weight</string>
     <string name="update_app_message">SimplySmart Service has a new update available on the Play Store. Stay up to date with the App to enjoy the latest features and best performance.</string>
+    <string name="please_enter_remark">Please enter remark.</string>
 
 </resources>
