@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -28,6 +30,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixListAdapter;
+import com.simplysmart.service.common.VersionComprator;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
@@ -38,6 +41,7 @@ import com.simplysmart.service.database.SensorDataRealm;
 import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
+import com.simplysmart.service.dialog.AlertDialogUpdateVersion;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.LogoutListener;
 import com.simplysmart.service.model.common.APIError;
@@ -49,6 +53,8 @@ import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
 import com.squareup.picasso.Picasso;
+
+import org.jsoup.Jsoup;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,23 +89,34 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private ArrayList<Unit> units;
     private User residentData;
 
+    private boolean isRunning = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         getUserInfo();
+        isRunning = true;
+        checkForUpdate();
+    }
+
+    private void checkForUpdate() {
+        GetVersionCode getVersionCode = new GetVersionCode();
+        getVersionCode.execute();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(UPDATE_METRIC_SENSOR_LIST_ROW, new IntentFilter("UPDATE_METRIC_SENSOR_LIST_ROW"));
+        isRunning = true;
     }
 
     @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UPDATE_METRIC_SENSOR_LIST_ROW);
+        isRunning = false;
         super.onDestroy();
     }
 
@@ -117,6 +134,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isRunning = true;
     }
 
     @Override
@@ -586,6 +609,52 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     public void logoutUser() {
         logout();
         finish();
+    }
+
+
+    private class GetVersionCode extends AsyncTask<Void, String, String> {
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            String newVersion = null;
+            try {
+                newVersion = Jsoup.connect("https://play.google.com/store/apps/details?id=" + MainActivity.this.getPackageName() + "&hl=it")
+                        .timeout(30000)
+                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                        .referrer("http://www.google.com")
+                        .get()
+                        .select("div[itemprop=softwareVersion]")
+                        .first()
+                        .ownText();
+                return newVersion;
+            } catch (Exception e) {
+                return newVersion;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String onlineVersion) {
+            super.onPostExecute(onlineVersion);
+
+            String currentVersion = "";
+            try {
+                currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("update", "Current version " + currentVersion + "playstore version " + onlineVersion);
+
+            if (onlineVersion != null && !onlineVersion.isEmpty()) {
+
+                VersionComprator cmp = new VersionComprator();
+                int result = cmp.compare(onlineVersion, currentVersion);
+
+                if (result > 0 && isRunning) {
+                    AlertDialogUpdateVersion.newInstance("New update available!", getResources().getString(R.string.update_app_message), "Later", "Update").show(getFragmentManager(), "Show update dialog");
+                }
+            }
+        }
     }
 
 }

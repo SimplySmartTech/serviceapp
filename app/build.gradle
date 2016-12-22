@@ -10,8 +10,8 @@ android {
         applicationId "com.simplysmart.service"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.2.1"
+        versionCode 5       //Current Version is 5
+        versionName "1.2.0"  //Playstore current is 1.2.1
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -74,6 +74,9 @@ dependencies {
 
     //Image downloader library
     compile 'com.squareup.picasso:picasso:2.5.2'
+
+    //Used to parse google play store page
+    compile 'org.jsoup:jsoup:1.8.3'
 }
 
 apply plugin: 'com.google.gms.google-services'
