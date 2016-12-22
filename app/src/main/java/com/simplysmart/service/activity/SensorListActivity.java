@@ -11,15 +11,16 @@ import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.SensorListAdapter;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
+import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.SensorData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SensorListActivity extends BaseActivity {
 
     private MatrixData data;
-    ArrayList<SensorData> sensors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,15 +35,21 @@ public class SensorListActivity extends BaseActivity {
         getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
 
         if (getIntent() != null && getIntent().getExtras() != null) {
-            data = getIntent().getParcelableExtra(StringConstants.METRIC_DATA);
-            if (data != null) {
-                if (data.getSensors() != null && data.getSensors().size() > 0) {
-                    sensors = data.getSensors();
-                    initializeWidgets();
-                }
+            String utility_id = getIntent().getStringExtra(StringConstants.UTILITY_ID);
+            if (utility_id != null && !utility_id.equalsIgnoreCase("")) {
+                getSensorList(utility_id);
             }
         }
 
+    }
+
+    private void getSensorList(String utility_id){
+        List<SensorTable> sensors = SensorTable.getSensorList(utility_id);
+        RecyclerView sensorList = (RecyclerView) findViewById(R.id.sensorList);
+        SensorListAdapter adapter = new SensorListAdapter(SensorListActivity.this, sensors);
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(SensorListActivity.this, 2);
+        sensorList.setLayoutManager(gridLayoutManager);
+        sensorList.setAdapter(adapter);
     }
 
     @Override
@@ -61,14 +68,6 @@ public class SensorListActivity extends BaseActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void initializeWidgets() {
-        RecyclerView sensorList = (RecyclerView) findViewById(R.id.sensorList);
-        SensorListAdapter adapter = new SensorListAdapter(SensorListActivity.this, sensors);
-        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(SensorListActivity.this, 2);
-        sensorList.setLayoutManager(gridLayoutManager);
-        sensorList.setAdapter(adapter);
     }
 
     @Override

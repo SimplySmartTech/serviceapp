@@ -54,6 +54,7 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingDataRealm;
+import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightRealm;
 import com.simplysmart.service.dialog.DeleteReadingDialog;
 import com.simplysmart.service.dialog.EditDialog;
@@ -96,15 +97,17 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private TextView unit, submitForm, titleList, mTareWeightUnit;
     private ImageView uploadImage;
     private Spinner tareWeightSpinner;
-    //    private ImageView photoDone;
+    private ImageView photoDone;
     private View middleLine;
 
     private RecyclerView readingList;
 
     private String uploadedReadingUrl = "";
     private String tare_weight = "";
+    private String utility_id= "";
+    private String sensor_name = "";
 
-    private SensorData sensorData;
+    private SensorTable sensorData;
     private int groupPosition;
     private int childPosition;
 
@@ -122,15 +125,18 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         setContentView(R.layout.activity_input_form);
 
         if (getIntent() != null && getIntent().getExtras() != null) {
-            sensorData = getIntent().getParcelableExtra(StringConstants.SENSOR_DATA);
+            utility_id = getIntent().getStringExtra(StringConstants.UTILITY_ID);
+            sensor_name = getIntent().getStringExtra(StringConstants.SENSOR_NAME);
             groupPosition = getIntent().getIntExtra("groupPosition", -1);
             childPosition = getIntent().getIntExtra("childPosition", -1);
         } else {
-            sensorData = null;
+            utility_id = "";
+            sensor_name = "";
             groupPosition = -1;
             childPosition = -1;
         }
 
+        sensorData = SensorTable.getSensorInfo(utility_id,sensor_name);
         transferUtility = Util.getTransferUtility(this);
         titleList = (TextView) findViewById(R.id.title_list);
 
@@ -138,7 +144,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(sensorData.getSensor_name() + " reading");
+        getSupportActionBar().setTitle(sensorData.sensor_name + " reading");
 
         bindViews();
         Realm realm = Realm.getDefaultInstance();
@@ -153,19 +159,20 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                 dialog.show(getFragmentManager(), "submitDialog");
             }
         }
-
-        RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
-        if (localDataList == null || localDataList.size() == 0) {
-            titleList.setVisibility(View.INVISIBLE);
-        } else {
-            titleList.setVisibility(View.VISIBLE);
-            setList(localDataList);
-        }
-
-        initialiseViews();
-        setupUI(mParentLayout);
-        initSwipe();
     }
+//
+//        RealmList<ReadingDataRealm> localDataList = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
+//        if (localDataList == null || localDataList.size() == 0) {
+//            titleList.setVisibility(View.INVISIBLE);
+//        } else {
+//            titleList.setVisibility(View.VISIBLE);
+//            setList(localDataList);
+//        }
+//
+//        initialiseViews();
+//        setupUI(mParentLayout);
+//        initSwipe();
+//    }
 
     public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
@@ -224,11 +231,11 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         mCustomTareWeightLayout = (RelativeLayout) findViewById(R.id.custom_tare_weight_layout);
         mTareWeightEditText = (EditText) findViewById(R.id.tare_weight_edittext);
         mTareWeightUnit = (TextView) findViewById(R.id.tare_weight_unit);
-        String unitOfSensor = sensorData.getUnit();
+        String unitOfSensor = sensorData.unit;
         if (unitOfSensor.contains("\\")) {
             unit.setText("\u00B0 C");
         } else {
-            unit.setText(sensorData.getUnit());
+            unit.setText(sensorData.unit);
         }
 
         mInputReadingValue.clearFocus();
@@ -318,7 +325,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             }
         });
 
-        if (sensorData != null && sensorData.getPhotographic_evidence() != null && sensorData.getPhotographic_evidence().equalsIgnoreCase("true")) {
+        if (sensorData != null && sensorData.photographic_evidence != null && sensorData.photographic_evidence.equalsIgnoreCase("true")) {
             uploadImage.setVisibility(View.VISIBLE);
             middleLine.setVisibility(View.VISIBLE);
         } else {
@@ -351,7 +358,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
         }
 
-        if (sensorData != null && sensorData.isTare_weight()) {
+        if (sensorData != null && sensorData.tare_weight) {
             needSpinner = true;
             ArrayAdapter<String> tareWeightAdapter = new ArrayAdapter<String>(InputFormActivity.this, android.R.layout.simple_spinner_item, tareWeights);
             tareWeightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -366,7 +373,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                     } else if (position == 0) {
                         tare_weight = "";
                         mCustomTareWeightLayout.setVisibility(View.VISIBLE);
-                        mTareWeightUnit.setText(sensorData.getUnit());
+                        mTareWeightUnit.setText(sensorData.unit);
                     } else {
                         tare_weight = null;
                     }
@@ -376,7 +383,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                 public void onNothingSelected(AdapterView<?> parent) {
                     tare_weight = null;
                     mCustomTareWeightLayout.setVisibility(View.VISIBLE);
-                    mTareWeightUnit.setText(sensorData.getUnit());
+                    mTareWeightUnit.setText(sensorData.unit);
                 }
             });
 
@@ -478,10 +485,10 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void submitForImage() {
         readingData = new ReadingData();
-        readingData.setUtility_id(sensorData.getUtility_identifier());
+        readingData.setUtility_id(sensorData.utility_identifier);
         readingData.setValue(mInputReadingValue.getText().toString());
         readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-        readingData.setSensor_name(sensorData.getSensor_name());
+        readingData.setSensor_name(sensorData.sensor_name);
 
         if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE) {
             tare_weight = mTareWeightEditText.getText().toString();
@@ -509,10 +516,10 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void submitWithoutImage() {
         readingData = new ReadingData();
-        readingData.setUtility_id(sensorData.getUtility_identifier());
+        readingData.setUtility_id(sensorData.utility_identifier);
         readingData.setValue(mInputReadingValue.getText().toString());
         readingData.setPhotographic_evidence_url(uploadedReadingUrl);
-        readingData.setSensor_name(sensorData.getSensor_name());
+        readingData.setSensor_name(sensorData.sensor_name);
 
         if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE) {
             tare_weight = mTareWeightEditText.getText().toString();
@@ -544,7 +551,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     }
 
     private void setList(RealmList<ReadingDataRealm> localDataList) {
-        RealmList<ReadingDataRealm> list = ReadingDataRealm.findExistingReading(sensorData.getUtility_identifier(), sensorData.getSensor_name());
+        RealmList<ReadingDataRealm> list = ReadingDataRealm.findExistingReading(sensorData.utility_identifier, sensorData.sensor_name);
         ArrayList<ReadingDataRealm> readingsList = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
@@ -580,7 +587,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingDataRealm.setDate(time);
         readingDataRealm.setTimestamp(calendar.getTimeInMillis());
         readingDataRealm.setLocal_photo_url(mCurrentPhotoPath);
-        readingDataRealm.setUnit(sensorData.getUnit());
+        readingDataRealm.setUnit(sensorData.unit);
         readingDataRealm.setUnit_id(GlobalData.getInstance().getSelectedUnitId());
 
         if (tare_weight != null && !tare_weight.equalsIgnoreCase("")) {

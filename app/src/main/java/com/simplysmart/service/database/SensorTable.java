@@ -15,46 +15,46 @@ import java.util.List;
 @Table(name="sensor")
 public class SensorTable extends Model {
 
-    @Column(name = "unit_id")
+    @Column(name = "site_name")
     public String site_name;
 
-    @Column(name = "unit_id")
+    @Column(name = "metric")
     public String metric;
 
-    @Column(name = "unit_id")
+    @Column(name = "sensor_name")
     public String sensor_name;
 
-    @Column(name = "unit_id")
+    @Column(name = "mandatory")
     public String mandatory;
 
-    @Column(name = "unit_id")
+    @Column(name = "unit")
     public String unit;
 
-    @Column(name = "unit_id")
+    @Column(name = "data_type")
     public String data_type;
 
-    @Column(name = "unit_id")
+    @Column(name = "photographic_evidence")
     public String photographic_evidence;
 
-    @Column(name = "unit_id")
+    @Column(name = "no_of_times")
     public String no_of_times;
 
-    @Column(name = "unit_id")
+    @Column(name = "duration_unit")
     public String duration_unit;
 
-    @Column(name = "unit_id")
+    @Column(name = "duration_type")
     public String duration_type;
 
-    @Column(name = "unit_id")
+    @Column(name = "utility_identifier")
     public String utility_identifier;
 
-    @Column(name = "unit_id")
+    @Column(name = "tooltip")
     public String tooltip;
 
-    @Column(name = "unit_id")
+    @Column(name = "tare_weight")
     public boolean tare_weight;
 
-    @Column(name = "unit_id")
+    @Column(name = "isChecked")
     public boolean isChecked;
 
     public SensorTable(){

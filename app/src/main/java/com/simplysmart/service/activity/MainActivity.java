@@ -254,6 +254,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     }
 
     private void deleteAllMatrixData() {
+        List<MatrixTable> matrixTables = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
+
+        for(int i =0;i<matrixTables.size();i++){
+            new Delete().from(SensorTable.class).where("utility_identifier = ?",matrixTables.get(i).utility_id).execute();
+        }
+
         new Delete().from(MatrixTable.class).where("unit_id = ?", GlobalData.getInstance().getSelectedUnitId()).execute();
     }
 

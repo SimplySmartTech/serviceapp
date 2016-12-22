@@ -12,10 +12,10 @@ import android.widget.LinearLayout;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.InputFormActivity;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.model.matrix.SensorData;
+import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.viewholder.ChildViewHolder;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by shekhar on 20/10/16.
@@ -24,13 +24,12 @@ import java.util.ArrayList;
 public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
 
     private Context mContext;
-    private ArrayList<SensorData> sensorData;
+    private List<SensorTable> sensorData;
     private Typeface textTypeface;
 
-    public SensorListAdapter(Context context, ArrayList<SensorData> data) {
+    public SensorListAdapter(Context context, List<SensorTable> data) {
         mContext = context;
         sensorData = data;
-
     }
 
     @Override
@@ -41,27 +40,28 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
 
     @Override
     public void onBindViewHolder(ChildViewHolder holder, final int position) {
-        final SensorData data = sensorData.get(position);
-        String sensorName = "";
+        final SensorTable data = sensorData.get(position);
+        String sensorName ="";
+        String tooltip = "";
         String unit;
-        if (data != null && data.getSensor_name() != null) {
-            sensorName = data.getSensor_name();
+        if (data != null && data.sensor_name != null) {
+            sensorName = data.sensor_name;
         }
 
-        if (data != null && data.getUnit() != null) {
-            unit = data.getUnit();
+        if (data != null && data.unit != null) {
+            unit = data.unit;
         } else {
             unit = "";
         }
 
-        String tooltip = "";
-        if (data != null && data.getTooltip() != null && !data.getTooltip().equals("")) {
-            tooltip = data.getTooltip();
-            holder.unit.setText(data.getTooltip());
+        if (data!=null && data.tooltip != null && !data.tooltip.equalsIgnoreCase("")) {
+            tooltip = data.tooltip;
+            holder.unit.setText(tooltip);
         } else {
             holder.unit.setVisibility(View.GONE);
             holder.sensor_name.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         }
+
 
         if (unit.contains("\\")) {
             holder.sensor_name.setText(sensorName + "( " + "\u00B0" + " C)");
@@ -69,11 +69,13 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
             holder.sensor_name.setText(sensorName + "( " + unit + ")");
         }
 
+        final String finalSensorName = sensorName;
         holder.sensor_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(mContext, InputFormActivity.class);
-                i.putExtra(StringConstants.SENSOR_DATA, data);
+                i.putExtra(StringConstants.UTILITY_ID, data.utility_identifier);
+                i.putExtra(StringConstants.SENSOR_NAME, finalSensorName);
                 mContext.startActivity(i);
             }
         });
@@ -82,7 +84,8 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(mContext, InputFormActivity.class);
-                i.putExtra(StringConstants.SENSOR_DATA, data);
+                i.putExtra(StringConstants.UTILITY_ID, data.utility_identifier);
+                i.putExtra(StringConstants.SENSOR_NAME, finalSensorName);
                 mContext.startActivity(i);
             }
         });
