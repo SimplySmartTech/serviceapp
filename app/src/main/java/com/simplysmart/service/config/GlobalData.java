@@ -3,6 +3,7 @@ package com.simplysmart.service.config;
 import android.app.Application;
 import android.content.Context;
 
+import com.activeandroid.ActiveAndroid;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 
@@ -14,7 +15,7 @@ import io.realm.Realm;
 /**
  * Created by shekhar on 17/8/15.
  */
-public class GlobalData extends Application {
+public class GlobalData extends com.activeandroid.app.Application {
 
     public static GlobalData mGlobalData;
 
@@ -33,7 +34,7 @@ public class GlobalData extends Application {
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
-
+        ActiveAndroid.initialize(this);
     }
 
     @Override

@@ -42,6 +42,11 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -74,6 +79,9 @@ dependencies {
 
     //Image downloader library
     compile 'com.squareup.picasso:picasso:2.5.2'
+
+    //----- Handle local database operations
+    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
 
     //Used to parse google play store page
     compile 'org.jsoup:jsoup:1.8.3'

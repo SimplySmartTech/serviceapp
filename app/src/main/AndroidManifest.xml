@@ -122,6 +122,19 @@
             android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService"
             android:enabled="true" />
 
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="ServiceAppData.db" />
+
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="1" />
+
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="com.simplysmart.service.database.MatrixTable" />
+
+
     </application>
 
 </manifest>
