@@ -166,6 +166,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     public void refreshLayout() {
         if (NetworkUtilities.isInternet(this)) {
             swipeRefreshLayout.setRefreshing(true);
+            setOfflineData();
             getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
         } else {
             swipeRefreshLayout.setRefreshing(true);
@@ -176,7 +177,9 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
     private void setOfflineData() {
         List<MatrixTable> list = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
-        setDataInList(list);
+        if(list!=null && list.size()>0) {
+            setDataInList(list);
+        }
     }
 
     private void uncheckAllMenuItems(NavigationView navigationView) {

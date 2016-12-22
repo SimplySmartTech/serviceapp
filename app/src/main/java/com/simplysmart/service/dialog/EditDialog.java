@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -201,11 +202,25 @@ public class EditDialog extends DialogFragment {
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,pos,"");
                 dismiss();
             }
         });
 
         builder.setView(dialogView);
+
+        // Makes dialog non cancelable but resolves problem of edit swipe getting frozen.
+        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
+                EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,pos,"");
+                dismiss();
+                return true;
+            }
+        });
+
         return builder.create();
     }
 }
