@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
@@ -61,8 +62,13 @@ public class EditDialog extends DialogFragment {
         TextView unit = (TextView) dialogView.findViewById(R.id.unit);
         final EditText newReading = (EditText) dialogView.findViewById(R.id.reading);
         Button dialogNegativeButton = (Button) dialogView.findViewById(R.id.dialogButtonNegative);
-        Button dialogPositiveButton = (Button) dialogView.findViewById(R.id.dialogButtonPositive);
+        final Button dialogPositiveButton = (Button) dialogView.findViewById(R.id.dialogButtonPositive);
         ImageView close = (ImageView) dialogView.findViewById(R.id.close);
+        final Button backButton = (Button)dialogView.findViewById(R.id.backButton);
+        final EditText remarks = (EditText)dialogView.findViewById(R.id.remarks);
+
+        final RelativeLayout readingLayout = (RelativeLayout)dialogView.findViewById(R.id.readingLayout);
+        final RelativeLayout remarksLayout = (RelativeLayout)dialogView.findViewById(R.id.remarksLayout);
 
         Bundle bundle = getArguments();
         String utilityId = bundle.getString(utility_id);
@@ -85,6 +91,8 @@ public class EditDialog extends DialogFragment {
         unit.setText(readingDataRealm.getUnit());
         newReading.setText(readingDataRealm.getValue());
         newReading.setCursorVisible(false);
+
+        dialogPositiveButton.setText("NEXT");
 
         newReading.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,23 +127,34 @@ public class EditDialog extends DialogFragment {
         dialogPositiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!newReading.getText().equals("")) {
-                    String string = newReading.getText().toString();
-                    try {
-                        realm.beginTransaction();
-                        readingDataRealm.setValue(string);
-                        realm.commitTransaction();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                if(dialogPositiveButton.getText().toString().equalsIgnoreCase("NEXT")){
+                    addRemarks();
+                }else {
+                    if (!newReading.getText().equals("")) {
+                        String string = newReading.getText().toString();
+                        try {
+                            realm.beginTransaction();
+                            readingDataRealm.setValue(string);
+                            realm.commitTransaction();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                        editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingDataRealm.getUnit());
+                        dismiss();
+                    } else {
+                        EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                        editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
+                        dismiss();
                     }
-                    EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                    editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingDataRealm.getUnit());
-                    dismiss();
-                } else {
-                    EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                    editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
-                    dismiss();
                 }
+            }
+
+            private void addRemarks() {
+                readingLayout.setVisibility(View.GONE);
+                backButton.setVisibility(View.VISIBLE);
+                remarksLayout.setVisibility(View.VISIBLE);
+                dialogPositiveButton.setText("UPDATE");
             }
         });
 
@@ -153,6 +172,16 @@ public class EditDialog extends DialogFragment {
                 EditDialogListener editDialogListener = (EditDialogListener) getActivity();
                 editDialogListener.updateResult(StringConstants.VALUE_DELETED, pos, "");
                 dismiss();
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                remarksLayout.setVisibility(View.GONE);
+                readingLayout.setVisibility(View.VISIBLE);
+                backButton.setVisibility(View.GONE);
+                dialogPositiveButton.setText("NEXT");
             }
         });
 
