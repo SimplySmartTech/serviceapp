@@ -364,6 +364,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                         tare_weight = tareWeightsList.get(position - 1).getValue();
                         mCustomTareWeightLayout.setVisibility(View.GONE);
                     } else if (position == 0) {
+                        tare_weight = "";
                         mCustomTareWeightLayout.setVisibility(View.VISIBLE);
                         mTareWeightUnit.setText(sensorData.getUnit());
                     } else {
@@ -410,6 +411,24 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             return false;
         }
 
+        if(tare_weight==null || tare_weight.equalsIgnoreCase("")) {
+            if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
+                int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
+                if (weight <= 0) {
+                    showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+                    return false;
+                }
+            }
+        }else {
+            if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("")) {
+                int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(tare_weight);
+                if (weight <= 0) {
+                    showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+                    return false;
+                }
+            }
+        }
+
 //        if (needSpinner) {
 //
 //            if (mCustomTareWeightLayout.getVisibility() != View.VISIBLE) {
@@ -434,13 +453,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 //                    return false;
 //                }
 //
-//                if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
-//                    int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
-//                    if (weight <= 0) {
-//                        showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
-//                        return false;
-//                    }
-//                } else {
+//                     if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
+//                          int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
+//                              if (weight <= 0) {
+//                                showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+//                              return false;
+//                              }
+//                      } else {
 //                    if (mInputReadingValue.getText() == null) {
 //                        showSnackBar(mParentLayout, "Please enter reading.", false);
 //                        return false;
@@ -452,6 +471,8 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 //            }
 //
 //        }
+
+
 
         return true;
     }
