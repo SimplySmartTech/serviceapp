@@ -35,8 +35,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="8dp"
-        android:padding="4dp"
         android:text="Confirm"
         android:textColor="@color/bw_color_white"
         android:textSize="14sp" />

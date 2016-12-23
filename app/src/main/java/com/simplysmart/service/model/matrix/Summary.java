@@ -13,6 +13,7 @@ public class Summary {
     private long timestamp;
     private boolean header;
     private boolean isUploaded;
+    private boolean edited;
 
     public String getName() {
         return name;
@@ -76,5 +77,13 @@ public class Summary {
 
     public void setUploaded(boolean uploaded) {
         isUploaded = uploaded;
+    }
+
+    public boolean isEdited() {
+        return edited;
+    }
+
+    public void setEdited(boolean edited) {
+        this.edited = edited;
     }
 }

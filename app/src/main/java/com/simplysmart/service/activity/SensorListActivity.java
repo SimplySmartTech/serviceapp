@@ -13,9 +13,7 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.model.matrix.MatrixData;
-import com.simplysmart.service.model.matrix.SensorData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SensorListActivity extends BaseActivity {

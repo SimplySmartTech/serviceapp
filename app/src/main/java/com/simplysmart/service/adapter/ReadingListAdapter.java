@@ -54,6 +54,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
     public void onBindViewHolder(final ReadingViewHolder holder, int position) {
         final ReadingTable readingTable = readingsList.get(position);
         String reading = readingTable.value + "  " + readingTable.unit;
+
         boolean imageFound = true;
         File image = null;
         try {
@@ -63,7 +64,13 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         }
 
         holder.reading.setText(reading);
-        holder.time.setText(readingTable.date);
+
+        String date = readingTable.date;
+        if(readingTable.updated_at!=0 && readingTable.remark!=null && !readingTable.remark.equalsIgnoreCase("")){
+            date+="  (Edited)";
+        }
+
+        holder.time.setText(date);
 
         if (imageFound) {
             setPic(holder.photo, image);

@@ -124,6 +124,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private void setDataForSummary() {
         int count = 0;
+        summaryList = new ArrayList<>();
         List<MatrixTable> matrixTableList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
         if (matrixTableList != null && matrixTableList.size() > 0) {
             for (MatrixTable matrixTable : matrixTableList) {
@@ -148,6 +149,12 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                                 summary.setLocalPhotoUrl(readingTable.local_photo_url);
                                 summary.setTimestamp(readingTable.timestamp);
                                 summary.setUploaded(readingTable.uploadedImage);
+
+                                if(readingTable.remark!=null && !readingTable.remark.equalsIgnoreCase("") && readingTable.updated_at!=0){
+                                    summary.setEdited(true);
+                                    summary.setTime(summary.getTime()+"  (Edited)");
+                                }
+
                                 if (!readingTable.uploadedImage) {
                                     count++;
                                 }
@@ -452,8 +459,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     @Override
     public void updateResult(int done, int position, String value) {
         if (done == StringConstants.NEW_VALUE) {
-            adapter.getData().get(position).setValue(value);
-            adapter.notifyItemChanged(position);
+            setDataForSummary();
+            summary.scrollToPosition(position);
         }
     }
 }

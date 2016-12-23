@@ -13,32 +13,30 @@
         android:weightSum="1.0"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:background="?attr/selectableItemBackground">
+        android:background="@color/colorPrimaryDark">
 
         <TextView
             android:id="@+id/typeName"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0.45"
-            android:background="@color/colorPrimary"
             android:ellipsize="end"
             android:gravity="center"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:text="Weight Sensor"
+            android:text=""
             android:textColor="@color/bw_color_white"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/unit"
-            android:text="@string/dummy_text"
+            android:text=""
             android:layout_weight="0.55"
             android:gravity="center"
             android:maxLines="3"
             android:ellipsize="end"
             android:textColor="@color/bw_color_dark_gray"
-            android:background="@color/colorPrimary"
             android:textSize="13sp"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
