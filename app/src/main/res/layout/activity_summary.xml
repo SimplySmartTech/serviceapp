@@ -31,11 +31,11 @@
 
     <Button
         android:id="@+id/submit"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_margin="8dp"
-        android:background="@color/accent"
         android:padding="4dp"
         android:text="Confirm"
         android:textColor="@color/bw_color_white"

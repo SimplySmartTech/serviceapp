@@ -94,7 +94,7 @@ public class EditDialog extends DialogFragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length()>0){
+                if (s.length() > 0) {
                     remark_mandatory_text.setVisibility(View.GONE);
                 }
             }
@@ -161,7 +161,7 @@ public class EditDialog extends DialogFragment {
                     EditDialogListener editDialogListener = (EditDialogListener) getActivity();
                     editDialogListener.updateResult(StringConstants.NEW_VALUE, pos, string + " " + readingTable.unit);
                     dismiss();
-                }else {
+                } else {
                     remark_mandatory_text.setVisibility(View.VISIBLE);
                 }
             }
@@ -203,7 +203,7 @@ public class EditDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,pos,"");
+                editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
                 dismiss();
             }
         });
@@ -214,10 +214,13 @@ public class EditDialog extends DialogFragment {
         builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
             public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
-                EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                editDialogListener.updateResult(StringConstants.NO_NEW_VALUE,pos,"");
-                dismiss();
-                return true;
+                if (i == KeyEvent.KEYCODE_BACK) {
+                    EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+                    editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
+                    dismiss();
+                    return true;
+                }
+                return false;
             }
         });
 

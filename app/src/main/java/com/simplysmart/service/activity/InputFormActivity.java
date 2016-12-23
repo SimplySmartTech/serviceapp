@@ -106,6 +106,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private SensorTable sensorData;
     private int groupPosition;
     private int childPosition;
+    private LinearLayout readingsLayout;
 
     private ReadingData readingData;
     private boolean imageTaken = false;
@@ -145,22 +146,11 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
         bindViews();
 
-        List<ReadingTable> readings = ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name);
-        if (readings != null && readings.size() > 0) {
-            String oldDate = getDate(readings.get(0).timestamp, "dd-MM-yyyy");
-            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
-            if (!oldDate.equals(newDate)) {
-                SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
-                dialog.setCancelable(false);
-                dialog.show(getFragmentManager(), "submitDialog");
-            }
-
-            setDataInList(readings);
-        }
-
         initialiseViews();
         setupUI(mParentLayout);
         initSwipe();
+
+        checkForPreviousData();
     }
 
     private void setDataInList(List<ReadingTable> readings) {
@@ -176,6 +166,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
         readingList.setVisibility(View.VISIBLE);
+        readingsLayout.setVisibility(View.VISIBLE);
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {
@@ -224,6 +215,27 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkForPreviousData();
+    }
+
+    private void checkForPreviousData(){
+        List<ReadingTable> readings = ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name);
+        if (readings != null && readings.size() > 0) {
+            String oldDate = getDate(readings.get(0).timestamp, "dd-MM-yyyy");
+            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
+            if (!oldDate.equals(newDate)) {
+                SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
+                dialog.setCancelable(false);
+                dialog.show(getFragmentManager(), "submitDialog");
+            }
+
+            setDataInList(readings);
+        }
+    }
+
     private void bindViews() {
         mParentLayout = (LinearLayout) findViewById(R.id.parentLayout);
         mInputReadingValue = (EditText) findViewById(R.id.reading);
@@ -236,6 +248,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         mCustomTareWeightLayout = (RelativeLayout) findViewById(R.id.custom_tare_weight_layout);
         mTareWeightEditText = (EditText) findViewById(R.id.tare_weight_edittext);
         mTareWeightUnit = (TextView) findViewById(R.id.tare_weight_unit);
+        readingsLayout = (LinearLayout)findViewById(R.id.readingsLayout);
         String unitOfSensor = sensorData.unit;
         if (unitOfSensor.contains("\\")) {
             unit.setText("\u00B0 C");
@@ -243,6 +256,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             unit.setText(sensorData.unit);
         }
 
+        readingsLayout.setVisibility(GONE);
         mInputReadingValue.clearFocus();
         CommonMethod.hideKeyboard(this);
     }
