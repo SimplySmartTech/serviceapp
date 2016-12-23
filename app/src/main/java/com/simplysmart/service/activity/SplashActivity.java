@@ -20,7 +20,7 @@ import java.io.File;
  * Created by Shekhar on 4/8/15.
  * Splash screen play landing app logo video.
  */
-public class SplashActivity extends Activity {
+public class SplashActivity extends BaseActivity {
 
     private boolean isLogin;
     private static final int SPLASH_TIME_OUT = 1000;
@@ -36,7 +36,12 @@ public class SplashActivity extends Activity {
         SharedPreferences.Editor userInfoEdit = UserInfo.edit();
         isLogin = UserInfo.getBoolean("isLogin", false);
 
-        switchToNextActivity();
+        if(UserInfo.getBoolean("logOutUser",true)){
+            userInfoEdit.putBoolean("logOutUser",false);
+            logout();
+        }else {
+            switchToNextActivity();
+        }
     }
 
     private void switchToNextActivity() {
@@ -58,5 +63,10 @@ public class SplashActivity extends Activity {
                 finish();
             }
         }, SPLASH_TIME_OUT);
+    }
+
+    @Override
+    protected int getStatusBarColor() {
+        return 0;
     }
 }
