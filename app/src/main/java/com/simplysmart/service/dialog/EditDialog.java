@@ -27,13 +27,14 @@ import com.simplysmart.service.interfaces.EditDialogListener;
 
 import java.util.Calendar;
 
-public class EditDialog extends DialogFragment {
+public class EditDialog extends DialogFragment implements DialogInterface.OnCancelListener{
 
     private static String utility_id = "UTILITY_ID";
     private static String sensor_name = "SENSOR_NAME";
     private static String timestamp = "TIMESTAMP";
     private static String position = "POSITION";
     private boolean edit = false;
+    private int pos=0;
 
     private ReadingTable readingTable;
 
@@ -81,7 +82,7 @@ public class EditDialog extends DialogFragment {
         String unitId = GlobalData.getInstance().getSelectedUnitId();
         String sensorName = bundle.getString(sensor_name);
         long time = bundle.getLong(timestamp);
-        final int pos = bundle.getInt(position);
+        pos = bundle.getInt(position);
         this.edit = bundle.getBoolean(StringConstants.EDIT);
 
         readingTable = ReadingTable.getReading(time);
@@ -210,20 +211,14 @@ public class EditDialog extends DialogFragment {
 
         builder.setView(dialogView);
 
-        // Makes dialog non cancelable but resolves problem of edit swipe getting frozen.
-        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialogInterface, int i, KeyEvent keyEvent) {
-                if (i == KeyEvent.KEYCODE_BACK) {
-                    EditDialogListener editDialogListener = (EditDialogListener) getActivity();
-                    editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
-                    dismiss();
-                    return true;
-                }
-                return false;
-            }
-        });
-
         return builder.create();
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        super.onCancel(dialog);
+        EditDialogListener editDialogListener = (EditDialogListener) getActivity();
+        editDialogListener.updateResult(StringConstants.NO_NEW_VALUE, pos, "");
+        dismiss();
     }
 }

@@ -204,7 +204,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     @Override
     public void updateResult(int newValue, int position, String value) {
         if (newValue == StringConstants.NEW_VALUE) {
-            readingListAdapter = new ReadingListAdapter(ReadingTable.getReadings(sensorData.utility_identifier,sensorData.sensor_name),this,getFragmentManager());
+            readingListAdapter = new ReadingListAdapter(ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name), this, getFragmentManager());
             readingList.setAdapter(readingListAdapter);
             readingListAdapter.notifyDataSetChanged();
         } else if (newValue == StringConstants.VALUE_DELETED) {
@@ -221,7 +221,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         checkForPreviousData();
     }
 
-    private void checkForPreviousData(){
+    private void checkForPreviousData() {
         List<ReadingTable> readings = ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name);
         if (readings != null && readings.size() > 0) {
             String oldDate = getDate(readings.get(0).timestamp, "dd-MM-yyyy");
@@ -248,7 +248,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         mCustomTareWeightLayout = (RelativeLayout) findViewById(R.id.custom_tare_weight_layout);
         mTareWeightEditText = (EditText) findViewById(R.id.tare_weight_edittext);
         mTareWeightUnit = (TextView) findViewById(R.id.tare_weight_unit);
-        readingsLayout = (LinearLayout)findViewById(R.id.readingsLayout);
+        readingsLayout = (LinearLayout) findViewById(R.id.readingsLayout);
         String unitOfSensor = sensorData.unit;
         if (unitOfSensor.contains("\\")) {
             unit.setText("\u00B0 C");
@@ -442,8 +442,21 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             return false;
         }
 
+        if (needSpinner) {
+            if (mCustomTareWeightLayout.getVisibility() != View.VISIBLE) {
+                if (tare_weight == null || tare_weight.equals("")) {
+                    showSnackBar(mParentLayout, "Please select tare weight.", false);
+                    return false;
+                }
+            }else {
+                if (mTareWeightEditText.getText() == null || mTareWeightEditText.getText().toString().equalsIgnoreCase("")) {
+                    showSnackBar(mParentLayout, "Please enter tare weight.", false);
+                    return false;
+                }
+            }
+        }
+
 //        if (needSpinner) {
-//
 //            if (mCustomTareWeightLayout.getVisibility() != View.VISIBLE) {
 //                if (tare_weight == null || tare_weight.equals("")) {
 //                    showSnackBar(mParentLayout, "Please select tare weight.", false);
@@ -466,13 +479,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 //                    return false;
 //                }
 //
-//                     if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
-//                          int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
-//                              if (weight <= 0) {
-//                                showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
-//                              return false;
-//                              }
-//                      } else {
+//                if (mInputReadingValue.getText() != null && !mInputReadingValue.getText().toString().equals("") && mTareWeightEditText.getText() != null && !mTareWeightEditText.getText().toString().equals("")) {
+//                    int weight = Integer.parseInt(mInputReadingValue.getText().toString()) - Integer.parseInt(mTareWeightEditText.getText().toString());
+//                    if (weight <= 0) {
+//                        showSnackBar(mParentLayout, "Net weight must be greater than tare weight.", false);
+//                        return false;
+//                    }
+//                } else {
 //                    if (mInputReadingValue.getText() == null) {
 //                        showSnackBar(mParentLayout, "Please enter reading.", false);
 //                        return false;
@@ -901,7 +914,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void showEditDialog(ReadingTable readingTable, int position) {
         EditDialog newDialog = EditDialog.newInstance(readingTable, position, true);
-        newDialog.setCancelable(false);
         newDialog.show(getFragmentManager(), "show_dialog");
     }
 
