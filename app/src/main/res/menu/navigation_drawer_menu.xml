@@ -5,9 +5,38 @@
     <group android:id="@+id/plants"
         android:checkableBehavior="single"
         android:visible="true"
-        android:enabled="true" ></group>
-    <group android:id="@+id/backdata"
-        android:checkableBehavior="single"
-        android:visible="true"
-        android:enabled="true" ></group>>
+        android:orderInCategory="0"
+        android:enabled="true" >
+    </group>
+
+    <group
+        android:id="@+id/others"
+        android:orderInCategory="1"
+        android:enabled="true"
+        android:visible="true">
+        <item
+            android:id="@+id/attendance"
+            android:orderInCategory="1"
+            android:enabled="true"
+            android:visible="true"
+            android:title="Attendance"
+            android:icon="@drawable/ic_supervisor_account_black_24dp"/>
+
+        <item
+            android:id="@+id/visitors"
+            android:orderInCategory="1"
+            android:enabled="true"
+            android:visible="true"
+            android:title="Visitors"
+            android:icon="@drawable/ic_account_circle_black_24dp"/>
+
+        <item
+            android:id="@+id/complaints"
+            android:orderInCategory="1"
+            android:enabled="true"
+            android:visible="true"
+            android:title="Complaints"
+            android:icon="@drawable/ic_border_color_black_24dp"/>
+
+    </group>
 </menu>

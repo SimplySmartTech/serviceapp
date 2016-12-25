@@ -228,7 +228,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
             if (!oldDate.equals(newDate)) {
                 SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
-                dialog.setCancelable(false);
                 dialog.show(getFragmentManager(), "submitDialog");
             }
 

@@ -35,4 +35,10 @@ public class StringConstants {
 
     public static final int IMAGE_CHANGED = 1;
     public static final int IMAGE_NOT_CHANGED = -1;
+
+    public static final int ORDER_PLANTS = 0;
+    public static final int ORDER_ATTENDANCE = 1;
+    public static final int ORDER_COMPLAINTS = 2;
+    public static final int ORDER_VISITORS = 3;
+
 }
