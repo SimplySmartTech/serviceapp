@@ -4,17 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,13 +39,14 @@ import com.simplysmart.service.interfaces.MandatoryReading;
 import com.simplysmart.service.interfaces.SubmitWithoutInternet;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.AllReadingsData;
-import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.Metric;
 import com.simplysmart.service.model.matrix.Reading;
 import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.service.PhotoUploadService;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -73,6 +68,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private boolean initializeUpload = false;
     private Button submit, add_new_data;
     private TextView no_data_found;
+    private ArrayList<String> dates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +90,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
+        dates = new ArrayList<>();
 
         submit = (Button) findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
@@ -111,13 +108,35 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         summary = (RecyclerView) findViewById(R.id.summary);
         summaryList = new ArrayList<>();
         showActivitySpinner();
+        findListOfDates();
         setDataForSummary();
         dismissActivitySpinner();
 
     }
 
-    private void showMandatoryDialog(String mandatory) {
+    private void findListOfDates() {
+        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
+        for(int i = 0 ;i<allReadings.size();i++){
+            String date = allReadings.get(i).date;
+            if(dates.size()>0){
+                if(!dates.contains(date)){
+                    dates.add(date);
+                }
+            }else {
+                dates.add(date);
+            }
+        }
 
+        Collections.sort(dates, new Comparator<String>() {
+            @Override
+            public int compare(String lhs, String rhs) {
+                return lhs.compareToIgnoreCase(rhs);
+            }
+        });
+
+    }
+
+    private void showMandatoryDialog(String mandatory) {
         AlertDialogMandatory alertDialogMandatory = AlertDialogMandatory.newInstance("Alert", "We strongly recommend you enter the mandatory readings :" + mandatory, "", "OK");
         alertDialogMandatory.show(getFragmentManager(), "alertDialogMandatory");
     }

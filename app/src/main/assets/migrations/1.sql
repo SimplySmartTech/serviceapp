@@ -1,0 +1,1 @@
+ALTER TABLE reading ADD COLUMN date_of_reading VARCHAR

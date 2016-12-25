@@ -53,6 +53,9 @@ public class ReadingTable extends Model {
     @Column(name = "updated_at")
     public long updated_at;
 
+    @Column(name = "date_of_reading")
+    public String date_of_reading;
+
     public ReadingTable() {
         super();
     }
@@ -96,4 +99,10 @@ public class ReadingTable extends Model {
                 .execute();
     }
 
+    public static List<ReadingTable> getAllReadings(String unit_id){
+        return new Select()
+                .from(ReadingTable.class)
+                .where("unit_id = ?",unit_id)
+                .execute();
+    }
 }
