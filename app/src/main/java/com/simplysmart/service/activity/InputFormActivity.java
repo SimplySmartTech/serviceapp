@@ -218,7 +218,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     @Override
     protected void onResume() {
         super.onResume();
-        checkForPreviousData();
     }
 
     private void checkForPreviousData() {

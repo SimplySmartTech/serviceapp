@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:text="Confirm"
+        android:layout_margin="4dp"
         android:textColor="@color/bw_color_white"
         android:textSize="14sp" />
 

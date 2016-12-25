@@ -4,10 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -69,17 +67,6 @@ public class SubmitReadingDialog extends DialogFragment implements View.OnClickL
         dialogNegativeButton.setOnClickListener(this);
         dialogPositiveButton.setOnClickListener(this);
 
-        builder.setOnKeyListener(new DialogInterface.OnKeyListener() {
-            @Override
-            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
-                if(keyCode == KeyEvent.KEYCODE_BACK){
-                    getActivity().finish();
-                    dismiss();
-                }
-                return true;
-            }
-        });
-
         builder.setView(dialogView);
         return builder.create();
     }
@@ -88,7 +75,6 @@ public class SubmitReadingDialog extends DialogFragment implements View.OnClickL
     public void onClick(View v) {
 
         if (v.getId() == R.id.dialogButtonNegative) {
-            getActivity().finish();
             dismiss();
         }
 
