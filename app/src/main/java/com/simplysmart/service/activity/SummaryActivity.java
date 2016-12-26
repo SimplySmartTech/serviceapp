@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,10 +45,11 @@ import com.simplysmart.service.model.matrix.Reading;
 import com.simplysmart.service.model.matrix.Summary;
 import com.simplysmart.service.service.PhotoUploadService;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -69,6 +71,10 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
     private Button submit, add_new_data;
     private TextView no_data_found;
     private ArrayList<String> dates;
+    private FloatingActionButton fab;
+    private String dateForReadings = "";
+    private boolean yesterday = true;
+    private SimpleDateFormat sdf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +94,15 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
             startService(i);
         }
 
+        sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        bindViews();
+        showActivitySpinner();
+        findListOfDates();
+        setDataForSummary();
+        dismissActivitySpinner();
+    }
+
+    private void bindViews() {
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         allReadingData = new AllReadingsData();
         dates = new ArrayList<>();
@@ -107,33 +122,74 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
         summary = (RecyclerView) findViewById(R.id.summary);
         summaryList = new ArrayList<>();
-        showActivitySpinner();
-        findListOfDates();
-        setDataForSummary();
-        dismissActivitySpinner();
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (yesterday) {
+                    yesterday = false;
+                    dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+                    setDataForSummary();
+                    fab.setImageResource(R.drawable.yesterday);
+                    getSupportActionBar().setTitle("Summary : " + dateForReadings);
+                } else {
+                    yesterday = true;
+                    Calendar c = Calendar.getInstance();
+                    c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
+                    dateForReadings = sdf.format(c.getTimeInMillis());
+                    setDataForSummary();
+                    fab.setImageResource(R.drawable.today);
+                    getSupportActionBar().setTitle("Summary : " + dateForReadings);
+                }
+            }
+        });
 
     }
 
     private void findListOfDates() {
+        dates = new ArrayList<>();
         List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
-        for(int i = 0 ;i<allReadings.size();i++){
-            String date = allReadings.get(i).date;
-            if(dates.size()>0){
-                if(!dates.contains(date)){
+        for (int i = 0; i < allReadings.size(); i++) {
+            String date = allReadings.get(i).date_of_reading;
+            if (dates.size() > 0) {
+                if (!dates.contains(date)) {
                     dates.add(date);
                 }
-            }else {
+            } else {
                 dates.add(date);
             }
         }
 
-        Collections.sort(dates, new Comparator<String>() {
-            @Override
-            public int compare(String lhs, String rhs) {
-                return lhs.compareToIgnoreCase(rhs);
-            }
-        });
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
+        dateForReadings = sdf.format(c.getTimeInMillis());
 
+        if (dates.size() > 0) {
+            if (dates.contains(dateForReadings)) {
+                setDataForSummary();
+                yesterday = true;
+                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+            } else {
+                yesterday = false;
+                dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+                setDataForSummary();
+                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+            }
+
+            if(dates.size()>1) {
+                fab.setVisibility(View.VISIBLE);
+            }else {
+                fab.setVisibility(View.GONE);
+            }
+
+        } else {
+            yesterday = false;
+            fab.setVisibility(View.GONE);
+            dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+            setDataForSummary();
+            getSupportActionBar().setTitle("Summary : "+dateForReadings);
+        }
     }
 
     private void showMandatoryDialog(String mandatory) {
@@ -150,7 +206,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
                 if (sensorTableList != null && sensorTableList.size() > 0) {
                     for (SensorTable sensorTable : sensorTableList) {
-                        List<ReadingTable> readingsList = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name);
+                        List<ReadingTable> readingsList = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name, dateForReadings);
                         if (readingsList.size() > 0) {
                             Summary header = new Summary();
                             header.setName(matrixTable.type);
@@ -158,7 +214,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                             header.setHeader(true);
                             summaryList.add(header);
 
-                            for(ReadingTable readingTable:readingsList){
+                            for (ReadingTable readingTable : readingsList) {
                                 Summary summary = new Summary();
 
                                 summary.setName(readingTable.sensor_name);
@@ -169,9 +225,9 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                                 summary.setTimestamp(readingTable.timestamp);
                                 summary.setUploaded(readingTable.uploadedImage);
 
-                                if(readingTable.remark!=null && !readingTable.remark.equalsIgnoreCase("") && readingTable.updated_at!=0){
+                                if (readingTable.remark != null && !readingTable.remark.equalsIgnoreCase("") && readingTable.updated_at != 0) {
                                     summary.setEdited(true);
-                                    summary.setTime(summary.getTime()+"  (Edited)");
+                                    summary.setTime(summary.getTime() + "  (Edited)");
                                 }
 
                                 if (!readingTable.uploadedImage) {
@@ -194,7 +250,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        adapter = new SummaryListAdapter(summaryList, this, getFragmentManager());
+        adapter = new SummaryListAdapter(summaryList, this, getFragmentManager(), yesterday);
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
@@ -203,8 +259,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         add_new_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(SummaryActivity.this,MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Intent i = new Intent(SummaryActivity.this, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
             }
         });
@@ -295,7 +351,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
-                        removeLocalData(GlobalData.getInstance().getSelectedUnitId());
+                        removeLocalData(GlobalData.getInstance().getSelectedUnitId(),dateForReadings);
                         dismissActivitySpinner();
                         hideList();
                     } else if (response.code() == 401) {
@@ -337,6 +393,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         add_new_data.setVisibility(View.VISIBLE);
         no_data_found.setVisibility(View.VISIBLE);
         no_data_found.setText(getString(R.string.readings_submitted));
+        findListOfDates();
     }
 
     private AllReadingsData getDataToSubmit() {
@@ -351,7 +408,7 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 if (sensorTableList != null && sensorTableList.size() > 0) {
                     for (SensorTable sensorTable : sensorTableList) {
 
-                        List<ReadingTable> readings = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name);
+                        List<ReadingTable> readings = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name, dateForReadings);
                         if (readings != null && readings.size() > 0) {
 
                             ArrayList<Reading> readingToSend = new ArrayList<>();
@@ -413,8 +470,8 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         public void onReceive(Context context, Intent intent) {
             ReadingTable rdr = null;
             if (intent != null && intent.getExtras() != null) {
-                long timestamp = intent.getLongExtra(StringConstants.TIMESTAMP,0);
-                if(timestamp!=0){
+                long timestamp = intent.getLongExtra(StringConstants.TIMESTAMP, 0);
+                if (timestamp != 0) {
                     rdr = ReadingTable.getReading(timestamp);
                 }
             }

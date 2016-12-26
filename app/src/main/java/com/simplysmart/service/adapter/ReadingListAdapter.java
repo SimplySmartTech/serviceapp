@@ -3,6 +3,7 @@ package com.simplysmart.service.adapter;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,14 @@ import com.simplysmart.service.viewholder.ReadingViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by shailendrapsp on 4/11/16.
@@ -30,12 +36,13 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
     private List<ReadingTable> readingsList;
     private Context mContext;
     private FragmentManager fragmentManager;
+    private SimpleDateFormat sdf;
 
     public ReadingListAdapter(List<ReadingTable> readingsList, Context mContext, FragmentManager fragmentManager) {
         this.readingsList = readingsList;
         this.mContext = mContext;
         this.fragmentManager = fragmentManager;
-
+        this.sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Collections.sort(readingsList, new Comparator<ReadingTable>() {
             @Override
             public int compare(ReadingTable lhs, ReadingTable rhs) {
@@ -70,6 +77,12 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
             date += "  (Edited)";
         }
 
+        if (dateBeforeToday(readingTable.timestamp)) {
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_very_light_grey));
+        } else {
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_white));
+        }
+
         holder.time.setText(date);
 
         if (imageFound) {
@@ -97,6 +110,8 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
 
             }
         });
+
+
     }
 
     @Override
@@ -140,5 +155,26 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
 
     public void setReadingsList(List<ReadingTable> readingsList) {
         this.readingsList = readingsList;
+    }
+
+    private boolean dateBeforeToday(long date) {
+        Calendar c = Calendar.getInstance();
+        String current = sdf.format(c.getTimeInMillis());
+        String reading = sdf.format(date);
+        Date currentDate = null;
+        Date readingDate = null;
+        try {
+            currentDate = sdf.parse(current);
+            readingDate = sdf.parse(reading);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (readingDate.before(currentDate)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

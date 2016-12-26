@@ -36,4 +36,5 @@
     <color name="textColorList">#b5b4b4</color>
     <color name="translucentToolbar">#66607D8B</color>
 
+    <color name = "reading_list_background_color">#FFF5B09F</color>
 </resources>

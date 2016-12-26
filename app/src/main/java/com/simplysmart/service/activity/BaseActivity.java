@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresPermission;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -451,6 +452,10 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void removeLocalData(String unit_id) {
         new Delete().from(ReadingTable.class).where("unit_id = ?",unit_id).execute();
+    }
+
+    protected void removeLocalData(String unit_id,String date){
+        new Delete().from(ReadingTable.class).where("unit_id = ?",unit_id).where("date_of_reading = ?",date).execute();
     }
 }
 

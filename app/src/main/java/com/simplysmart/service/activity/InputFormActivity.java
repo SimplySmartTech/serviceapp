@@ -610,10 +610,18 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void updateList(ReadingTable readingTable) {
         if (readingListAdapter != null) {
-            readingList.scrollToPosition(readingListAdapter.addElement(readingTable));
+            int pos = readingListAdapter.addElement(readingTable);
+            readingList.scrollToPosition(pos);
+            if(backdated){
+                showEditDialog(readingTable,pos);
+            }
+
         } else {
             List<ReadingTable> list = ReadingTable.getReadings(utility_id, sensor_name);
             setDataInList(list);
+            if(backdated){
+                showEditDialog(readingTable,0);
+            }
         }
     }
 

@@ -35,10 +35,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="Confirm"
         android:layout_margin="4dp"
+        android:text="Confirm"
         android:textColor="@color/bw_color_white"
         android:textSize="14sp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:src="@drawable/today" />
 
     <include layout="@layout/custom_error_layout" />
 

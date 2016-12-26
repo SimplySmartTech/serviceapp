@@ -68,6 +68,15 @@ public class ReadingTable extends Model {
                 .execute();
     }
 
+    public static List<ReadingTable> getReadings(String utility_id, String sensor_name, String date) {
+        return new Select()
+                .from(ReadingTable.class)
+                .where("utility_id = ?", utility_id)
+                .where("sensor_name = ?", sensor_name)
+                .where("date_of_reading = ?", date)
+                .execute();
+    }
+
     public static ReadingTable getReading(String utility_id, String sensor_name, long timestamp) {
         return new Select()
                 .from(ReadingTable.class)
@@ -84,25 +93,26 @@ public class ReadingTable extends Model {
                 .executeSingle();
     }
 
-    public static List<ReadingTable> getReadings(boolean imagesUploaded){
+    public static List<ReadingTable> getReadings(boolean imagesUploaded) {
         return new Select()
                 .from(ReadingTable.class)
-                .where("uploadedImage = ?",imagesUploaded)
+                .where("uploadedImage = ?", imagesUploaded)
                 .execute();
     }
 
-    public static List<ReadingTable> getReadings(String unit_id,boolean imagesUploaded){
+    public static List<ReadingTable> getReadings(String unit_id, boolean imagesUploaded) {
         return new Select()
                 .from(ReadingTable.class)
-                .where("unit_id = ?",unit_id)
-                .where("uploadedImage = ?",imagesUploaded)
+                .where("unit_id = ?", unit_id)
+                .where("uploadedImage = ?", imagesUploaded)
                 .execute();
     }
 
-    public static List<ReadingTable> getAllReadings(String unit_id){
+    public static List<ReadingTable> getAllReadings(String unit_id) {
         return new Select()
                 .from(ReadingTable.class)
-                .where("unit_id = ?",unit_id)
+                .where("unit_id = ?", unit_id)
                 .execute();
     }
+
 }

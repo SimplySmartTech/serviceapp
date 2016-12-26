@@ -2,6 +2,7 @@ package com.simplysmart.service.viewholder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
@@ -12,10 +13,13 @@ import com.simplysmart.service.R;
 
 public class SummaryHeaderViewHolder extends RecyclerView.ViewHolder {
 
-    public TextView logo,type;
+    public TextView logo, type;
+    public LinearLayout parentLayout;
+
     public SummaryHeaderViewHolder(View itemView) {
         super(itemView);
-        logo = (TextView)itemView.findViewById(R.id.logo);
-        type = (TextView)itemView.findViewById(R.id.type);
+        parentLayout = (LinearLayout) itemView.findViewById(R.id.parentLayout);
+        logo = (TextView) itemView.findViewById(R.id.logo);
+        type = (TextView) itemView.findViewById(R.id.type);
     }
 }

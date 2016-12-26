@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -23,7 +24,12 @@ import com.simplysmart.service.viewholder.SummaryViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by shailendrapsp on 4/11/16.
@@ -37,12 +43,16 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private Context mContext;
     private Typeface textTypeface;
     private FragmentManager fragmentManager;
+    private SimpleDateFormat sdf;
+    private boolean yesterday;
 
-    public SummaryListAdapter(ArrayList<Summary> data, Context mContext, FragmentManager fragmentManager) {
+    public SummaryListAdapter(ArrayList<Summary> data, Context mContext, FragmentManager fragmentManager, boolean yesterday) {
         this.data = data;
         this.mContext = mContext;
+        this.sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         this.textTypeface = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
         this.fragmentManager = fragmentManager;
+        this.yesterday = yesterday;
     }
 
     @Override
@@ -73,6 +83,12 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             viewHolder.type.setText(type);
             if (position == 0) {
 //                viewHolder.line.setVisibility(View.GONE);
+            }
+
+            if (yesterday) {
+                ((SummaryHeaderViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_very_light_grey));
+            } else {
+                ((SummaryHeaderViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_white));
             }
 
         } else {
@@ -123,6 +139,13 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             } else {
                 viewHolder.uploadImageBar.setVisibility(View.GONE);
             }
+
+            if (yesterday) {
+                ((SummaryViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_very_light_grey));
+            } else {
+                ((SummaryViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_white));
+            }
+
         }
     }
 
@@ -162,5 +185,26 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     public void setData(ArrayList<Summary> data) {
         this.data = data;
+    }
+
+    private boolean dateBeforeToday(long date) {
+        Calendar c = Calendar.getInstance();
+        String current = sdf.format(c.getTimeInMillis());
+        String reading = sdf.format(date);
+        Date currentDate = null;
+        Date readingDate = null;
+        try {
+            currentDate = sdf.parse(current);
+            readingDate = sdf.parse(reading);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (readingDate.before(currentDate)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
