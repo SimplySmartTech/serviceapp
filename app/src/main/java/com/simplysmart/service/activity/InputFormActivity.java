@@ -90,7 +90,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private LinearLayout mParentLayout;
     private RelativeLayout mCustomTareWeightLayout;
     private EditText mInputReadingValue, mTareWeightEditText;
-    private TextView unit, submitForm, titleList, mTareWeightUnit;
+    private TextView unit, submitForm, titleList, mTareWeightUnit,timeOld;
     private ImageView uploadImage;
     private Spinner tareWeightSpinner;
     private ImageView photoDone;
@@ -102,6 +102,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private String tare_weight = "";
     private String utility_id = "";
     private String sensor_name = "";
+    private String old_date;
 
     private SensorTable sensorData;
     private int groupPosition;
@@ -247,6 +248,8 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         mTareWeightEditText = (EditText) findViewById(R.id.tare_weight_edittext);
         mTareWeightUnit = (TextView) findViewById(R.id.tare_weight_unit);
         readingsLayout = (LinearLayout) findViewById(R.id.readingsLayout);
+        timeOld = (TextView) findViewById(R.id.time_old);
+
         String unitOfSensor = sensorData.unit;
         if (unitOfSensor.contains("\\")) {
             unit.setText("\u00B0 C");
@@ -430,6 +433,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
                         tare_weight = null;
                     }
                 }
+            }
+        });
+
+        timeOld.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

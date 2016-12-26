@@ -153,12 +153,20 @@
                             android:layout_centerVertical="true"
                             android:layout_marginBottom="8dp"
                             android:layout_marginEnd="16dp"
-                            android:inputType="numberDecimal"
                             android:padding="8dp"
                             android:textSize="16sp" />
 
                     </RelativeLayout>
 
+                    <TextView
+                        android:id="@+id/time_old"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:padding="8dp"
+                        android:text="--Click to select time of reading--"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp" />
 
                 </LinearLayout>
             </android.support.v7.widget.CardView>
