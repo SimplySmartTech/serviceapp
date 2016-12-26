@@ -5,22 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.view.Window;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.config.GlobalData;
-import com.simplysmart.service.config.StringConstants;
-
-import java.io.File;
 
 
 /**
  * Created by Shekhar on 4/8/15.
  * Splash screen play landing app logo video.
  */
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends Activity {
 
     private boolean isLogin;
     private static final int SPLASH_TIME_OUT = 1000;
@@ -36,10 +31,12 @@ public class SplashActivity extends BaseActivity {
         SharedPreferences.Editor userInfoEdit = UserInfo.edit();
         isLogin = UserInfo.getBoolean("isLogin", false);
 
-        if(UserInfo.getBoolean("logOutUser",true)){
-            userInfoEdit.putBoolean("logOutUser",false);
-            logout();
-        }else {
+        if (UserInfo.getBoolean("logOutUser", true)) {
+            userInfoEdit.putBoolean("logOutUser", false).apply();
+            Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+            startActivity(i);
+            finish();
+        } else {
             switchToNextActivity();
         }
     }
@@ -65,8 +62,4 @@ public class SplashActivity extends BaseActivity {
         }, SPLASH_TIME_OUT);
     }
 
-    @Override
-    protected int getStatusBarColor() {
-        return 0;
-    }
 }
