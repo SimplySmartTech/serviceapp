@@ -2,6 +2,7 @@ package com.simplysmart.service.activity;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -37,6 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
@@ -90,7 +92,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private LinearLayout mParentLayout;
     private RelativeLayout mCustomTareWeightLayout;
     private EditText mInputReadingValue, mTareWeightEditText;
-    private TextView unit, submitForm, titleList, mTareWeightUnit,timeOld;
+    private TextView unit, submitForm, titleList, mTareWeightUnit, timeOld;
     private ImageView uploadImage;
     private Spinner tareWeightSpinner;
     private ImageView photoDone;
@@ -102,7 +104,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private String tare_weight = "";
     private String utility_id = "";
     private String sensor_name = "";
-    private String old_date;
+    private long old_date = -1;
 
     private SensorTable sensorData;
     private int groupPosition;
@@ -118,6 +120,8 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     private ReadingListAdapter readingListAdapter;
     private Paint p = new Paint();
 
+    private boolean backdated;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,6 +132,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             sensor_name = getIntent().getStringExtra(StringConstants.SENSOR_NAME);
             groupPosition = getIntent().getIntExtra("groupPosition", -1);
             childPosition = getIntent().getIntExtra("childPosition", -1);
+            backdated = getIntent().getBooleanExtra(StringConstants.BACKDATA, false);
         } else {
             utility_id = "";
             sensor_name = "";
@@ -250,6 +255,12 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         readingsLayout = (LinearLayout) findViewById(R.id.readingsLayout);
         timeOld = (TextView) findViewById(R.id.time_old);
 
+        if (backdated) {
+            timeOld.setVisibility(View.VISIBLE);
+        } else {
+            timeOld.setVisibility(GONE);
+        }
+
         String unitOfSensor = sensorData.unit;
         if (unitOfSensor.contains("\\")) {
             unit.setText("\u00B0 C");
@@ -345,6 +356,13 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             }
         });
 
+        mTareWeightEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mTareWeightEditText.setCursorVisible(true);
+            }
+        });
+
         if (sensorData != null && sensorData.photographic_evidence != null && sensorData.photographic_evidence.equalsIgnoreCase("true")) {
             uploadImage.setVisibility(View.VISIBLE);
             middleLine.setVisibility(View.VISIBLE);
@@ -428,7 +446,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
                     if (needSpinner) {
                         tareWeightSpinner.setSelection(0);
-                        mCustomTareWeightLayout.setVisibility(View.GONE);
+                        mCustomTareWeightLayout.setVisibility(View.VISIBLE);
                         mTareWeightEditText.setText("");
                         tare_weight = null;
                     }
@@ -439,15 +457,52 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         timeOld.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                showTimePickerDialog();
             }
         });
+    }
+
+    private void showTimePickerDialog() {
+        Calendar c = Calendar.getInstance();
+
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                saveTimeOfReading(hourOfDay, minute);
+            }
+        }, hour, minute, false);
+
+        timePickerDialog.show();
+    }
+
+    private void saveTimeOfReading(int hourOfDay, int minute) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
+
+        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        c.set(Calendar.MINUTE, minute);
+
+        timeOld.setText("" + hourOfDay + " : " + minute);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.getDefault());
+        String time = simpleDateFormat.format(c.getTimeInMillis());
+        timeOld.setText(time);
+        old_date = c.getTimeInMillis();
     }
 
     private boolean validateFields() {
         if (mInputReadingValue.getText() == null || mInputReadingValue.getText().toString().equals("")) {
             showSnackBar(mParentLayout, "Please enter reading.", false);
             return false;
+        }
+
+        if (backdated) {
+            if (old_date == -1) {
+                showSnackBar(mParentLayout, "Please select time", false);
+                return false;
+            }
         }
 
         return true;
@@ -482,7 +537,9 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         uploadImage.setImageResource(R.drawable.ic_camera_alt_black_48dp);
         uploadImage.setAlpha(0.4f);
         uploadedImage = false;
-        mCustomTareWeightLayout.setVisibility(View.GONE);
+        old_date = -1;
+        timeOld.setText(getString(R.string.old_time_text));
+
         if (NetworkUtilities.isInternet(InputFormActivity.this)) {
             Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
             i.putExtra(StringConstants.USE_UNIT, false);
@@ -496,6 +553,9 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         mInputReadingValue.setText("");
         mCurrentPhotoPath = "";
         uploadedReadingUrl = "";
+        old_date = -1;
+
+        timeOld.setText(getString(R.string.old_time_text));
         imageTaken = false;
         uploadedImage = false;
         uploadImage.setAlpha(0.4f);
@@ -505,6 +565,8 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm aa", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
         String time = simpleDateFormat.format(calendar.getTimeInMillis());
 
         ReadingTable readingTable = new ReadingTable();
@@ -521,7 +583,6 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         }
 
         readingTable.local_photo_url = mCurrentPhotoPath;
-        readingTable.date = time;
         readingTable.unit = sensorData.unit;
 
         if (mCustomTareWeightLayout.getVisibility() == View.VISIBLE) {
@@ -531,7 +592,16 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             readingTable.tare_weight = tare_weight;
         }
 
-        readingTable.timestamp = calendar.getTimeInMillis();
+        if (backdated) {
+            readingTable.timestamp = old_date;
+            readingTable.date = timeOld.getText().toString();
+            readingTable.date_of_reading = sdf.format(old_date);
+        } else {
+            readingTable.timestamp = calendar.getTimeInMillis();
+            readingTable.date = time;
+            readingTable.date_of_reading = sdf.format(calendar.getTimeInMillis());
+        }
+
         readingTable.unit_id = GlobalData.getInstance().getSelectedUnitId();
         readingTable.save();
 
@@ -540,8 +610,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void updateList(ReadingTable readingTable) {
         if (readingListAdapter != null) {
-            readingListAdapter.addElement(readingTable);
-            readingList.scrollToPosition(0);
+            readingList.scrollToPosition(readingListAdapter.addElement(readingTable));
         } else {
             List<ReadingTable> list = ReadingTable.getReadings(utility_id, sensor_name);
             setDataInList(list);
@@ -802,6 +871,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     public void closeKeyboardAndCursor() {
         mInputReadingValue.setCursorVisible(false);
+        mTareWeightEditText.setCursorVisible(false);
         CommonMethod.hideKeyboard(InputFormActivity.this);
     }
 

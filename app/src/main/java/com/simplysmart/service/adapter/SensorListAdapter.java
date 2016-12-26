@@ -26,10 +26,12 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
     private Context mContext;
     private List<SensorTable> sensorData;
     private Typeface textTypeface;
+    private boolean backdated;
 
-    public SensorListAdapter(Context context, List<SensorTable> data) {
+    public SensorListAdapter(Context context, List<SensorTable> data,boolean backdated) {
         mContext = context;
         sensorData = data;
+        this.backdated = backdated;
     }
 
     @Override
@@ -76,6 +78,7 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
                 Intent i = new Intent(mContext, InputFormActivity.class);
                 i.putExtra(StringConstants.UTILITY_ID, data.utility_identifier);
                 i.putExtra(StringConstants.SENSOR_NAME, finalSensorName);
+                i.putExtra(StringConstants.BACKDATA,backdated);
                 mContext.startActivity(i);
             }
         });
@@ -86,6 +89,7 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
                 Intent i = new Intent(mContext, InputFormActivity.class);
                 i.putExtra(StringConstants.UTILITY_ID, data.utility_identifier);
                 i.putExtra(StringConstants.SENSOR_NAME, finalSensorName);
+                i.putExtra(StringConstants.BACKDATA,backdated);
                 mContext.startActivity(i);
             }
         });

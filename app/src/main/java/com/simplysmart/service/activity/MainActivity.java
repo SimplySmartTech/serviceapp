@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -31,7 +30,6 @@ import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
-import com.simplysmart.service.adapter.MatrixListAdapter;
 import com.simplysmart.service.adapter.MatrixTableAdapter;
 import com.simplysmart.service.common.VersionComprator;
 import com.simplysmart.service.config.ErrorUtils;
@@ -74,7 +72,7 @@ import retrofit2.Response;
 public class MainActivity extends BaseActivity implements LogoutListener {
 
 
-    private TextView no_data_found;
+    private TextView no_data_found,add_previous_reading;
     private RecyclerView matrixList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Button submitButton;
@@ -91,6 +89,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private boolean isRunning = true;
     private boolean backdated = false;
     private MatrixTableAdapter adapter;
+    private MatrixTableAdapter matrixTableAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,7 +178,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
     private void setOfflineData() {
         List<MatrixTable> list = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
-        if(list!=null && list.size()>0) {
+        if (list != null && list.size() > 0) {
             setDataInList(list);
         }
     }
@@ -305,10 +304,10 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             }
         });
 
-        adapter = new MatrixTableAdapter(this, list,backdated);
+        matrixTableAdapter = new MatrixTableAdapter(this, list, backdated);
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
         matrixList.setLayoutManager(gridLayoutManager);
-        matrixList.setAdapter(adapter);
+        matrixList.setAdapter(matrixTableAdapter);
     }
 
 
@@ -379,6 +378,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         submitButton = (Button) findViewById(R.id.submit);
         no_data_found = (TextView) findViewById(R.id.no_data_found);
         matrixList = (RecyclerView) findViewById(R.id.matrixList);
+        add_previous_reading = (TextView) findViewById(R.id.add_previous_reading);
 
         String buttonText;
         Calendar calendar = Calendar.getInstance();
@@ -457,6 +457,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         Unit unit = units.get(id);
 
                         backdated = false;
+                        submitButton.setVisibility(View.VISIBLE);
+                        add_previous_reading.setVisibility(View.GONE);
                         uncheckAllMenuItems(navigationView);
                         item.setChecked(true);
                         GlobalData.getInstance().setSelectedUnitId(unit.getId());
@@ -482,10 +484,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     }
 
     private void setUpActivityForBackdatedEntries() {
-        String title = GlobalData.getInstance().getSelectedUnit() + getString(R.string.previous_reading_title);
-        getSupportActionBar().setTitle(title);
+        add_previous_reading.setVisibility(View.VISIBLE);
         submitButton.setVisibility(View.GONE);
         backdated = true;
+        if (matrixTableAdapter != null) {
+            matrixTableAdapter.setBackdated(true);
+        }
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {
@@ -509,7 +513,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         logout();
         finish();
     }
-
 
     private class GetVersionCode extends AsyncTask<Void, String, String> {
         @Override

@@ -39,7 +39,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         Collections.sort(readingsList, new Comparator<ReadingTable>() {
             @Override
             public int compare(ReadingTable lhs, ReadingTable rhs) {
-                return (int)(rhs.timestamp-lhs.timestamp);
+                return (int) (rhs.timestamp - lhs.timestamp);
             }
         });
     }
@@ -66,8 +66,8 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         holder.reading.setText(reading);
 
         String date = readingTable.date;
-        if(readingTable.updated_at!=0 && readingTable.remark!=null && !readingTable.remark.equalsIgnoreCase("")){
-            date+="  (Edited)";
+        if (readingTable.updated_at != 0 && readingTable.remark != null && !readingTable.remark.equalsIgnoreCase("")) {
+            date += "  (Edited)";
         }
 
         holder.time.setText(date);
@@ -104,7 +104,7 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
         return readingsList.size();
     }
 
-    public void addElement(ReadingTable readingTable) {
+    public int addElement(ReadingTable readingTable) {
         readingsList.add(readingTable);
 
         Collections.sort(readingsList, new Comparator<ReadingTable>() {
@@ -114,7 +114,8 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
             }
         });
 
-        notifyItemInserted(0);
+        notifyItemInserted(readingsList.indexOf(readingTable));
+        return readingsList.indexOf(readingTable);
     }
 
     private void setPic(ImageView view, File image) {

@@ -162,9 +162,12 @@
                         android:id="@+id/time_old"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
                         android:padding="8dp"
-                        android:text="--Click to select time of reading--"
+                        android:textSize="16sp"
+                        android:background="?attr/editTextBackground"
+                        android:text="@string/old_time_text"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp" />
 

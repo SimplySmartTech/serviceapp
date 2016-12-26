@@ -19,6 +19,7 @@ import java.util.List;
 public class SensorListActivity extends BaseActivity {
 
     private MatrixData data;
+    private boolean backdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +34,7 @@ public class SensorListActivity extends BaseActivity {
         getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
 
         if (getIntent() != null && getIntent().getExtras() != null) {
+            backdated = getIntent().getBooleanExtra(StringConstants.BACKDATA,false);
             String utility_id = getIntent().getStringExtra(StringConstants.UTILITY_ID);
             if (utility_id != null && !utility_id.equalsIgnoreCase("")) {
                 getSensorList(utility_id);
@@ -44,7 +46,7 @@ public class SensorListActivity extends BaseActivity {
     private void getSensorList(String utility_id){
         List<SensorTable> sensors = SensorTable.getSensorList(utility_id);
         RecyclerView sensorList = (RecyclerView) findViewById(R.id.sensorList);
-        SensorListAdapter adapter = new SensorListAdapter(SensorListActivity.this, sensors);
+        SensorListAdapter adapter = new SensorListAdapter(SensorListActivity.this, sensors,backdated);
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(SensorListActivity.this, 2);
         sensorList.setLayoutManager(gridLayoutManager);
         sensorList.setAdapter(adapter);
