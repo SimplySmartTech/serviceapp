@@ -5,15 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.view.Window;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.config.GlobalData;
-import com.simplysmart.service.config.StringConstants;
-
-import java.io.File;
 
 
 /**
@@ -36,7 +31,14 @@ public class SplashActivity extends Activity {
         SharedPreferences.Editor userInfoEdit = UserInfo.edit();
         isLogin = UserInfo.getBoolean("isLogin", false);
 
-        switchToNextActivity();
+        if (UserInfo.getBoolean("logOutUser", true)) {
+            userInfoEdit.putBoolean("logOutUser", false).apply();
+            Intent i = new Intent(SplashActivity.this, LoginActivity.class);
+            startActivity(i);
+            finish();
+        } else {
+            switchToNextActivity();
+        }
     }
 
     private void switchToNextActivity() {
@@ -59,4 +61,5 @@ public class SplashActivity extends Activity {
             }
         }, SPLASH_TIME_OUT);
     }
+
 }
