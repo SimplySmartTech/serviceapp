@@ -373,15 +373,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         for (int i = 0; i < units.size(); i++) {
             menu.add(R.id.plants, i, StringConstants.ORDER_PLANTS, units.get(i).getName()).setIcon(R.drawable.plant_icon);
         }
-//
-//        menu = navigationView.getMenu();
-//        for (int i = 0; i < menu.size(); i++) {
-//            menu.add(R.id.plants,Menu.NONE, StringConstants.ORDER_PLANTS,units.get(i).getName()).setIcon(R.drawable.plant_icon);
-//            MenuItem item = menu.getItem(i);
-//            MenuItemCompat.setActionView(item, R.layout.nav_item_view);
-//            TextView plantName = (TextView) MenuItemCompat.getActionView(item).findViewById(R.id.plant_name);
-//            plantName.setText(units.get(i).getName());
-//        }
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         submitButton = (Button) findViewById(R.id.submit);
@@ -481,30 +472,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         return true;
                 }
             }
-
-//                drawer.closeDrawers();
-//                int id = item.getItemId();
-//                Unit unit = units.get(id);
-//
-//                uncheckAllMenuItems(navigationView);
-//                item.setChecked(true);
-//                GlobalData.getInstance().setSelectedUnitId(unit.getId());
-//                GlobalData.getInstance().setSelectedUnit(unit.getName());
-//
-//                getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
-//                if (NetworkUtilities.isInternet(getApplicationContext())) {
-//                    swipeRefreshLayout.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            swipeRefreshLayout.setRefreshing(true);
-//                            getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
-//                        }
-//                    });
-//                } else {
-//                    setOfflineData();
-//                }
-//                return true;
-//            }
 
         });
     }
