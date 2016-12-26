@@ -25,12 +25,12 @@ import java.util.List;
 public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
     private Context mContext;
     private List<MatrixTable> matrixData;
-    private final LayoutInflater inflater;
+    private boolean backdated;
 
-    public MatrixTableAdapter(Context context, List<MatrixTable> data) {
-        inflater = LayoutInflater.from(context);
+    public MatrixTableAdapter(Context context, List<MatrixTable> data,boolean backdated) {
         mContext = context;
         matrixData = data;
+        this.backdated = backdated;
     }
 
     @Override
@@ -83,11 +83,13 @@ public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
                 if (sensorTable.size() > 1) {
                     Intent i = new Intent(mContext, SensorListActivity.class);
                     i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
+                    i.putExtra(StringConstants.BACKDATA,backdated);
                     mContext.startActivity(i);
                 } else {
                     Intent i = new Intent(mContext, InputFormActivity.class);
                     i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
                     i.putExtra(StringConstants.SENSOR_NAME, sensorTable.get(0).sensor_name);
+                    i.putExtra(StringConstants.BACKDATA,backdated);
                     mContext.startActivity(i);
                 }
             }
@@ -113,5 +115,13 @@ public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
     @Override
     public int getItemCount() {
         return matrixData.size();
+    }
+
+    public boolean isBackdated() {
+        return backdated;
+    }
+
+    public void setBackdated(boolean backdated) {
+        this.backdated = backdated;
     }
 }

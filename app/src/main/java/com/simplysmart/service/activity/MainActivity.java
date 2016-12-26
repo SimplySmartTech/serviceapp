@@ -77,7 +77,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private TextView no_data_found;
     private RecyclerView matrixList;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private MatrixListAdapter matrixListAdapter;
     private Button submitButton;
     private MatrixResponse matrixResponse;
     private int lastExpandedPosition = -1;
@@ -90,6 +89,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private User residentData;
 
     private boolean isRunning = true;
+    private boolean backdated = false;
+    private MatrixTableAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -304,7 +305,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             }
         });
 
-        MatrixTableAdapter adapter = new MatrixTableAdapter(this, list);
+        adapter = new MatrixTableAdapter(this, list,backdated);
         RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
         matrixList.setLayoutManager(gridLayoutManager);
         matrixList.setAdapter(adapter);
@@ -323,7 +324,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         int childPosition = intent.getIntExtra("childPosition", -1);
 
         matrixResponse.getData().get(groupPosition).getSensors().get(childPosition).setChecked(true);
-        matrixListAdapter.notifyDataSetChanged();
+//        matrixListAdapter.notifyDataSetChanged();
     }
 
     //Fetch logged user info from shared preferences
@@ -448,10 +449,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         return true;
                     case R.id.complaints:
                         return true;
+                    case R.id.backdated:
+                        setUpActivityForBackdatedEntries();
+                        return true;
                     default:
                         int id = item.getItemId();
                         Unit unit = units.get(id);
 
+                        backdated = false;
                         uncheckAllMenuItems(navigationView);
                         item.setChecked(true);
                         GlobalData.getInstance().setSelectedUnitId(unit.getId());
@@ -474,6 +479,13 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             }
 
         });
+    }
+
+    private void setUpActivityForBackdatedEntries() {
+        String title = GlobalData.getInstance().getSelectedUnit() + getString(R.string.previous_reading_title);
+        getSupportActionBar().setTitle(title);
+        submitButton.setVisibility(View.GONE);
+        backdated = true;
     }
 
     public static String getDate(long milliSeconds, String dateFormat) {

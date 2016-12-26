@@ -41,4 +41,5 @@ public class StringConstants {
     public static final int ORDER_COMPLAINTS = 2;
     public static final int ORDER_VISITORS = 3;
 
+    public static final String BACKDATA = "backdata";
 }

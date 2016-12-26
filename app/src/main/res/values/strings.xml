@@ -34,5 +34,6 @@
     <string name="enter_tare_weight">Enter Tare Weight</string>
     <string name="update_app_message">SimplySmart Service has a new update available on the Play Store. Stay up to date with the App to enjoy the latest features and best performance.</string>
     <string name="please_enter_remark">Please enter remark.</string>
+    <string name="previous_reading_title">Previous Readings</string>
 
 </resources>
