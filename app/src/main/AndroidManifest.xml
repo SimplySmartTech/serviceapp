@@ -67,6 +67,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/ThemeStyle" />
 
+        <activity android:name=".activity.AttendanceActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
         <!-- Push Notification GCM Services & Receivers -->
         <service android:name=".gcm.RegistrationIntentService" />
 
@@ -112,6 +116,10 @@
 
         <service android:name=".service.ReadingSubmitService" />
 
+        <service android:name=".service.AttendanceUploadService"/>
+
+        <service android:name=".service.CheckAttendanceTimeService"/>
+
         <!-- Google play service version -->
         <meta-data
             android:name="com.google.android.gms.version"
@@ -132,7 +140,7 @@
 
         <meta-data
             android:name="AA_MODELS"
-            android:value="com.simplysmart.service.database.MatrixTable,com.simplysmart.service.database.SensorTable,com.simplysmart.service.database.TareWeightTable,com.simplysmart.service.database.ReadingTable,com.simplysmart.service.database.FinalReadingTable" />
+            android:value="com.simplysmart.service.database.MatrixTable,com.simplysmart.service.database.SensorTable,com.simplysmart.service.database.TareWeightTable,com.simplysmart.service.database.ReadingTable,com.simplysmart.service.database.FinalReadingTable,com.simplysmart.service.database.AttendanceTable" />
 
     </application>
 

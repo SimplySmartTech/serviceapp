@@ -444,6 +444,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
                 switch (item.getItemId()) {
                     case R.id.attendance:
+                        Intent i = new Intent(MainActivity.this,AttendanceActivity.class);
+                        startActivity(i);
                         return true;
                     case R.id.visitors:
                         return true;

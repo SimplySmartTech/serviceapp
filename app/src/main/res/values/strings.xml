@@ -36,5 +36,6 @@
     <string name="please_enter_remark">Please enter remark.</string>
     <string name="previous_reading_title">Add yesterday\'s readings.</string>
     <string name="old_time_text">--Click to select time of reading--</string>
+    <string name="attendance">Attendance</string>
 
 </resources>

@@ -21,6 +21,7 @@ public class StringConstants {
     public static String ALLOW_NEW_IMAGE = "ALLOW";
     public static String READING_DATA = "READING_DATA";
     public static String EDIT = "EDIT";
+    public static String PREV_DATE = "prev_date";
 
     public static int COMRESS_WIDTH = 612;
     public static int COMPRESS_HEIGHT = 816;
@@ -42,4 +43,11 @@ public class StringConstants {
     public static final int ORDER_VISITORS = 3;
 
     public static final String BACKDATA = "backdata";
+
+    public static final int NEW_PIC = 1;
+    public static final int EDIT_PIC = 2;
+    public static final int VIEW_PIC = 3;
+    public static final int SUBMIT_PIC = 4;
+
+    public static final String ATTENDANCE_AT = "attendance_at";
 }
