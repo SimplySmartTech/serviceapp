@@ -22,6 +22,7 @@ public class StringConstants {
     public static String READING_DATA = "READING_DATA";
     public static String EDIT = "EDIT";
     public static String PREV_DATE = "prev_date";
+    public static String NO_NEW_IMAGE = "no_new_image";
 
     public static int COMRESS_WIDTH = 612;
     public static int COMPRESS_HEIGHT = 816;
@@ -50,4 +51,5 @@ public class StringConstants {
     public static final int SUBMIT_PIC = 4;
 
     public static final String ATTENDANCE_AT = "attendance_at";
+    public static final String DISABLE_GALLERY = "disable_gallery";
 }

@@ -40,5 +40,6 @@
     <string name="visitor">Visitors</string>
     <string name="enter_number_of_person">Enter number of person :</string>
     <string name="enter_details">Enter details :</string>
+    <string name="click_here_to_take_photo">Click here to take photo :</string>
 
 </resources>

@@ -10,7 +10,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -18,20 +22,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
-import com.activeandroid.query.Select;
 import com.simplysmart.service.R;
+import com.simplysmart.service.adapter.AttendanceListAdapter;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.AttendanceTable;
-import com.simplysmart.service.database.ReadingTable;
-import com.simplysmart.service.model.attendance.Attendance;
-import com.simplysmart.service.model.attendance.AttendanceList;
 import com.simplysmart.service.permission.MarshmallowPermission;
 import com.simplysmart.service.service.AttendanceUploadService;
 import com.squareup.picasso.Picasso;
@@ -40,8 +41,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -58,8 +60,13 @@ public class AttendanceActivity extends BaseActivity {
 
     private ImageView take_pic;
     private ImageView view_pic;
-    private Button submit;
+    private TextView submit;
     private RelativeLayout mParentLayout;
+    private LinearLayout takePhotoLayout;
+    private TextView takePhotoText;
+    private RecyclerView recyclerView;
+    private CardView cardView;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,17 +82,6 @@ public class AttendanceActivity extends BaseActivity {
 
         bindViews();
         initializeViews();
-
-        List<ReadingTable> readingTable = new Select().from(ReadingTable.class).where("uploadedImage = ?", true).execute();
-        Attendance attendance = new Attendance();
-        attendance.setImage_url(readingTable.get(0).photographic_evidence_url);
-        attendance.setTime(readingTable.get(0).timestamp);
-
-        ArrayList<Attendance> attendances = new ArrayList<>();
-        attendances.add(attendance);
-
-        AttendanceList list = new AttendanceList();
-        list.setAttendances(attendances);
     }
 
     @Override
@@ -170,9 +166,7 @@ public class AttendanceActivity extends BaseActivity {
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
-        }
-
-        if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED) {
+        } else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED) {
             File oldImage = new File(mCurrentPhotoPath);
             String newPhotoPath = "";
             if (data != null && data.getExtras() != null) {
@@ -182,8 +176,10 @@ public class AttendanceActivity extends BaseActivity {
             if (!newPhotoPath.equals("") && oldImage.exists()) {
                 oldImage.delete();
                 mCurrentPhotoPath = newPhotoPath;
-                setPic(view_pic, mCurrentPhotoPath);
+                saveAttendanceToDisk();
             }
+        } else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == 0) {
+            saveAttendanceToDisk();
         }
     }
 
@@ -326,7 +322,11 @@ public class AttendanceActivity extends BaseActivity {
         }
 
         mCurrentPhotoPath = compressedPath;
-        setPic(view_pic, mCurrentPhotoPath);
+        Intent intent = new Intent(AttendanceActivity.this, ImageViewActivity.class);
+        intent.putExtra(StringConstants.PHOTO_PATH, mCurrentPhotoPath);
+        intent.putExtra(StringConstants.ALLOW_NEW_IMAGE, true);
+        intent.putExtra(StringConstants.DISABLE_GALLERY, true);
+        startActivityForResult(intent, StringConstants.IMAGE_CHANGED);
     }
 
     private void setPic(ImageView view, String imageUrl) {
@@ -351,26 +351,61 @@ public class AttendanceActivity extends BaseActivity {
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         take_pic = (ImageView) findViewById(R.id.take_pic);
         view_pic = (ImageView) findViewById(R.id.view_pic);
-        submit = (Button) findViewById(R.id.submit);
+        submit = (TextView) findViewById(R.id.submit);
+        takePhotoText = (TextView) findViewById(R.id.take_pic_text);
+        recyclerView = (RecyclerView) findViewById(R.id.attendanceList);
+        cardView = (CardView) findViewById(R.id.cardView);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
     }
 
     private void initializeViews() {
-        take_pic.setOnClickListener(new View.OnClickListener() {
+        setDataInRecyclerView();
+
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 customImagePicker();
             }
         });
+    }
 
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveAttendanceToDisk();
+    private void setDataInRecyclerView() {
+        List<AttendanceTable> attendanceList = AttendanceTable.getAllAttendances();
+        if(attendanceList!=null && attendanceList.size()>0) {
 
+            if(attendanceList.size()>7){
+                for(int i =7;i<attendanceList.size();i++){
+                    if(attendanceList.get(i).synched){
+                        attendanceList.get(i).delete();
+                    }
+                }
             }
-        });
 
-        submit.setVisibility(View.INVISIBLE);
+            attendanceList = AttendanceTable.getAllAttendances();
+            Collections.sort(attendanceList, new Comparator<AttendanceTable>() {
+                @Override
+                public int compare(AttendanceTable lhs, AttendanceTable rhs) {
+                    return (int) (rhs.timestamp - lhs.timestamp);
+                }
+            });
+
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+
+            for (AttendanceTable attendanceTable : attendanceList) {
+                String date = sdf.format(attendanceTable.timestamp);
+                String currentDate = sdf.format(Calendar.getInstance().getTimeInMillis());
+
+                if (date.equalsIgnoreCase(currentDate)) {
+                    fab.setVisibility(View.GONE);
+                    break;
+                }
+            }
+
+            AttendanceListAdapter attendanceListAdapter = new AttendanceListAdapter(this, attendanceList);
+            RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+            recyclerView.setLayoutManager(gridLayoutManager);
+            recyclerView.setAdapter(attendanceListAdapter);
+        }
     }
 
     private void saveAttendanceToDisk() {
@@ -384,7 +419,7 @@ public class AttendanceActivity extends BaseActivity {
             startService(i);
         }
 
-        finish();
+        setDataInRecyclerView();
     }
 
 

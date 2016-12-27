@@ -26,6 +26,9 @@ public class AttendanceTable extends Model {
     @Column(name = "submitted")
     public boolean submitted;
 
+    @Column(name = "synched")
+    public boolean synched;
+
     public AttendanceTable(){
         super();
     }
@@ -34,6 +37,7 @@ public class AttendanceTable extends Model {
         return new Select()
                 .from(AttendanceTable.class)
                 .where("submitted = ?",false)
+                .where("synched = ?",false)
                 .execute();
     }
 
@@ -41,6 +45,20 @@ public class AttendanceTable extends Model {
         return new Select()
                 .from(AttendanceTable.class)
                 .where("submitted = ?",true)
+                .where("synched = ?",false)
                 .execute();
+    }
+
+    public static List<AttendanceTable> getAllAttendances(){
+        return new Select()
+                .from(AttendanceTable.class)
+                .execute();
+    }
+
+    public static AttendanceTable getTable(long timestamp){
+        return new Select()
+                .from(AttendanceTable.class)
+                .where("timestamp = ?",timestamp)
+                .executeSingle();
     }
 }

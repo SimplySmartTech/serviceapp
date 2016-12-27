@@ -52,6 +52,7 @@ public class ImageViewActivity extends BaseActivity {
     private Button newPhoto, done;
     private LinearLayout anotherPhotoLayout;
     private TextView errorLayout;
+    private boolean disableGallery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,7 @@ public class ImageViewActivity extends BaseActivity {
         if (getIntent() != null && getIntent().getExtras() != null) {
             mPreviousPhotoPath = getIntent().getStringExtra(StringConstants.PHOTO_PATH);
             takeNewImage = getIntent().getBooleanExtra(StringConstants.ALLOW_NEW_IMAGE, false);
+            disableGallery = getIntent().getBooleanExtra(StringConstants.DISABLE_GALLERY,false);
         }
 
         parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
@@ -179,6 +181,10 @@ public class ImageViewActivity extends BaseActivity {
                 dialog.dismiss();
             }
         });
+
+        if(disableGallery){
+            lLayoutGalleryDialog.setVisibility(View.GONE);
+        }
 
         lLayoutRemoveDialog.setOnClickListener(new View.OnClickListener() {
 
