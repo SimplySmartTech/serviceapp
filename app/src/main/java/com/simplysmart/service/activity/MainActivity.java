@@ -1,5 +1,7 @@
 package com.simplysmart.service.activity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -54,6 +56,7 @@ import com.simplysmart.service.model.matrix.TareWeight;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
+import com.simplysmart.service.service.AlarmReceiver;
 import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
@@ -72,6 +75,8 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements LogoutListener {
 
+    AlarmManager alarmManager;
+    private PendingIntent pendingIntent;
 
     private TextView no_data_found,add_previous_reading;
     private RecyclerView matrixList;
@@ -97,9 +102,37 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setAlarmForNotification();
         getUserInfo();
         isRunning = true;
         checkForUpdate();
+    }
+
+    private void setAlarmForNotification() {
+        Calendar calendar = Calendar.getInstance();
+        SharedPreferences preferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
+        String alarmTime = preferences.getString(StringConstants.ATTENDANCE_AT,"09:00");
+        try {
+            String hour = alarmTime.substring(0,2);
+            String minute = alarmTime.substring(3,4);
+
+            calendar.set(Calendar.HOUR_OF_DAY,Integer.parseInt(hour));
+            calendar.set(Calendar.MINUTE,Integer.parseInt(minute));
+            alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+            Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
+            pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
+
+            if(alarmManager!=null){
+                alarmManager.cancel(pendingIntent);
+            }
+
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, pendingIntent);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     private void checkForUpdate() {
