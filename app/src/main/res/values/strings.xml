@@ -37,5 +37,8 @@
     <string name="previous_reading_title">Add yesterday\'s readings.</string>
     <string name="old_time_text">--Click to select time of reading--</string>
     <string name="attendance">Attendance</string>
+    <string name="visitor">Visitors</string>
+    <string name="enter_number_of_person">Enter number of person :</string>
+    <string name="enter_details">Enter details :</string>
 
 </resources>

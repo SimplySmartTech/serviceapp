@@ -41,6 +41,7 @@ import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightTable;
+import com.simplysmart.service.database.VisitorTable;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.dialog.AlertDialogUpdateVersion;
@@ -448,6 +449,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         startActivity(i);
                         return true;
                     case R.id.visitors:
+                        Intent i2 = new Intent(MainActivity.this, VisitorActivity.class);
+                        startActivity(i2);
                         return true;
                     case R.id.complaints:
                         return true;

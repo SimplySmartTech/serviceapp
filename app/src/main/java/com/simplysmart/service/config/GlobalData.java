@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.Configuration;
+import com.simplysmart.service.database.VisitorTable;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 
@@ -30,7 +32,8 @@ public class GlobalData extends com.activeandroid.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        ActiveAndroid.initialize(this);
+        Configuration configuration = new Configuration.Builder(this).addModelClass(VisitorTable.class).create();
+        ActiveAndroid.initialize(configuration);
     }
 
     @Override

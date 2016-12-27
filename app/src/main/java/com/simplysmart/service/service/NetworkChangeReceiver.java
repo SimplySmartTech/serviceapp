@@ -37,6 +37,9 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
 
             Intent i5 = new Intent(context,AttendanceUploadService.class);
             context.startService(i5);
+
+            Intent i6 = new Intent(context,VisitorInfoUploadService.class);
+            context.startService(i6);
         }
     }
 

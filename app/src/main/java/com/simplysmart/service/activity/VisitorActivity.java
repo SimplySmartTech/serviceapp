@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,74 +20,64 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.activeandroid.query.Select;
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.AttendanceTable;
-import com.simplysmart.service.database.ReadingTable;
-import com.simplysmart.service.model.attendance.Attendance;
-import com.simplysmart.service.model.attendance.AttendanceList;
+import com.simplysmart.service.database.VisitorTable;
 import com.simplysmart.service.permission.MarshmallowPermission;
-import com.simplysmart.service.service.AttendanceUploadService;
+import com.simplysmart.service.service.VisitorInfoUploadService;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by shailendrapsp on 26/12/16.
+ * Created by shailendrapsp on 27/12/16.
  */
 
-public class AttendanceActivity extends BaseActivity {
+public class VisitorActivity extends BaseActivity {
     private final int REQUEST_TAKE_PHOTO = 1;
     private final int REQUEST_GALLERY_PHOTO = 2;
     private String mCurrentPhotoPath;
     private File image;
 
-    private ImageView take_pic;
-    private ImageView view_pic;
+    private EditText number_of_visitor;
+    private EditText details;
+    private LinearLayout take_pic_layout;
+    private GridLayout gridLayout;
+    private RelativeLayout parentLayout;
     private Button submit;
-    private RelativeLayout mParentLayout;
+
+    private String local_image_urls="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_attendance);
+        setContentView(R.layout.activity_visitor_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        getSupportActionBar().setTitle(getString(R.string.attendance));
+        getSupportActionBar().setTitle(getString(R.string.visitor));
 
         bindViews();
         initializeViews();
-
-        List<ReadingTable> readingTable = new Select().from(ReadingTable.class).where("uploadedImage = ?", true).execute();
-        Attendance attendance = new Attendance();
-        attendance.setImage_url(readingTable.get(0).photographic_evidence_url);
-        attendance.setTime(readingTable.get(0).timestamp);
-
-        ArrayList<Attendance> attendances = new ArrayList<>();
-        attendances.add(attendance);
-
-        AttendanceList list = new AttendanceList();
-        list.setAttendances(attendances);
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -151,7 +142,7 @@ public class AttendanceActivity extends BaseActivity {
                     Log.d("CameraPhoto", mCurrentPhotoPath);
                     compressAndDeleteFile(mCurrentPhotoPath, true);
                 } else {
-                    showSnackBar(mParentLayout, "Getting error in image file.", false);
+                    showSnackBar(parentLayout, "Getting error in image file.", false);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -165,7 +156,7 @@ public class AttendanceActivity extends BaseActivity {
                     compressAndDeleteFile(mCurrentPhotoPath, false);
                     Log.d("GalleryPhoto", mCurrentPhotoPath);
                 } else {
-                    showSnackBar(mParentLayout, "Getting error in image file.", false);
+                    showSnackBar(parentLayout, "Getting error in image file.", false);
                 }
             } catch (URISyntaxException e) {
                 e.printStackTrace();
@@ -182,7 +173,7 @@ public class AttendanceActivity extends BaseActivity {
             if (!newPhotoPath.equals("") && oldImage.exists()) {
                 oldImage.delete();
                 mCurrentPhotoPath = newPhotoPath;
-                setPic(view_pic, mCurrentPhotoPath);
+                addPicToGrid();
             }
         }
     }
@@ -198,7 +189,7 @@ public class AttendanceActivity extends BaseActivity {
             // Permission is already available, start Internet preview
             dispatchTakePictureIntent();
         } else {
-            new MarshmallowPermission(this, mParentLayout).checkPermissionForCamera();
+            new MarshmallowPermission(this, parentLayout).checkPermissionForCamera();
         }
     }
 
@@ -209,7 +200,7 @@ public class AttendanceActivity extends BaseActivity {
             // Permission is already available, start Internet preview
             checkCamera();
         } else {
-            new MarshmallowPermission(this, mParentLayout).checkPermissionForExternalStorage();
+            new MarshmallowPermission(this, parentLayout).checkPermissionForExternalStorage();
         }
     }
 
@@ -223,8 +214,6 @@ public class AttendanceActivity extends BaseActivity {
         LinearLayout lLayoutCameraDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutCameraDialog);
         LinearLayout lLayoutGalleryDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutGalleryDialog);
         LinearLayout lLayoutRemoveDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutRemoveDialog);
-
-        lLayoutGalleryDialog.setVisibility(View.GONE);
 
         lLayoutCameraDialog.setOnClickListener(new View.OnClickListener() {
 
@@ -321,12 +310,12 @@ public class AttendanceActivity extends BaseActivity {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                showSnackBar(mParentLayout, "Unable to compress image file.");
+                showSnackBar(parentLayout, "Unable to compress image file.");
             }
         }
 
         mCurrentPhotoPath = compressedPath;
-        setPic(view_pic, mCurrentPhotoPath);
+        addPicToGrid();
     }
 
     private void setPic(ImageView view, String imageUrl) {
@@ -341,21 +330,21 @@ public class AttendanceActivity extends BaseActivity {
                     .error(R.drawable.ic_menu_slideshow).into(view);
             view.setAlpha(1.0f);
             view.setVisibility(View.VISIBLE);
-            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
 
-        submit.setVisibility(View.VISIBLE);
     }
 
     private void bindViews() {
-        mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
-        take_pic = (ImageView) findViewById(R.id.take_pic);
-        view_pic = (ImageView) findViewById(R.id.view_pic);
+        number_of_visitor = (EditText) findViewById(R.id.noOfPersons);
+        details = (EditText) findViewById(R.id.details);
+        take_pic_layout = (LinearLayout) findViewById(R.id.take_pic_layout);
+        gridLayout = (GridLayout) findViewById(R.id.view_pics_layout);
+        parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         submit = (Button) findViewById(R.id.submit);
     }
 
     private void initializeViews() {
-        take_pic.setOnClickListener(new View.OnClickListener() {
+        take_pic_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 customImagePicker();
@@ -365,27 +354,57 @@ public class AttendanceActivity extends BaseActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveAttendanceToDisk();
+                if(validateInfo()){
+                    VisitorTable visitorTable = new VisitorTable();
+                    visitorTable.num_of_person = Integer.parseInt(number_of_visitor.getText().toString());
+                    visitorTable.details = details.getText().toString();
+                    visitorTable.timestamp = Calendar.getInstance().getTimeInMillis();
+                    visitorTable.local_image_urls = local_image_urls;
+                    visitorTable.save();
 
+                    if(NetworkUtilities.isInternet(VisitorActivity.this)) {
+                        Intent i = new Intent(VisitorActivity.this, VisitorInfoUploadService.class);
+                        startService(i);
+                    }
+
+                    finish();
+                }
             }
         });
-
-        submit.setVisibility(View.INVISIBLE);
     }
 
-    private void saveAttendanceToDisk() {
-        AttendanceTable attendanceTable = new AttendanceTable();
-        attendanceTable.local_photo_url = mCurrentPhotoPath;
-        attendanceTable.timestamp = Calendar.getInstance().getTimeInMillis();
-        attendanceTable.save();
-
-        if (NetworkUtilities.isInternet(this)) {
-            Intent i = new Intent(this, AttendanceUploadService.class);
-            startService(i);
+    private boolean validateInfo() {
+        if(number_of_visitor.getText().toString().equalsIgnoreCase("")){
+            showSnackBar(parentLayout,"Please enter number of people for visit.");
+            return false;
         }
 
-        finish();
+        if(details.getText().toString().equalsIgnoreCase("")){
+            showSnackBar(parentLayout,"Please enter details of people for visit.");
+            return false;
+        }
+
+        return true;
     }
 
+    private void addPicToGrid() {
+        ImageView imageView = new ImageView(this);
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(160));
+        imageView.setLayoutParams(params);
+        imageView.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
+//        v = LayoutInflater.from(this).inflate(R.layout.layout_pic, gridLayout, false);
+//        ImageView imageView = (ImageView) v.findViewById(R.id.view_pic);
+        setPic(imageView, mCurrentPhotoPath);
+        gridLayout.setColumnCount(2);
+        gridLayout.addView(imageView);
+
+        local_image_urls += mCurrentPhotoPath+",";
+        mCurrentPhotoPath = "";
+    }
+
+    public int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    }
 
 }

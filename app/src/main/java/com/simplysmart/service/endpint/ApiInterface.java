@@ -9,6 +9,8 @@ import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.user.LoginRequest;
 import com.simplysmart.service.model.user.LoginResponse;
+import com.simplysmart.service.model.visitors.VisitorPost;
+import com.simplysmart.service.model.visitors.Visitors;
 
 import org.json.JSONObject;
 
@@ -49,4 +51,9 @@ public interface ApiInterface {
     Call<JsonObject> sendAttendances(
             @Query("subdomain")String subdomain,
             @Body AttendanceList list);
+
+    @POST("/api/visitors")
+    Call<JsonObject> sendVisitors(@Query("subdomain")String subdomain,
+                                  @Body VisitorPost post);
+
 }
