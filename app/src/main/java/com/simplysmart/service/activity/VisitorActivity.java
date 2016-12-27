@@ -10,7 +10,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -21,12 +24,12 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.adapter.VisitorListAdapter;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
@@ -39,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -56,11 +60,13 @@ public class VisitorActivity extends BaseActivity {
     private EditText number_of_visitor;
     private EditText details;
     private LinearLayout take_pic_layout;
-    private GridLayout gridLayout;
+    private RecyclerView recyclerView;
     private RelativeLayout parentLayout;
     private Button submit;
 
-    private String local_image_urls="";
+    private String local_image_urls = "";
+    private ArrayList<String> imageUrls;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,9 +167,7 @@ public class VisitorActivity extends BaseActivity {
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
-        }
-
-        if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED) {
+        }else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED) {
             File oldImage = new File(mCurrentPhotoPath);
             String newPhotoPath = "";
             if (data != null && data.getExtras() != null) {
@@ -173,8 +177,14 @@ public class VisitorActivity extends BaseActivity {
             if (!newPhotoPath.equals("") && oldImage.exists()) {
                 oldImage.delete();
                 mCurrentPhotoPath = newPhotoPath;
+                imageUrls.add(mCurrentPhotoPath);
+                local_image_urls+=mCurrentPhotoPath+",";
                 addPicToGrid();
             }
+        }else if(requestCode == StringConstants.IMAGE_CHANGED && resultCode == 0){
+            imageUrls.add(mCurrentPhotoPath);
+            local_image_urls+=mCurrentPhotoPath+",";
+            addPicToGrid();
         }
     }
 
@@ -315,36 +325,26 @@ public class VisitorActivity extends BaseActivity {
         }
 
         mCurrentPhotoPath = compressedPath;
-        addPicToGrid();
-    }
-
-    private void setPic(ImageView view, String imageUrl) {
-        File image = new File(imageUrl);
-
-        if (image.exists()) {
-            Picasso.with(this).load(image)
-                    .placeholder(R.drawable.ic_photo_black_48dp)
-                    .noFade()
-                    .fit().centerCrop()
-//                    .resize(48, 48)
-                    .error(R.drawable.ic_menu_slideshow).into(view);
-            view.setAlpha(1.0f);
-            view.setVisibility(View.VISIBLE);
-        }
+        Intent intent = new Intent(VisitorActivity.this, ImageViewActivity.class);
+        intent.putExtra(StringConstants.PHOTO_PATH, mCurrentPhotoPath);
+        intent.putExtra(StringConstants.ALLOW_NEW_IMAGE, true);
+        startActivityForResult(intent, StringConstants.IMAGE_CHANGED);
 
     }
 
     private void bindViews() {
         number_of_visitor = (EditText) findViewById(R.id.noOfPersons);
         details = (EditText) findViewById(R.id.details);
-        take_pic_layout = (LinearLayout) findViewById(R.id.take_pic_layout);
-        gridLayout = (GridLayout) findViewById(R.id.view_pics_layout);
+        recyclerView = (RecyclerView) findViewById(R.id.photoList);
         parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         submit = (Button) findViewById(R.id.submit);
+        fab = (FloatingActionButton)findViewById(R.id.fab);
     }
 
     private void initializeViews() {
-        take_pic_layout.setOnClickListener(new View.OnClickListener() {
+        imageUrls = new ArrayList<>();
+
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 customImagePicker();
@@ -354,7 +354,7 @@ public class VisitorActivity extends BaseActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(validateInfo()){
+                if (validateInfo()) {
                     VisitorTable visitorTable = new VisitorTable();
                     visitorTable.num_of_person = Integer.parseInt(number_of_visitor.getText().toString());
                     visitorTable.details = details.getText().toString();
@@ -362,7 +362,7 @@ public class VisitorActivity extends BaseActivity {
                     visitorTable.local_image_urls = local_image_urls;
                     visitorTable.save();
 
-                    if(NetworkUtilities.isInternet(VisitorActivity.this)) {
+                    if (NetworkUtilities.isInternet(VisitorActivity.this)) {
                         Intent i = new Intent(VisitorActivity.this, VisitorInfoUploadService.class);
                         startService(i);
                     }
@@ -374,13 +374,13 @@ public class VisitorActivity extends BaseActivity {
     }
 
     private boolean validateInfo() {
-        if(number_of_visitor.getText().toString().equalsIgnoreCase("")){
-            showSnackBar(parentLayout,"Please enter number of people for visit.");
+        if (number_of_visitor.getText().toString().equalsIgnoreCase("")) {
+            showSnackBar(parentLayout, "Please enter number of people for visit.");
             return false;
         }
 
-        if(details.getText().toString().equalsIgnoreCase("")){
-            showSnackBar(parentLayout,"Please enter details of people for visit.");
+        if (details.getText().toString().equalsIgnoreCase("")) {
+            showSnackBar(parentLayout, "Please enter details of people for visit.");
             return false;
         }
 
@@ -388,23 +388,11 @@ public class VisitorActivity extends BaseActivity {
     }
 
     private void addPicToGrid() {
-        ImageView imageView = new ImageView(this);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(160));
-        imageView.setLayoutParams(params);
-        imageView.setPadding(dpToPx(8), dpToPx(8), dpToPx(8), dpToPx(8));
-//        v = LayoutInflater.from(this).inflate(R.layout.layout_pic, gridLayout, false);
-//        ImageView imageView = (ImageView) v.findViewById(R.id.view_pic);
-        setPic(imageView, mCurrentPhotoPath);
-        gridLayout.setColumnCount(2);
-        gridLayout.addView(imageView);
-
-        local_image_urls += mCurrentPhotoPath+",";
-        mCurrentPhotoPath = "";
+        if (imageUrls != null && imageUrls.size() > 0) {
+            VisitorListAdapter visitorListAdapter = new VisitorListAdapter(this, imageUrls);
+            GridLayoutManager glm = new GridLayoutManager(this, 2);
+            recyclerView.setLayoutManager(glm);
+            recyclerView.setAdapter(visitorListAdapter);
+        }
     }
-
-    public int dpToPx(int dp) {
-        DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
-        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-    }
-
 }

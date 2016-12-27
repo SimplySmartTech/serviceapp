@@ -12,6 +12,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.google.gson.JsonObject;
+import com.simplysmart.service.adapter.VisitorListAdapter;
 import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.DebugLog;
@@ -24,6 +25,7 @@ import com.simplysmart.service.model.visitors.Visitors;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,9 +38,9 @@ import static android.content.ContentValues.TAG;
  */
 
 public class VisitorInfoUploadService extends Service {
-    TransferUtility transferUtility;
-    int count = 0;
-    ArrayList<String> imageUrls;
+    private TransferUtility transferUtility;
+    private int count = 0;
+    private ArrayList<String> imageUrls;
 
     @Nullable
     @Override
@@ -50,27 +52,36 @@ public class VisitorInfoUploadService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         transferUtility = Util.getTransferUtility(getApplicationContext());
         imageUrls = new ArrayList<>();
-        VisitorTable visitor = VisitorTable.getVisitorTable();
-        if(visitor!=null) {
-            String imageUrls = visitor.local_image_urls;
-            DebugLog.d(imageUrls);
-            ArrayList<String> urlList = new ArrayList<>();
-            int prevPos = 0;
-            for (int j = 0; j < imageUrls.length(); j++) {
-                if (imageUrls.charAt(j) == ',') {
-                    urlList.add(imageUrls.substring(prevPos, j));
-                    prevPos = j + 1;
+        List<VisitorTable> visitors = VisitorTable.getVisitorTables();
+        if(visitors!=null && visitors.size()>0) {
+            for (VisitorTable visitor : visitors) {
+                String imageUrls = visitor.local_image_urls;
+                DebugLog.d(imageUrls);
+                ArrayList<String> urlList = new ArrayList<>();
+                int prevPos = 0;
+                for (int j = 0; j < imageUrls.length(); j++) {
+                    if (imageUrls.charAt(j) == ',') {
+                        urlList.add(imageUrls.substring(prevPos, j));
+                        prevPos = j + 1;
+                    }
                 }
-            }
 
-            count = urlList.size();
-            uploadImages(urlList, visitor);
+                if(urlList.size()>0){
+                    count = urlList.size();
+                    uploadImages(urlList, visitor);
+                }else {
+                    sendVisitorList(visitor);
+                }
+
+                break;
+            }
         }
         return super.onStartCommand(intent, flags, startId);
     }
 
     private void uploadImages(ArrayList<String> imageUrls, VisitorTable table) {
         for (String url : imageUrls) {
+            DebugLog.d(url);
             beginUpload(url, table);
         }
     }
