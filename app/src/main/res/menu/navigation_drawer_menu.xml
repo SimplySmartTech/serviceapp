@@ -39,13 +39,13 @@
             android:title="Visitors"
             android:icon="@drawable/ic_supervisor_account_black_24dp"/>
 
-        <item
-            android:id="@+id/complaints"
-            android:orderInCategory="1"
-            android:enabled="true"
-            android:visible="true"
-            android:title="Complaints"
-            android:icon="@drawable/ic_border_color_black_24dp"/>
+        <!--<item-->
+            <!--android:id="@+id/complaints"-->
+            <!--android:orderInCategory="1"-->
+            <!--android:enabled="true"-->
+            <!--android:visible="true"-->
+            <!--android:title="Complaints"-->
+            <!--android:icon="@drawable/ic_border_color_black_24dp"/>-->
 
     </group>
 </menu>

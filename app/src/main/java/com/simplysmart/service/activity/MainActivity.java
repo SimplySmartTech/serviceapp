@@ -485,8 +485,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         Intent i2 = new Intent(MainActivity.this, VisitorActivity.class);
                         startActivity(i2);
                         return true;
-                    case R.id.complaints:
-                        return true;
+//                    case R.id.complaints:
+//                        return true;
                     case R.id.backdated:
                         setUpActivityForBackdatedEntries();
                         return true;
