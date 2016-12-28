@@ -169,10 +169,6 @@ public class AttendanceUploadService extends Service {
                 if (response.isSuccessful()) {
                     markAsSynched(attendanceList);
                 }
-
-                if(response.code()==201){
-                    Toast.makeText(getApplicationContext(),response.message(),Toast.LENGTH_SHORT).show();
-                }
             }
 
             @Override
