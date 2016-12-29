@@ -6,6 +6,7 @@ import android.app.FragmentManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -33,8 +34,6 @@ import com.activeandroid.query.Delete;
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
-import com.simplysmart.service.config.GlobalData;
-import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.custom.CustomProgressDialog;
 import com.simplysmart.service.database.FinalReadingTable;
 import com.simplysmart.service.database.MatrixTable;
@@ -42,8 +41,6 @@ import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.dialog.AlertDialogStandard;
-import com.simplysmart.service.model.matrix.Reading;
-import com.simplysmart.service.model.matrix.TareWeight;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +52,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.List;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
@@ -383,11 +379,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void logout() {
-        if (GlobalData.getInstance().getUnits() != null && GlobalData.getInstance().getUnits().size() > 0) {
-            for (int i = 0; i < GlobalData.getInstance().getUnits().size(); i++) {
-                removeLocalData(GlobalData.getInstance().getUnits().get(i).getId());
-            }
-        }
 
         new Delete().from(MatrixTable.class).execute();
         new Delete().from(SensorTable.class).execute();
@@ -396,30 +387,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         new Delete().from(TareWeightTable.class).execute();
 
         handleAuthorizationFailed();
-    }
-
-    public void clearApplicationData() {
-
-        File cacheDirectory = getCacheDir();
-        File applicationDirectory = new File(cacheDirectory.getParent());
-        try {
-            if (applicationDirectory.exists()) {
-                String[] fileNames = applicationDirectory.list();
-                for (String fileName : fileNames) {
-                    if (!fileName.equals("lib")) {
-                        deleteFile(new File(applicationDirectory, fileName));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        try {
-            deleteFile(new File(Environment.getExternalStorageDirectory() + "/" + StringConstants.STORAGE_DIRECTORY));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static boolean deleteFile(File file) {
@@ -443,14 +410,18 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void handleAuthorizationFailed() {
-        clearApplicationData();
+
+        SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor userInfoEdit = UserInfo.edit();
+        userInfoEdit.clear().apply();
+
         Intent i = new Intent(this, LoginActivity.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(i);
     }
 
     protected void removeLocalData(String unit_id) {
-        new Delete().from(ReadingTable.class).where("unit_id = ?",unit_id).execute();
+        new Delete().from(ReadingTable.class).where("unit_id = ?", unit_id).execute();
     }
 }
 
