@@ -43,7 +43,6 @@ import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightTable;
-import com.simplysmart.service.database.VisitorTable;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.dialog.AlertDialogUpdateVersion;
@@ -78,7 +77,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     AlarmManager alarmManager;
     private PendingIntent pendingIntent;
 
-    private TextView no_data_found,add_previous_reading;
+    private TextView no_data_found, add_previous_reading;
     private RecyclerView matrixList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Button submitButton;
@@ -110,26 +109,26 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
     private void setAlarmForNotification() {
         Calendar calendar = Calendar.getInstance();
-        SharedPreferences preferences = getSharedPreferences("UserInfo",MODE_PRIVATE);
-        String alarmTime = preferences.getString(StringConstants.ATTENDANCE_AT,"09:00");
+        SharedPreferences preferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
+        String alarmTime = preferences.getString(StringConstants.ATTENDANCE_AT, "09:00");
         try {
-            String hour = alarmTime.substring(0,2);
-            String minute = alarmTime.substring(3,4);
+            String hour = alarmTime.substring(0, 2);
+            String minute = alarmTime.substring(3, 4);
 
-            calendar.set(Calendar.HOUR_OF_DAY,Integer.parseInt(hour));
-            calendar.set(Calendar.MINUTE,Integer.parseInt(minute));
-            alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+            calendar.set(Calendar.MINUTE, Integer.parseInt(minute));
+            alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
             pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
 
-            if(alarmManager!=null){
+            if (alarmManager != null) {
                 alarmManager.cancel(pendingIntent);
             }
 
             alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY, pendingIntent);
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -161,7 +160,26 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (backdated) {
+            backdated = false;
+            submitButton.setVisibility(View.VISIBLE);
+            add_previous_reading.setVisibility(View.GONE);
+
+            getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
+            if (NetworkUtilities.isInternet(getApplicationContext())) {
+                swipeRefreshLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(true);
+                        getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
+                    }
+                });
+            } else {
+                setOfflineData();
+            }
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -478,7 +496,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
                 switch (item.getItemId()) {
                     case R.id.attendance:
-                        Intent i = new Intent(MainActivity.this,AttendanceActivity.class);
+                        Intent i = new Intent(MainActivity.this, AttendanceActivity.class);
                         startActivity(i);
                         return true;
                     case R.id.visitors:
