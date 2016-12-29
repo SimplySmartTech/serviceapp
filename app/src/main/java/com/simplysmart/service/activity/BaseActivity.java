@@ -36,11 +36,13 @@ import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.custom.CustomProgressDialog;
+import com.simplysmart.service.database.AttendanceTable;
 import com.simplysmart.service.database.FinalReadingTable;
 import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightTable;
+import com.simplysmart.service.database.VisitorTable;
 import com.simplysmart.service.dialog.AlertDialogStandard;
 
 import org.json.JSONException;
@@ -386,6 +388,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         new Delete().from(ReadingTable.class).execute();
         new Delete().from(FinalReadingTable.class).execute();
         new Delete().from(TareWeightTable.class).execute();
+        new Delete().from(AttendanceTable.class).execute();
+        new Delete().from(VisitorTable.class).execute();
 
         handleAuthorizationFailed();
     }

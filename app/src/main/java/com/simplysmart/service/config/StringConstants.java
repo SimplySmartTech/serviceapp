@@ -35,8 +35,8 @@ public class StringConstants {
     public static final int NO_NEW_VALUE = 1;
     public static final int VALUE_DELETED = 2;
 
-    public static final int IMAGE_CHANGED = 1;
-    public static final int IMAGE_NOT_CHANGED = -1;
+    public static final int IMAGE_CHANGED = 9;
+    public static final int IMAGE_NOT_CHANGED = -9;
 
     public static final int ORDER_PLANTS = 0;
     public static final int ORDER_ATTENDANCE = 1;

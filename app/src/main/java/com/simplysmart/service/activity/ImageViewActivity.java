@@ -114,6 +114,9 @@ public class ImageViewActivity extends BaseActivity {
                     setResult(StringConstants.IMAGE_CHANGED, returnIntent);
                     finish();
                 } else {
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra(StringConstants.PHOTO_PATH, mCurrentPhotoPath);
+                    setResult(StringConstants.IMAGE_NOT_CHANGED, returnIntent);
                     finish();
                 }
             }

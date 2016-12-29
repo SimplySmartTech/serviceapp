@@ -178,7 +178,7 @@ public class AttendanceActivity extends BaseActivity {
                 mCurrentPhotoPath = newPhotoPath;
                 saveAttendanceToDisk();
             }
-        } else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == 0) {
+        } else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_NOT_CHANGED) {
             saveAttendanceToDisk();
         }
     }

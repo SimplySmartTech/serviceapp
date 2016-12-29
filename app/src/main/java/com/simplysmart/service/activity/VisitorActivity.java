@@ -15,7 +15,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +23,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -36,7 +34,6 @@ import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.VisitorTable;
 import com.simplysmart.service.permission.MarshmallowPermission;
 import com.simplysmart.service.service.VisitorInfoUploadService;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -167,7 +164,7 @@ public class VisitorActivity extends BaseActivity {
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
-        }else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED) {
+        } else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_CHANGED) {
             File oldImage = new File(mCurrentPhotoPath);
             String newPhotoPath = "";
             if (data != null && data.getExtras() != null) {
@@ -178,12 +175,12 @@ public class VisitorActivity extends BaseActivity {
                 oldImage.delete();
                 mCurrentPhotoPath = newPhotoPath;
                 imageUrls.add(mCurrentPhotoPath);
-                local_image_urls+=mCurrentPhotoPath+",";
+                local_image_urls += mCurrentPhotoPath + ",";
                 addPicToGrid();
             }
-        }else if(requestCode == StringConstants.IMAGE_CHANGED && resultCode == 0){
+        } else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_NOT_CHANGED) {
             imageUrls.add(mCurrentPhotoPath);
-            local_image_urls+=mCurrentPhotoPath+",";
+            local_image_urls += mCurrentPhotoPath + ",";
             addPicToGrid();
         }
     }
@@ -338,7 +335,7 @@ public class VisitorActivity extends BaseActivity {
         recyclerView = (RecyclerView) findViewById(R.id.photoList);
         parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         submit = (Button) findViewById(R.id.submit);
-        fab = (FloatingActionButton)findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
     }
 
     private void initializeViews() {
