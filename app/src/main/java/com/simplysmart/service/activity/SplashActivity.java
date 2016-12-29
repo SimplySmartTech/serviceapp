@@ -1,7 +1,6 @@
 package com.simplysmart.service.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,10 +10,6 @@ import android.view.Window;
 import com.simplysmart.service.R;
 
 
-/**
- * Created by Shekhar on 4/8/15.
- * Splash screen play landing app logo video.
- */
 public class SplashActivity extends Activity {
 
     private boolean isLogin;
@@ -27,18 +22,7 @@ public class SplashActivity extends Activity {
 
         setContentView(R.layout.activity_splash);
 
-        SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor userInfoEdit = UserInfo.edit();
-        isLogin = UserInfo.getBoolean("isLogin", false);
-
-        if (UserInfo.getBoolean("logOutUser", true)) {
-            userInfoEdit.putBoolean("logOutUser", false).apply();
-            Intent i = new Intent(SplashActivity.this, LoginActivity.class);
-            startActivity(i);
-            finish();
-        } else {
-            switchToNextActivity();
-        }
+        switchToNextActivity();
     }
 
     private void switchToNextActivity() {

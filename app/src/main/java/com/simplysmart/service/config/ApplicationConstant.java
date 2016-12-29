@@ -16,7 +16,4 @@ public class ApplicationConstant {
     public static final String CONTENT_TYPE = "application/json";
     public static final String CONTENT_LOCALE = "en-US";
 
-    //Cloudinary URL
-    public static final String cloudinary_base_path = "https://res.cloudinary.com/mixtape/image/upload/";
-
 }
