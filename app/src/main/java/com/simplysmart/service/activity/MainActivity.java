@@ -109,33 +109,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         checkForUpdate();
     }
 
-    private void setAlarmForNotification() {
-        Calendar calendar = Calendar.getInstance();
-        SharedPreferences preferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
-        String alarmTime = preferences.getString(StringConstants.ATTENDANCE_AT, "09:00");
-        try {
-            String hour = alarmTime.substring(0, 2);
-            String minute = alarmTime.substring(3, 4);
-
-            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
-            calendar.set(Calendar.MINUTE, Integer.parseInt(minute));
-            alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
-            pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
-
-            if (alarmManager != null) {
-                alarmManager.cancel(pendingIntent);
-            }
-
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY, pendingIntent);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
     private void checkForUpdate() {
         GetVersionCode getVersionCode = new GetVersionCode();
         getVersionCode.execute();
@@ -635,4 +608,38 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             }
         }
     }
+
+
+    private void setAlarmForNotification() {
+        Calendar calendar = Calendar.getInstance();
+        SharedPreferences preferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
+        String alarmTime = preferences.getString(StringConstants.ATTENDANCE_AT, "09:00");
+        try {
+            String hour = alarmTime.substring(0, 2);
+            String minute = alarmTime.substring(3, 4);
+
+            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+            calendar.set(Calendar.MINUTE, Integer.parseInt(minute));
+
+            if(Calendar.getInstance().getTimeInMillis()>calendar.getTimeInMillis()){
+                calendar.set(Calendar.DATE,calendar.get(Calendar.DATE)+1);
+            }
+
+            alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
+            pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
+
+            if (alarmManager != null) {
+                alarmManager.cancel(pendingIntent);
+            }
+
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, pendingIntent);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }
