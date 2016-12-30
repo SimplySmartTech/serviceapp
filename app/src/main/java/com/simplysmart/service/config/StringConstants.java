@@ -23,6 +23,8 @@ public class StringConstants {
     public static String EDIT = "EDIT";
     public static String PREV_DATE = "prev_date";
     public static String NO_NEW_IMAGE = "no_new_image";
+    public static String NEED_TO_CHECK = "need_to_check";
+    public static String CHECK_FOR_PREVIOUS_DATE = "check_for_previous_date";
 
     public static int COMRESS_WIDTH = 612;
     public static int COMPRESS_HEIGHT = 816;

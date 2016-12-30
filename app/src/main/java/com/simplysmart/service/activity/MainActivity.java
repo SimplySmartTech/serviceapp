@@ -95,12 +95,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private boolean backdated = false;
     private MatrixTableAdapter adapter;
     private MatrixTableAdapter matrixTableAdapter;
+    private SimpleDateFormat sdf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        modifyPrevReadings();
         setAlarmForNotification();
         getUserInfo();
         isRunning = true;
@@ -619,4 +621,18 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
     }
 
+    private void modifyPrevReadings() {
+        sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SharedPreferences sharedPreferences = getSharedPreferences(StringConstants.NEED_TO_CHECK, MODE_PRIVATE);
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+        if(sharedPreferences.getBoolean(StringConstants.CHECK_FOR_PREVIOUS_DATE,true)) {
+            edit.putBoolean(StringConstants.CHECK_FOR_PREVIOUS_DATE, false).apply();
+            List<ReadingTable> readings = ReadingTable.getAllReadingInPhone();
+            for (ReadingTable table : readings) {
+                String dateOfReading = sdf.format(table.timestamp);
+                table.date_of_reading = dateOfReading;
+                table.save();
+            }
+        }
+    }
 }

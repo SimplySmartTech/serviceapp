@@ -115,4 +115,9 @@ public class ReadingTable extends Model {
                 .execute();
     }
 
+    public static List<ReadingTable> getAllReadingInPhone(){
+        return new Select()
+                .from(ReadingTable.class)
+                .execute();
+    }
 }
