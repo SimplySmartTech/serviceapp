@@ -332,6 +332,10 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void initialiseViews() {
 
+        if(sensorData.placeholder!=null && !sensorData.placeholder.equalsIgnoreCase("")){
+            mInputReadingValue.setHint(sensorData.placeholder);
+        }
+
         mInputReadingValue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -136,7 +137,6 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 } else {
                     yesterday = true;
                     Calendar c = Calendar.getInstance();
-                    c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
                     dateForReadings = sdf.format(c.getTimeInMillis());
                     setDataForSummary();
                     fab.setImageResource(R.drawable.today);
@@ -162,24 +162,20 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
         }
 
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.DATE, c.get(Calendar.DATE) - 1);
         dateForReadings = sdf.format(c.getTimeInMillis());
 
         if (dates.size() > 0) {
-            if (dates.contains(dateForReadings)) {
+            if (dates.contains(dateForReadings) && dates.size()>1) {
                 setDataForSummary();
                 yesterday = true;
+                dates.remove(dateForReadings);
                 getSupportActionBar().setTitle("Summary : " + dateForReadings);
+                fab.setVisibility(View.VISIBLE);
             } else {
                 yesterday = false;
                 dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
                 setDataForSummary();
                 getSupportActionBar().setTitle("Summary : " + dateForReadings);
-            }
-
-            if(dates.size()>1) {
-                fab.setVisibility(View.VISIBLE);
-            }else {
                 fab.setVisibility(View.GONE);
             }
 
@@ -206,7 +202,19 @@ public class SummaryActivity extends BaseActivity implements SubmitReadingWithou
                 List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
                 if (sensorTableList != null && sensorTableList.size() > 0) {
                     for (SensorTable sensorTable : sensorTableList) {
-                        List<ReadingTable> readingsList = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name, dateForReadings);
+                        List<ReadingTable> readingsList = new Vector<>();
+                        if(yesterday){
+                            for(String date :dates){
+                                List<ReadingTable> readings = ReadingTable.getReadings(matrixTable.utility_id,sensorTable.sensor_name,date);
+                                if(readings!=null && readings.size()>0){
+                                    for(ReadingTable readingTable : readings){
+                                        readingsList.add(readingTable);
+                                    }
+                                }
+                            }
+                        }else {
+                            readingsList = ReadingTable.getReadings(matrixTable.utility_id,sensorTable.sensor_name,dateForReadings);
+                        }
                         if (readingsList.size() > 0) {
                             Summary header = new Summary();
                             header.setName(matrixTable.type);

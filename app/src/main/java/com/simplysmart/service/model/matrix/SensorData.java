@@ -13,6 +13,7 @@ public class SensorData implements Parcelable {
     private String sensor_name;
     private String mandatory;
     private String unit;
+    private String placeholder;
     private String data_type;
     private String photographic_evidence;
     private String no_of_times;
@@ -31,6 +32,7 @@ public class SensorData implements Parcelable {
         sensor_name = in.readString();
         mandatory = in.readString();
         unit = in.readString();
+        placeholder = in.readString();
         data_type = in.readString();
         photographic_evidence = in.readString();
         no_of_times = in.readString();
@@ -49,6 +51,7 @@ public class SensorData implements Parcelable {
         dest.writeString(sensor_name);
         dest.writeString(mandatory);
         dest.writeString(unit);
+        dest.writeString(placeholder);
         dest.writeString(data_type);
         dest.writeString(photographic_evidence);
         dest.writeString(no_of_times);
@@ -76,6 +79,14 @@ public class SensorData implements Parcelable {
             return new SensorData[size];
         }
     };
+
+    public String getPlaceholder() {
+        return placeholder;
+    }
+
+    public void setPlaceholder(String placeholder) {
+        this.placeholder = placeholder;
+    }
 
     public String getTooltip() {
         return tooltip;

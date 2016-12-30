@@ -100,7 +100,6 @@ public class AttendanceUploadService extends Service {
                 observer.setTransferListener(new UploadListener(table, file.getName()));
             } catch (Exception e) {
                 e.printStackTrace();
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -108,7 +107,6 @@ public class AttendanceUploadService extends Service {
     }
 
     class UploadListener implements TransferListener {
-
         private AttendanceTable attendanceTable;
         private String fileName;
 
@@ -120,7 +118,6 @@ public class AttendanceUploadService extends Service {
         @Override
         public void onError(int id, Exception e) {
             Log.e(TAG, "Error during upload: " + id, e);
-
         }
 
         @Override

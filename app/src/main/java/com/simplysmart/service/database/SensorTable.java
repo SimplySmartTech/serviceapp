@@ -57,6 +57,9 @@ public class SensorTable extends Model {
     @Column(name = "isChecked")
     public boolean isChecked;
 
+    @Column(name = "placeholder")
+    public String placeholder;
+
     public SensorTable(){
         super();
     }
@@ -81,6 +84,10 @@ public class SensorTable extends Model {
 
         if(sensorData.isTare_weight()){
             this.tare_weight = sensorData.isTare_weight();
+        }
+
+        if(sensorData.getPlaceholder()!=null && !sensorData.getPlaceholder().equalsIgnoreCase("")){
+            this.placeholder = sensorData.getPlaceholder();
         }
     }
 
