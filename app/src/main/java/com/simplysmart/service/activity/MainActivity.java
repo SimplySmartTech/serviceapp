@@ -281,9 +281,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         setMatrixData(response.body());
                     } else if (response.code() == 401) {
                         handleAuthorizationFailed();
+                        swipeRefreshLayout.setRefreshing(false);
                     } else {
                         APIError error = ErrorUtils.parseError(response);
                         displayMessage(error.message());
+                        swipeRefreshLayout.setRefreshing(false);
                         no_data_found.setText(getResources().getString(R.string.error_in_network));
                         no_data_found.setVisibility(View.VISIBLE);
                     }

@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -19,7 +18,7 @@ import com.simplysmart.service.activity.AttendanceActivity;
 
 public class AlarmService extends IntentService {
 
-    public AlarmService(){
+    public AlarmService() {
         super(AlarmService.class.getName());
     }
 

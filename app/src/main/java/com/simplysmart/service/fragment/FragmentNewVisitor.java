@@ -1,4 +1,4 @@
-package com.simplysmart.service.activity;
+package com.simplysmart.service.fragment;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -10,101 +10,165 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.CardView;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ImageView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.adapter.AttendanceListAdapter;
+import com.simplysmart.service.activity.BaseActivity;
+import com.simplysmart.service.activity.ImageViewActivity;
+import com.simplysmart.service.activity.VisitorActivity;
+import com.simplysmart.service.adapter.VisitorListAdapter;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.database.AttendanceTable;
+import com.simplysmart.service.database.VisitorTable;
+import com.simplysmart.service.interfaces.ForceScrollListener;
 import com.simplysmart.service.permission.MarshmallowPermission;
-import com.simplysmart.service.service.AttendanceUploadService;
-import com.squareup.picasso.Picasso;
+import com.simplysmart.service.service.VisitorInfoUploadService;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
- * Created by shailendrapsp on 26/12/16.
+ * Created by shailendrapsp on 30/12/16.
  */
 
-public class AttendanceActivity extends BaseActivity {
+public class FragmentNewVisitor extends BaseFragment {
+    private View rootView;
     private final int REQUEST_TAKE_PHOTO = 1;
     private final int REQUEST_GALLERY_PHOTO = 2;
     private String mCurrentPhotoPath;
     private File image;
 
-    private ImageView take_pic;
-    private ImageView view_pic;
-    private TextView submit;
-    private RelativeLayout mParentLayout;
-    private LinearLayout takePhotoLayout;
-    private TextView takePhotoText;
+    private EditText number_of_visitor;
+    private EditText details;
+    private LinearLayout take_pic_layout;
     private RecyclerView recyclerView;
-    private CardView cardView;
+    private RelativeLayout parentLayout;
+    private Button submit;
+
+    private String local_image_urls = "";
+    private ArrayList<String> imageUrls;
     private FloatingActionButton fab;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_attendance);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        rootView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_new_visitor,container,false);
+        return rootView;
+    }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-        getSupportActionBar().setTitle(getString(R.string.attendance));
-
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         bindViews();
         initializeViews();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public void onResume() {
+        super.onResume();
+    }
+
+    private void bindViews() {
+        number_of_visitor = (EditText) rootView.findViewById(R.id.noOfPersons);
+        details = (EditText) rootView.findViewById(R.id.details);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.photoList);
+        parentLayout = (RelativeLayout) rootView.findViewById(R.id.parentLayout);
+        submit = (Button) rootView.findViewById(R.id.submit);
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+    }
+
+    private void initializeViews() {
+        imageUrls = new ArrayList<>();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                customImagePicker();
+            }
+        });
+        number_of_visitor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                number_of_visitor.setCursorVisible(true);
+            }
+        });
+
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validateInfo()) {
+                    VisitorTable visitorTable = new VisitorTable();
+                    visitorTable.num_of_person = Integer.parseInt(number_of_visitor.getText().toString());
+                    visitorTable.details = details.getText().toString();
+                    visitorTable.timestamp = Calendar.getInstance().getTimeInMillis();
+                    visitorTable.local_image_urls = local_image_urls;
+                    visitorTable.save();
+
+                    if (NetworkUtilities.isInternet(getContext())) {
+                        Intent i = new Intent(getActivity(), VisitorInfoUploadService.class);
+                        getActivity().startService(i);
+                    }
+
+                    clearAllData();
+                    ForceScrollListener forceScrollListener = (ForceScrollListener)(getActivity());
+                    forceScrollListener.scrollTo();
+                }
+            }
+        });
+    }
+
+    private void clearAllData() {
+        number_of_visitor.setText("");
+        details.setText("");
+        local_image_urls = "";
+        imageUrls = new ArrayList<>();
+        recyclerView.setVisibility(View.GONE);
+    }
+
+    private boolean validateInfo() {
+        if (number_of_visitor.getText().toString().equalsIgnoreCase("")) {
+            showSnackBar(parentLayout, "Please enter number of people for visit.",false);
+            return false;
+        }
+
+        if (details.getText().toString().equalsIgnoreCase("")) {
+            showSnackBar(parentLayout, "Please enter details of people for visit.",false);
+            return false;
+        }
+
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-
-            case android.R.id.home:
-                supportFinishAfterTransition();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+    private void addPicToGrid() {
+        if (imageUrls != null && imageUrls.size() > 0) {
+            VisitorListAdapter visitorListAdapter = new VisitorListAdapter(getContext(), imageUrls);
+            GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
+            recyclerView.setLayoutManager(glm);
+            recyclerView.setAdapter(visitorListAdapter);
+            recyclerView.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    protected int getStatusBarColor() {
-        return 0;
     }
 
     @Override
@@ -139,7 +203,7 @@ public class AttendanceActivity extends BaseActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             try {
@@ -147,7 +211,7 @@ public class AttendanceActivity extends BaseActivity {
                     Log.d("CameraPhoto", mCurrentPhotoPath);
                     compressAndDeleteFile(mCurrentPhotoPath, true);
                 } else {
-                    showSnackBar(mParentLayout, "Getting error in image file.", false);
+                    showSnackBar(parentLayout, "Getting error in image file.", false);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -161,7 +225,7 @@ public class AttendanceActivity extends BaseActivity {
                     compressAndDeleteFile(mCurrentPhotoPath, false);
                     Log.d("GalleryPhoto", mCurrentPhotoPath);
                 } else {
-                    showSnackBar(mParentLayout, "Getting error in image file.", false);
+                    showSnackBar(parentLayout, "Getting error in image file.", false);
                 }
             } catch (URISyntaxException e) {
                 e.printStackTrace();
@@ -176,10 +240,14 @@ public class AttendanceActivity extends BaseActivity {
             if (!newPhotoPath.equals("") && oldImage.exists()) {
                 oldImage.delete();
                 mCurrentPhotoPath = newPhotoPath;
-                saveAttendanceToDisk();
+                imageUrls.add(mCurrentPhotoPath);
+                local_image_urls += mCurrentPhotoPath + ",";
+                addPicToGrid();
             }
         } else if (requestCode == StringConstants.IMAGE_CHANGED && resultCode == StringConstants.IMAGE_NOT_CHANGED) {
-            saveAttendanceToDisk();
+            imageUrls.add(mCurrentPhotoPath);
+            local_image_urls += mCurrentPhotoPath + ",";
+            addPicToGrid();
         }
     }
 
@@ -188,30 +256,30 @@ public class AttendanceActivity extends BaseActivity {
     }
 
     private void checkCamera() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
 
             // Permission is already available, start Internet preview
             dispatchTakePictureIntent();
         } else {
-            new MarshmallowPermission(this, mParentLayout).checkPermissionForCamera();
+            new MarshmallowPermission(getActivity(), parentLayout).checkPermissionForCamera();
         }
     }
 
     private void checkExternalStorage() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
 
             // Permission is already available, start Internet preview
             checkCamera();
         } else {
-            new MarshmallowPermission(this, mParentLayout).checkPermissionForExternalStorage();
+            new MarshmallowPermission(getActivity(), parentLayout).checkPermissionForExternalStorage();
         }
     }
 
     public void customImagePicker() {
 
-        final Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(getActivity());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_image_capture);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -219,8 +287,6 @@ public class AttendanceActivity extends BaseActivity {
         LinearLayout lLayoutCameraDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutCameraDialog);
         LinearLayout lLayoutGalleryDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutGalleryDialog);
         LinearLayout lLayoutRemoveDialog = (LinearLayout) dialog.findViewById(R.id.lLayoutRemoveDialog);
-
-        lLayoutGalleryDialog.setVisibility(View.GONE);
 
         lLayoutCameraDialog.setOnClickListener(new View.OnClickListener() {
 
@@ -263,7 +329,7 @@ public class AttendanceActivity extends BaseActivity {
     private void dispatchTakePictureIntent() {
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
 
             File photoFile = null;
 
@@ -317,108 +383,15 @@ public class AttendanceActivity extends BaseActivity {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                showSnackBar(mParentLayout, "Unable to compress image file.");
+                showSnackBar(parentLayout, "Unable to compress image file.",false);
             }
         }
 
         mCurrentPhotoPath = compressedPath;
-        Intent intent = new Intent(AttendanceActivity.this, ImageViewActivity.class);
+        Intent intent = new Intent(getActivity(), ImageViewActivity.class);
         intent.putExtra(StringConstants.PHOTO_PATH, mCurrentPhotoPath);
         intent.putExtra(StringConstants.ALLOW_NEW_IMAGE, true);
-        intent.putExtra(StringConstants.DISABLE_GALLERY, true);
         startActivityForResult(intent, StringConstants.IMAGE_CHANGED);
+
     }
-
-    private void setPic(ImageView view, String imageUrl) {
-        File image = new File(imageUrl);
-
-        if (image.exists()) {
-            Picasso.with(this).load(image)
-                    .placeholder(R.drawable.ic_photo_black_48dp)
-                    .noFade()
-                    .fit().centerCrop()
-//                    .resize(48, 48)
-                    .error(R.drawable.ic_menu_slideshow).into(view);
-            view.setAlpha(1.0f);
-            view.setVisibility(View.VISIBLE);
-            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        }
-
-        submit.setVisibility(View.VISIBLE);
-    }
-
-    private void bindViews() {
-        mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
-        take_pic = (ImageView) findViewById(R.id.take_pic);
-        view_pic = (ImageView) findViewById(R.id.view_pic);
-        submit = (TextView) findViewById(R.id.submit);
-        takePhotoText = (TextView) findViewById(R.id.take_pic_text);
-        recyclerView = (RecyclerView) findViewById(R.id.attendanceList);
-        cardView = (CardView) findViewById(R.id.cardView);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-    }
-
-    private void initializeViews() {
-        setDataInRecyclerView();
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customImagePicker();
-            }
-        });
-    }
-
-    private void setDataInRecyclerView() {
-        List<AttendanceTable> attendanceList = AttendanceTable.getAllAttendances();
-        if(attendanceList!=null && attendanceList.size()>0) {
-            Collections.sort(attendanceList, new Comparator<AttendanceTable>() {
-                @Override
-                public int compare(AttendanceTable lhs, AttendanceTable rhs) {
-                    return (int) (rhs.timestamp - lhs.timestamp);
-                }
-            });
-
-            if(attendanceList.size()>7){
-                for(int i =7;i<attendanceList.size();i++){
-                    attendanceList.remove(i);
-                    if(attendanceList.get(i).synched){
-                        attendanceList.get(i).delete();
-                    }
-                }
-            }
-
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-            for (AttendanceTable attendanceTable : attendanceList) {
-                String date = sdf.format(attendanceTable.timestamp);
-                String currentDate = sdf.format(Calendar.getInstance().getTimeInMillis());
-
-                if (date.equalsIgnoreCase(currentDate)) {
-                    fab.setVisibility(View.GONE);
-                    break;
-                }
-            }
-
-            AttendanceListAdapter attendanceListAdapter = new AttendanceListAdapter(this, attendanceList);
-            RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-            recyclerView.setLayoutManager(gridLayoutManager);
-            recyclerView.setAdapter(attendanceListAdapter);
-        }
-    }
-
-    private void saveAttendanceToDisk() {
-        AttendanceTable attendanceTable = new AttendanceTable();
-        attendanceTable.local_photo_url = mCurrentPhotoPath;
-        attendanceTable.timestamp = Calendar.getInstance().getTimeInMillis();
-        attendanceTable.save();
-
-        if (NetworkUtilities.isInternet(this)) {
-            Intent i = new Intent(this, AttendanceUploadService.class);
-            startService(i);
-        }
-
-        setDataInRecyclerView();
-    }
-
-
 }

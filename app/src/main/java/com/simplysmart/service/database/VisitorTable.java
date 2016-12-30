@@ -28,11 +28,21 @@ public class VisitorTable extends Model {
     @Column(name = "timestamp")
     public long timestamp;
 
+    @Column(name = "synched")
+    public boolean synched;
+
     public VisitorTable() {
         super();
     }
 
     public static List<VisitorTable> getVisitorTables() {
+        return new Select()
+                .from(VisitorTable.class)
+                .where("synched = ?",false)
+                .execute();
+    }
+
+    public static List<VisitorTable> getAllVisitorTables(){
         return new Select()
                 .from(VisitorTable.class)
                 .execute();

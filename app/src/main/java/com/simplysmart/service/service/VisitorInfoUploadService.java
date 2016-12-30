@@ -25,6 +25,7 @@ import com.simplysmart.service.model.visitors.Visitors;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
@@ -155,7 +156,7 @@ public class VisitorInfoUploadService extends Service {
     }
 
     private void sendVisitorList(final VisitorTable visitorTable) {
-        Visitors visitors = new Visitors();
+        final Visitors visitors = new Visitors();
         visitors.setTime(visitorTable.timestamp);
         visitors.setDetails(visitorTable.details);
         visitors.setImage_urls(imageUrls);
@@ -173,7 +174,9 @@ public class VisitorInfoUploadService extends Service {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.isSuccessful()) {
-                    visitorTable.delete();
+                    visitorTable.synched = true;
+                    visitorTable.save();
+                    deleteIfNotRequired(visitorTable);
                     Intent i = new Intent(getApplicationContext(),VisitorInfoUploadService.class);
                     startService(i);
                 }
@@ -184,5 +187,14 @@ public class VisitorInfoUploadService extends Service {
 
             }
         });
+    }
+
+    private void deleteIfNotRequired(VisitorTable visitorTable) {
+        long tableTimestamp = visitorTable.timestamp;
+        long currentTimestamp = Calendar.getInstance().getTimeInMillis();
+
+        if((currentTimestamp-tableTimestamp)>(604800000L)){
+            visitorTable.delete();
+        }
     }
 }

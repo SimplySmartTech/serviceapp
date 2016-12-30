@@ -5,10 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
@@ -27,12 +24,8 @@ import com.simplysmart.service.model.attendance.Attendance;
 import com.simplysmart.service.model.attendance.AttendanceList;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -179,7 +172,7 @@ public class AttendanceUploadService extends Service {
     }
 
     private void markAsSynched(AttendanceList attendanceList) {
-        for(int i =0;i<attendanceList.getAttendances().size();i++){
+        for (int i = 0; i < attendanceList.getAttendances().size(); i++) {
             AttendanceTable at = AttendanceTable.getTable(attendanceList.getAttendances().get(i).getTime());
             at.synched = true;
         }
