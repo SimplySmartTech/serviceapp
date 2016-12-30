@@ -44,7 +44,7 @@ public class CheckAttendanceTimeService extends Service {
         if(!preferences.getString(StringConstants.PREV_DATE,"").equalsIgnoreCase(currentDate)){
             getNewAttendanceTime();
             SharedPreferences.Editor edit = preferences.edit();
-            edit.putString(StringConstants.PREV_DATE,currentDate);
+            edit.putString(StringConstants.PREV_DATE,currentDate).apply();
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -70,6 +70,6 @@ public class CheckAttendanceTimeService extends Service {
     private void saveNewAttendanceTime(Response<AttendanceAt> response) {
         SharedPreferences preferences = getApplicationContext().getSharedPreferences("UserInfo",MODE_PRIVATE);
         SharedPreferences.Editor edit = preferences.edit();
-        edit.putString(StringConstants.ATTENDANCE_AT,response.body().getAttendance_at());
+        edit.putString(StringConstants.ATTENDANCE_AT,response.body().getAttendance_at()).apply();
     }
 }
