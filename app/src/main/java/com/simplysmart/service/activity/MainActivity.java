@@ -625,8 +625,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SharedPreferences sharedPreferences = getSharedPreferences(StringConstants.NEED_TO_CHECK, MODE_PRIVATE);
         SharedPreferences.Editor edit = sharedPreferences.edit();
-        if(sharedPreferences.getBoolean(StringConstants.CHECK_FOR_PREVIOUS_DATE,true)) {
-            edit.putBoolean(StringConstants.CHECK_FOR_PREVIOUS_DATE, false).apply();
+        if(sharedPreferences.getString(StringConstants.CHECK_FOR_PREVIOUS_DATE,"true").equalsIgnoreCase("true")) {
+            edit.putString(StringConstants.CHECK_FOR_PREVIOUS_DATE, "false").apply();
             List<ReadingTable> readings = ReadingTable.getAllReadingInPhone();
             for (ReadingTable table : readings) {
                 String dateOfReading = sdf.format(table.timestamp);
