@@ -18,8 +18,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,7 +36,7 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
 
     @Override
     public AttendanceItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AttendanceItemViewHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_attendance_item,parent,false));
+        return new AttendanceItemViewHolder(LayoutInflater.from(mContext).inflate(R.layout.layout_attendance_item, parent, false));
     }
 
     @Override
@@ -48,7 +46,7 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
         holder.date.setText(getDate(table));
         holder.time.setText(getTime(table));
         File image = new File(table.local_photo_url);
-        setPic(holder.view_pic,image);
+        setPic(holder.view_pic, image);
 
         holder.view_pic.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,7 +65,22 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
         c.setTimeInMillis(table.timestamp);
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
-        return ""+hour+":"+minute;
+
+        String h = "";
+        String m = "";
+        if (hour < 10) {
+            h = "0" + hour;
+        } else {
+            h = "" + hour;
+        }
+
+        if (minute < 10) {
+            m = "0" + minute;
+        } else {
+            m = "" + minute;
+        }
+
+        return "" + h + ":" + m+" hrs";
     }
 
     private String getDate(AttendanceTable table) {
@@ -90,6 +103,5 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
                 .fit().centerCrop()
 //                .resize(48, 48)
                 .error(R.drawable.photo_default).into(view);
-
     }
 }

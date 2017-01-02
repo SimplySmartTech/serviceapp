@@ -381,10 +381,10 @@ public class AttendanceActivity extends BaseActivity {
 
             if(attendanceList.size()>7){
                 for(int i =7;i<attendanceList.size();i++){
-                    attendanceList.remove(i);
                     if(attendanceList.get(i).synched){
                         attendanceList.get(i).delete();
                     }
+                    attendanceList.remove(i);
                 }
             }
 
