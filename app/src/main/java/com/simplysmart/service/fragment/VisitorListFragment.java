@@ -9,13 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.activeandroid.annotation.Column;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.VisitorListAdapter2;
 import com.simplysmart.service.database.VisitorTable;
 import com.simplysmart.service.interfaces.PageSelectedListener;
-
-import org.jsoup.Connection;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,7 +27,7 @@ public class VisitorListFragment extends BaseFragment implements PageSelectedLis
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_visitor_list,container,false);
+        rootView = inflater.inflate(R.layout.fragment_visitor_list,container,false);
         return rootView;
     }
 

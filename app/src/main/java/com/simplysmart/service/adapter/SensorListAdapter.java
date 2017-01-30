@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.activity.InputFormActivity;
+import com.simplysmart.service.activity.InputReadingFormActivity;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.viewholder.ChildViewHolder;
@@ -75,7 +75,7 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
         holder.sensor_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(mContext, InputFormActivity.class);
+                Intent i = new Intent(mContext, InputReadingFormActivity.class);
                 i.putExtra(StringConstants.UTILITY_ID, data.utility_identifier);
                 i.putExtra(StringConstants.SENSOR_NAME, finalSensorName);
                 i.putExtra(StringConstants.BACKDATA,backdated);
@@ -86,7 +86,7 @@ public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
         holder.unit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(mContext, InputFormActivity.class);
+                Intent i = new Intent(mContext, InputReadingFormActivity.class);
                 i.putExtra(StringConstants.UTILITY_ID, data.utility_identifier);
                 i.putExtra(StringConstants.SENSOR_NAME, finalSensorName);
                 i.putExtra(StringConstants.BACKDATA,backdated);

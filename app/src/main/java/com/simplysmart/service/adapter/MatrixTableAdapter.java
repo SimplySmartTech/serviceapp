@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.activity.InputFormActivity;
+import com.simplysmart.service.activity.InputReadingFormActivity;
 import com.simplysmart.service.activity.SensorListActivity;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.MatrixTable;
@@ -86,7 +86,7 @@ public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
                     i.putExtra(StringConstants.BACKDATA,backdated);
                     mContext.startActivity(i);
                 } else {
-                    Intent i = new Intent(mContext, InputFormActivity.class);
+                    Intent i = new Intent(mContext, InputReadingFormActivity.class);
                     i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
                     i.putExtra(StringConstants.SENSOR_NAME, sensorTable.get(0).sensor_name);
                     i.putExtra(StringConstants.BACKDATA,backdated);
@@ -103,7 +103,7 @@ public class MatrixTableAdapter extends RecyclerView.Adapter<ParentViewHolder> {
                     i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
                     mContext.startActivity(i);
                 } else {
-                    Intent i = new Intent(mContext, InputFormActivity.class);
+                    Intent i = new Intent(mContext, InputReadingFormActivity.class);
                     i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
                     i.putExtra(StringConstants.SENSOR_NAME, sensorTable.get(0).sensor_name);
                     mContext.startActivity(i);

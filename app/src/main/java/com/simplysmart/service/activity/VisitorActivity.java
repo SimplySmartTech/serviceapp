@@ -88,7 +88,6 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
                 }
             });
         }
-
     }
 
     private void setupViewPager() {

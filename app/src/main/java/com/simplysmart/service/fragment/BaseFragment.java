@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -18,7 +17,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -36,6 +34,7 @@ import com.simplysmart.service.activity.LoginActivity;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.custom.CustomProgressDialog;
+import com.simplysmart.service.database.ReadingTable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -295,6 +294,15 @@ public class BaseFragment extends Fragment {
             inSampleSize++;
         }
         return inSampleSize;
+    }
+
+
+    protected void removeLocalData(String unit_id) {
+        new Delete().from(ReadingTable.class).where("unit_id = ?", unit_id).execute();
+    }
+
+    protected void removeLocalData(String unit_id,String date){
+        new Delete().from(ReadingTable.class).where("unit_id = ?",unit_id).where("date_of_reading = ?",date).execute();
     }
 
 }

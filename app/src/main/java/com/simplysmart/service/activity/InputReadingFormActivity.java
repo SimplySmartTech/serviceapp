@@ -81,9 +81,9 @@ import java.util.Locale;
 
 import static android.view.View.GONE;
 
-public class InputFormActivity extends BaseActivity implements EditDialogListener {
+public class InputReadingFormActivity extends BaseActivity implements EditDialogListener {
 
-    private static final String TAG = "InputFormActivity";
+    private static final String TAG = "InputReadingActivity";
     private final int REQUEST_TAKE_PHOTO = 1;
     private final int REQUEST_GALLERY_PHOTO = 2;
     private String mCurrentPhotoPath;
@@ -168,7 +168,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         });
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        readingListAdapter = new ReadingListAdapter(readings, this, getFragmentManager());
+        readingListAdapter = new ReadingListAdapter(readings, this, getSupportFragmentManager());
         readingList.setLayoutManager(linearLayoutManager);
         readingList.setAdapter(readingListAdapter);
         readingList.setVisibility(View.VISIBLE);
@@ -210,7 +210,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     @Override
     public void updateResult(int newValue, int position, String value) {
         if (newValue == StringConstants.NEW_VALUE) {
-            readingListAdapter = new ReadingListAdapter(ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name), this, getFragmentManager());
+            readingListAdapter = new ReadingListAdapter(ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name), this, getSupportFragmentManager());
             readingList.setAdapter(readingListAdapter);
             readingListAdapter.notifyDataSetChanged();
         } else if (newValue == StringConstants.VALUE_DELETED) {
@@ -315,7 +315,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             // Permission is already available, start Internet preview
             dispatchTakePictureIntent();
         } else {
-            new MarshmallowPermission(InputFormActivity.this, mParentLayout).checkPermissionForCamera();
+            new MarshmallowPermission(InputReadingFormActivity.this, mParentLayout).checkPermissionForCamera();
         }
     }
 
@@ -326,7 +326,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             // Permission is already available, start Internet preview
             checkCamera();
         } else {
-            new MarshmallowPermission(InputFormActivity.this, mParentLayout).checkPermissionForExternalStorage();
+            new MarshmallowPermission(InputReadingFormActivity.this, mParentLayout).checkPermissionForExternalStorage();
         }
     }
 
@@ -379,7 +379,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
             @Override
             public void onClick(View v) {
                 if (imageTaken && mCurrentPhotoPath != null && !mCurrentPhotoPath.equals("")) {
-                    Intent intent = new Intent(InputFormActivity.this, ImageViewActivity.class);
+                    Intent intent = new Intent(InputReadingFormActivity.this, ImageViewActivity.class);
                     intent.putExtra(StringConstants.PHOTO_PATH, mCurrentPhotoPath);
                     intent.putExtra(StringConstants.ALLOW_NEW_IMAGE, true);
                     startActivityForResult(intent, StringConstants.IMAGE_CHANGED);
@@ -407,7 +407,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
         if (sensorData != null && sensorData.tare_weight) {
             needSpinner = true;
-            ArrayAdapter<String> tareWeightAdapter = new ArrayAdapter<String>(InputFormActivity.this, android.R.layout.simple_spinner_item, tareWeights);
+            ArrayAdapter<String> tareWeightAdapter = new ArrayAdapter<String>(InputReadingFormActivity.this, android.R.layout.simple_spinner_item, tareWeights);
             tareWeightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             tareWeightSpinner.setAdapter(tareWeightAdapter);
 
@@ -544,8 +544,8 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         old_date = -1;
         timeOld.setText(getString(R.string.old_time_text));
 
-        if (NetworkUtilities.isInternet(InputFormActivity.this)) {
-            Intent i = new Intent(InputFormActivity.this, PhotoUploadService.class);
+        if (NetworkUtilities.isInternet(InputReadingFormActivity.this)) {
+            Intent i = new Intent(InputReadingFormActivity.this, PhotoUploadService.class);
             i.putExtra(StringConstants.USE_UNIT, false);
             startService(i);
         }
@@ -631,7 +631,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     public void customImagePicker() {
 
-        final Dialog dialog = new Dialog(InputFormActivity.this);
+        final Dialog dialog = new Dialog(InputReadingFormActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_image_capture);
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -794,7 +794,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
         File image = new File(imageUrl);
 
         if (image.exists()) {
-            Picasso.with(InputFormActivity.this).load(image)
+            Picasso.with(InputReadingFormActivity.this).load(image)
                     .placeholder(R.drawable.ic_photo_black_48dp)
                     .noFade()
                     .fit().centerCrop()
@@ -884,7 +884,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
     public void closeKeyboardAndCursor() {
         mInputReadingValue.setCursorVisible(false);
         mTareWeightEditText.setCursorVisible(false);
-        CommonMethod.hideKeyboard(InputFormActivity.this);
+        CommonMethod.hideKeyboard(InputReadingFormActivity.this);
     }
 
     private void initSwipe() {
@@ -948,7 +948,7 @@ public class InputFormActivity extends BaseActivity implements EditDialogListene
 
     private void showEditDialog(ReadingTable readingTable, int position) {
         EditDialog newDialog = EditDialog.newInstance(readingTable, position, true);
-        newDialog.show(getFragmentManager(), "show_dialog");
+        newDialog.show(getSupportFragmentManager(), "show_dialog");
     }
 
 }
