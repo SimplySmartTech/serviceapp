@@ -1,6 +1,7 @@
 package com.simplysmart.service.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,6 +22,9 @@ public class SplashActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_splash);
+
+        //Used for force fully reset application (logout forcefully) set flag true for reset user
+        resetApplication(false);
 
         switchToNextActivity();
     }
@@ -44,6 +48,23 @@ public class SplashActivity extends Activity {
                 finish();
             }
         }, SPLASH_TIME_OUT);
+    }
+
+    private void resetApplication(boolean reset) {
+        SharedPreferences ResetUserPreferences = this.getSharedPreferences("ResetUserPreferences", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = ResetUserPreferences.edit();
+        boolean logoutUser = ResetUserPreferences.getBoolean("logoutUser", true);
+
+        if (reset) {
+            if (logoutUser) {
+                SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                SharedPreferences.Editor userInfoEdit = UserInfo.edit();
+                userInfoEdit.clear().apply();
+                editor.putBoolean("logoutUser", false).apply();
+            }
+        } else {
+            editor.remove("logoutUser").apply();
+        }
     }
 
 }
