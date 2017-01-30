@@ -54,7 +54,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by shailendrapsp on 30/12/16.
  */
 
-public class FragmentNewVisitor extends BaseFragment {
+public class NewVisitorFragment extends BaseFragment {
     private View rootView;
     private final int REQUEST_TAKE_PHOTO = 1;
     private final int REQUEST_GALLERY_PHOTO = 2;

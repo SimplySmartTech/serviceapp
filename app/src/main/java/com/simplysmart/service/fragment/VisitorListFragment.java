@@ -25,7 +25,7 @@ import java.util.List;
  * Created by shailendrapsp on 30/12/16.
  */
 
-public class FragmentVisitorList extends BaseFragment implements PageSelectedListener {
+public class VisitorListFragment extends BaseFragment implements PageSelectedListener {
     private View rootView;
 
     @Override
