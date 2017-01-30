@@ -7,15 +7,14 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
 /**
- * Created by shailendrapsp on 27/12/16.
+ * Created by shekhar on 27/12/16.
  */
 
 public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        ComponentName comp = new ComponentName(context.getPackageName(),
-                AlarmService.class.getName());
+        ComponentName comp = new ComponentName(context.getPackageName(), AlarmService.class.getName());
         startWakefulService(context, (intent.setComponent(comp)));
         setResultCode(Activity.RESULT_OK);
     }

@@ -16,8 +16,8 @@ import android.widget.RelativeLayout;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.TabAdapter;
 import com.simplysmart.service.common.CommonMethod;
-import com.simplysmart.service.fragment.FragmentNewVisitor;
-import com.simplysmart.service.fragment.FragmentVisitorList;
+import com.simplysmart.service.fragment.NewVisitorFragment;
+import com.simplysmart.service.fragment.VisitorListFragment;
 import com.simplysmart.service.interfaces.ForceScrollListener;
 import com.simplysmart.service.interfaces.PageSelectedListener;
 
@@ -93,8 +93,8 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
 
     private void setupViewPager() {
         tabAdapter = new TabAdapter(getSupportFragmentManager(), this);
-        tabAdapter.addFragment(new FragmentNewVisitor(), "New Visitor");
-        tabAdapter.addFragment(new FragmentVisitorList(), "Visitor List");
+        tabAdapter.addFragment(new NewVisitorFragment(), "New Visitor");
+        tabAdapter.addFragment(new VisitorListFragment(), "Visitor List");
         viewPager.setAdapter(tabAdapter);
         viewPager.setCurrentItem(0);
 

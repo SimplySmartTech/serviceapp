@@ -146,8 +146,7 @@ public class LoginActivity extends BaseActivity {
 
         if (NetworkUtilities.isInternet(LoginActivity.this)) {
 
-            if (residentLoginValidation(editUsername.getText().toString().trim(),
-                    editPassword.getText().toString().trim(), LoginActivity.this)) {
+            if (residentLoginValidation(editUsername.getText().toString().trim(), editPassword.getText().toString().trim())) {
 
                 showActivitySpinner();
 
@@ -245,8 +244,7 @@ public class LoginActivity extends BaseActivity {
 
         if (NetworkUtilities.isInternet(LoginActivity.this)) {
 
-            if (residentLoginValidation(editUsername.getText().toString().trim(),
-                    editPassword.getText().toString().trim(), LoginActivity.this)) {
+            if (residentLoginValidation(editUsername.getText().toString().trim(), editPassword.getText().toString().trim())) {
 
                 showActivitySpinner();
 
@@ -325,7 +323,7 @@ public class LoginActivity extends BaseActivity {
 
     }
 
-    private boolean residentLoginValidation(String Username, String Password, Context mContext) {
+    private boolean residentLoginValidation(String Username, String Password) {
 
         if (Username.equals("")) {
             displayMessage("Please enter username.");

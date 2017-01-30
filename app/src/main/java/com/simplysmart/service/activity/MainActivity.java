@@ -56,7 +56,6 @@ import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
 import com.simplysmart.service.service.AlarmReceiver;
-import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 
@@ -102,11 +101,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        modifyPrevReadings();
-        setAlarmForNotification();
-        getUserInfo();
         isRunning = true;
-        checkForUpdate();
+
+        getUserInfo();
+
+        modifyPrevReadings();
+
+        setAlarmForNotification();
+
     }
 
     private void checkForUpdate() {
@@ -122,10 +124,44 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        isRunning = true;
+        checkForUpdate();
+    }
+
+    @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UPDATE_METRIC_SENSOR_LIST_ROW);
         isRunning = false;
         super.onDestroy();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.submit:
+                //do this
+                Intent intent = new Intent(this, SummaryActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.logout:
+                AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
+                        .show(getFragmentManager(), "logout");
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -157,40 +193,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        isRunning = true;
-        GetVersionCode getVersionCode = new GetVersionCode();
-        getVersionCode.execute();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.submit:
-                //do this
-                Intent intent = new Intent(this, SummaryActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.logout:
-                AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
-                        .show(getFragmentManager(), "logout");
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     public void refreshLayout() {
         if (NetworkUtilities.isInternet(this)) {
             swipeRefreshLayout.setRefreshing(true);
@@ -210,7 +212,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
     }
 
-    private void uncheckAllMenuItems(NavigationView navigationView) {
+    private void unCheckAllMenuItems(NavigationView navigationView) {
         final Menu menu = navigationView.getMenu();
         for (int i = 0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
@@ -227,13 +229,14 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     }
 
     private void setDataInHeader(NavigationView navigationView) {
+
         navigationView.inflateHeaderView(R.layout.nav_header_main);
         View view = navigationView.getHeaderView(0);
         ImageView companyLogo = (ImageView) view.findViewById(R.id.companyLogo);
         TextView companyName = (TextView) view.findViewById(R.id.companyName);
         TextView userName = (TextView) view.findViewById(R.id.userName);
 
-//        companyLogo.setImageResource(R.drawable.ic_launcher);
+        companyLogo.setImageResource(R.drawable.ic_launcher);
         companyName.setText(residentData.getCompany().getName());
         userName.setText(residentData.getName());
 
@@ -339,7 +342,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         matrixList.setAdapter(matrixTableAdapter);
     }
 
-
     private BroadcastReceiver UPDATE_METRIC_SENSOR_LIST_ROW = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -352,7 +354,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         int childPosition = intent.getIntExtra("childPosition", -1);
 
         matrixResponse.getData().get(groupPosition).getSensors().get(childPosition).setChecked(true);
-//        matrixListAdapter.notifyDataSetChanged();
     }
 
     //Fetch logged user info from shared preferences
@@ -385,6 +386,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     }
 
     private void initializeRemainingStuff() {
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
@@ -413,9 +415,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         Calendar calendar = Calendar.getInstance();
         long time = calendar.getTimeInMillis();
         calendar.setTimeInMillis(time);
-        String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
-        int dateOfMonth = calendar.get(Calendar.DATE);
-        buttonText = "Submit readings for " + dateOfMonth + " " + month;
+        String month;
+        int dateOfMonth;
 
         ReadingTable readings = new Select().from(ReadingTable.class).executeSingle();
         if (readings != null) {
@@ -492,7 +493,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                         backdated = false;
                         submitButton.setVisibility(View.VISIBLE);
                         add_previous_reading.setVisibility(View.GONE);
-                        uncheckAllMenuItems(navigationView);
+                        unCheckAllMenuItems(navigationView);
                         item.setChecked(true);
                         GlobalData.getInstance().setSelectedUnitId(unit.getId());
                         GlobalData.getInstance().setSelectedUnit(unit.getName());
@@ -530,15 +531,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
-    }
-
-    private void setPic(ImageView view, String image) {
-        view.setVisibility(View.VISIBLE);
-        Picasso.with(this).load(image)
-                .placeholder(R.drawable.ic_menu_slideshow)
-                .noFade()
-                .resize(64, 64)
-                .error(R.drawable.ic_menu_slideshow).into(view);
     }
 
     @Override
@@ -598,17 +590,16 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SharedPreferences sharedPreferences = getSharedPreferences(StringConstants.NEED_TO_CHECK, MODE_PRIVATE);
         SharedPreferences.Editor edit = sharedPreferences.edit();
-        if(sharedPreferences.getString(StringConstants.CHECK_FOR_PREVIOUS_DATE,"true").equalsIgnoreCase("true")) {
+
+        if (sharedPreferences.getString(StringConstants.CHECK_FOR_PREVIOUS_DATE, "true").equalsIgnoreCase("true")) {
             edit.putString(StringConstants.CHECK_FOR_PREVIOUS_DATE, "false").apply();
             List<ReadingTable> readings = ReadingTable.getAllReadingInPhone();
             for (ReadingTable table : readings) {
-                String dateOfReading = sdf.format(table.timestamp);
-                table.date_of_reading = dateOfReading;
+                table.date_of_reading = sdf.format(table.timestamp);
                 table.save();
             }
         }
     }
-
 
     private void setAlarmForNotification() {
         Calendar calendar = Calendar.getInstance();
@@ -621,8 +612,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
             calendar.set(Calendar.MINUTE, Integer.parseInt(minute));
 
-            if(Calendar.getInstance().getTimeInMillis()>calendar.getTimeInMillis()){
-                calendar.set(Calendar.DATE,calendar.get(Calendar.DATE)+1);
+            if (Calendar.getInstance().getTimeInMillis() > calendar.getTimeInMillis()) {
+                calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
             }
 
             alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
@@ -632,14 +623,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             if (alarmManager != null) {
                 alarmManager.cancel(pendingIntent);
             }
-
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                    AlarmManager.INTERVAL_DAY, pendingIntent);
+            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 }
