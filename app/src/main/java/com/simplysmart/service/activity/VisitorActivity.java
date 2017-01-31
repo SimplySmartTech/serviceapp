@@ -1,17 +1,11 @@
 package com.simplysmart.service.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.TabAdapter;
@@ -21,29 +15,12 @@ import com.simplysmart.service.fragment.VisitorListFragment;
 import com.simplysmart.service.interfaces.ForceScrollListener;
 import com.simplysmart.service.interfaces.PageSelectedListener;
 
-import java.io.File;
-import java.util.ArrayList;
-
 /**
- * Created by shailendrapsp on 27/12/16.
+ * Created by shekhar on 27/12/16.
  */
 
 public class VisitorActivity extends BaseActivity implements ForceScrollListener {
-    private final int REQUEST_TAKE_PHOTO = 1;
-    private final int REQUEST_GALLERY_PHOTO = 2;
-    private String mCurrentPhotoPath;
-    private File image;
 
-    private EditText number_of_visitor;
-    private EditText details;
-    private LinearLayout take_pic_layout;
-    private RecyclerView recyclerView;
-    private RelativeLayout parentLayout;
-    private Button submit;
-
-    private String local_image_urls = "";
-    private ArrayList<String> imageUrls;
-    private FloatingActionButton fab;
     private TabAdapter tabAdapter;
     private ViewPager viewPager;
     private TabLayout tabLayout;
@@ -63,8 +40,8 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-
         setupViewPager();
+
         if (tabLayout != null) {
             tabLayout.setupWithViewPager(viewPager);
             tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -91,6 +68,7 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
     }
 
     private void setupViewPager() {
+
         tabAdapter = new TabAdapter(getSupportFragmentManager(), this);
         tabAdapter.addFragment(new NewVisitorFragment(), "New Visitor");
         tabAdapter.addFragment(new VisitorListFragment(), "Visitor List");
@@ -111,7 +89,6 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
                     pageSelectedListener.onPageSelected();
                     CommonMethod.hideKeyboard(VisitorActivity.this);
                 }
-
             }
 
             @Override

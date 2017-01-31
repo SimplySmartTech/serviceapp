@@ -38,8 +38,10 @@
     <string name="old_time_text">--Click to select time of reading--</string>
     <string name="attendance">Attendance</string>
     <string name="visitor">Visitors</string>
-    <string name="enter_number_of_person">Enter number of person :</string>
-    <string name="enter_details">Enter details :</string>
+    <string name="enter_number_of_person">Please enter number of people</string>
+    <string name="enter_details">Enter details</string>
     <string name="click_here_to_take_photo">Click here to take photo :</string>
+    <string name="alert_txt_madatory">We strongly recommend you enter the mandatory readings :</string>
+    <string name="alert_txt_upload_without_image">All images have not been uploaded yet. Do you want to submit readings without uploading all images ?</string>
 
 </resources>

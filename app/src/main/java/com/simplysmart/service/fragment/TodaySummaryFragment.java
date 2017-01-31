@@ -1,12 +1,14 @@
 package com.simplysmart.service.fragment;
 
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,13 +34,11 @@ import com.simplysmart.service.database.FinalReadingTable;
 import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
-import com.simplysmart.service.dialog.AlertDialogMandatory;
-import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
-import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
+import com.simplysmart.service.dialog.AlertDialogMandatoryV2;
+import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialogV2;
+import com.simplysmart.service.dialog.SubmitWithoutInternetDialogV2;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.EditDialogListener;
-import com.simplysmart.service.interfaces.MandatoryReading;
-import com.simplysmart.service.interfaces.SubmitWithoutInternet;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.Metric;
@@ -51,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -61,28 +60,30 @@ import retrofit2.Response;
  * Created by shekhar on 28/1/17.
  */
 
-public class TodaySummaryFragment extends BaseFragment implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet, MandatoryReading, EditDialogListener {
+public class TodaySummaryFragment extends BaseFragment implements EditDialogListener {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
-    private AllReadingsData allReadingData;
-    private RelativeLayout mParentLayout;
     private SummaryListAdapter adapter;
-    private boolean allDone = false;
-    private boolean initializeUpload = false;
+
+    private RelativeLayout mParentLayout;
     private Button submit, add_new_data;
     private TextView no_data_found;
-    private ArrayList<String> dates;
-    private FloatingActionButton fab;
+
     private String dateForReadings = "";
-    private boolean yesterday = true;
     private SimpleDateFormat sdf;
+    private boolean allDone = false;
 
     private View rootView;
 
+    int mStackLevel = 0;
+    public static final int MANDATORY_DIALOG_FRAGMENT = 1;
+    public static final int SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT = 2;
+    public static final int SUBMIT_DATA_WITHOUT_INTERNET = 3;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_todays_reading,container,false);
+        rootView = inflater.inflate(R.layout.fragment_todays_reading, container, false);
         return rootView;
     }
 
@@ -96,24 +97,44 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
             i.putExtra(StringConstants.UNIT_ID, GlobalData.getInstance().getSelectedUnitId());
             getActivity().startService(i);
         }
-
-        sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         bindViews();
+
         showActivitySpinner();
-        findListOfDates();
         setDataForSummary();
         dismissActivitySpinner();
     }
 
-    private void bindViews() {
-        mParentLayout = (RelativeLayout) rootView.findViewById(R.id.parentLayout);
-        allReadingData = new AllReadingsData();
-        dates = new ArrayList<>();
+    @Override
+    public void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(uploadComplete, new IntentFilter("uploadComplete"));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(uploadImage, new IntentFilter("imageUploadComplete"));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(uploadStarted, new IntentFilter("uploadStarted"));
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(uploadComplete);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(uploadImage);
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(uploadStarted);
+    }
+
+    private void bindViews() {
+
+        mParentLayout = (RelativeLayout) rootView.findViewById(R.id.parentLayout);
+        summary = (RecyclerView) rootView.findViewById(R.id.summary);
         submit = (Button) rootView.findViewById(R.id.submit);
+
+        sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        Calendar c = Calendar.getInstance();
+        dateForReadings = sdf.format(c.getTimeInMillis());
+
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String mandatory = checkAllMandatoryReadings();
                 if (mandatory.equals("")) {
                     checkAndSubmitData();
@@ -122,81 +143,32 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
                 }
             }
         });
-
-        summary = (RecyclerView) rootView.findViewById(R.id.summary);
-        summaryList = new ArrayList<>();
-
-    }
-
-    private void findListOfDates() {
-        dates = new ArrayList<>();
-        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
-        for (int i = 0; i < allReadings.size(); i++) {
-            String date = allReadings.get(i).date_of_reading;
-            if (dates.size() > 0) {
-                if (!dates.contains(date)) {
-                    dates.add(date);
-                }
-            } else {
-                dates.add(date);
-            }
-        }
-
-        Calendar c = Calendar.getInstance();
-        dateForReadings = sdf.format(c.getTimeInMillis());
-
-//        if (dates.size() > 0) {
-//            if (dates.contains(dateForReadings) && dates.size()>1) {
-//                setDataForSummary();
-//                yesterday = true;
-//                dates.remove(dateForReadings);
-//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
-//                fab.setVisibility(View.VISIBLE);
-//            } else {
-//                yesterday = false;
-//                dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
-//                setDataForSummary();
-//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
-//                fab.setVisibility(View.GONE);
-//            }
-//
-//        } else {
-//            yesterday = false;
-//            fab.setVisibility(View.GONE);
-//            dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
-//            setDataForSummary();
-//            getSupportActionBar().setTitle("Summary : "+dateForReadings);
-//        }
     }
 
     private void showMandatoryDialog(String mandatory) {
-        AlertDialogMandatory alertDialogMandatory = AlertDialogMandatory.newInstance("Alert", "We strongly recommend you enter the mandatory readings :" + mandatory, "", "OK");
-        alertDialogMandatory.show(getFragmentManager(), "alertDialogMandatory");
+
+        showDialog(MANDATORY_DIALOG_FRAGMENT, mandatory);
     }
 
     private void setDataForSummary() {
+
         int count = 0;
         summaryList = new ArrayList<>();
         List<MatrixTable> matrixTableList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
+
         if (matrixTableList != null && matrixTableList.size() > 0) {
+
             for (MatrixTable matrixTable : matrixTableList) {
+
                 List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
+
                 if (sensorTableList != null && sensorTableList.size() > 0) {
+
                     for (SensorTable sensorTable : sensorTableList) {
-                        List<ReadingTable> readingsList = new Vector<>();
-                        if(yesterday){
-                            for(String date :dates){
-                                List<ReadingTable> readings = ReadingTable.getReadings(matrixTable.utility_id,sensorTable.sensor_name,date);
-                                if(readings!=null && readings.size()>0){
-                                    for(ReadingTable readingTable : readings){
-                                        readingsList.add(readingTable);
-                                    }
-                                }
-                            }
-                        }else {
-                            readingsList = ReadingTable.getReadings(matrixTable.utility_id,sensorTable.sensor_name,dateForReadings);
-                        }
-                        if (readingsList.size() > 0) {
+                        List<ReadingTable> readingsList = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, dateForReadings);
+
+                        if (readingsList != null && readingsList.size() > 0) {
+
                             Summary header = new Summary();
                             header.setName(matrixTable.type);
                             header.setValue(matrixTable.icon);
@@ -239,7 +211,7 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        adapter = new SummaryListAdapter(summaryList, getActivity(), getFragmentManager(), yesterday);
+        adapter = new SummaryListAdapter(summaryList, getActivity(), getFragmentManager());
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
@@ -267,38 +239,18 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(uploadComplete, new IntentFilter("uploadComplete"));
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(uploadImage, new IntentFilter("imageUploadComplete"));
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(uploadStarted, new IntentFilter("uploadStarted"));
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(uploadComplete);
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(uploadImage);
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(uploadStarted);
-    }
-
     private void checkAndSubmitData() {
         if (allDone) {
             submitData();
         } else {
-            showImageNotUploadedDialog();
+            showDialog(SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT, "");
         }
     }
 
-    private void showImageNotUploadedDialog() {
-        SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert", "All images have not been uploaded yet. Do you want to submit readings without uploading all images ?", "No", "Yes");
-        submitReadingWithoutImageDialog.setCancelable(false);
-        submitReadingWithoutImageDialog.show(getFragmentManager(), "submitReadingWithoutImageDialog");
-    }
-
     private void submitData() {
+
         AllReadingsData allReadingData = getDataToSubmit();
+
         if (NetworkUtilities.isInternet(getActivity())) {
             showActivitySpinner();
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
@@ -307,7 +259,7 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
-                        removeLocalData(GlobalData.getInstance().getSelectedUnitId(),dateForReadings);
+                        removeLocalData(GlobalData.getInstance().getSelectedUnitId(), dateForReadings);
                         dismissActivitySpinner();
                         hideList();
                     } else if (response.code() == 401) {
@@ -327,9 +279,7 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
                 }
             });
         } else {
-            SubmitWithoutInternetDialog dataToSend = SubmitWithoutInternetDialog.newInstance("Alert", getString(R.string.after_internet_send), "", "OK");
-            dataToSend.setCancelable(false);
-            dataToSend.show(getFragmentManager(), "dataToSend");
+            showDialog(SUBMIT_DATA_WITHOUT_INTERNET, "");
         }
     }
 
@@ -348,7 +298,6 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
         add_new_data.setVisibility(View.VISIBLE);
         no_data_found.setVisibility(View.VISIBLE);
         no_data_found.setText(getString(R.string.readings_submitted));
-        findListOfDates();
     }
 
     private AllReadingsData getDataToSubmit() {
@@ -445,31 +394,20 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
         }
     };
 
-    @Override
-    public void submitWithoutImage() {
-        submitData();
-    }
-
-    @Override
-    public void submitWithoutInternet() {
-        saveToDisk(getDataToSubmit());
-    }
-
-    @Override
-    public void continueAhead() {
-        checkAndSubmitData();
-    }
-
     private String checkAllMandatoryReadings() {
 
         String mandatory = "\n";
         List<MatrixTable> matrixMandatoryTables = MatrixTable.getMandatoryList(GlobalData.getInstance().getSelectedUnitId());
+
         if (matrixMandatoryTables != null && matrixMandatoryTables.size() > 0) {
             for (MatrixTable matrixTable : matrixMandatoryTables) {
+
                 List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
                 if (sensorTableList != null && sensorTableList.size() > 0) {
+
                     for (SensorTable sensorTable : sensorTableList) {
                         List<ReadingTable> readings = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name);
+
                         if (readings == null || readings.size() == 0) {
                             mandatory += "\n" + matrixTable.type + " : " + sensorTable.sensor_name;
                         }
@@ -477,7 +415,6 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
                 }
             }
         }
-
         return mandatory;
     }
 
@@ -488,4 +425,77 @@ public class TodaySummaryFragment extends BaseFragment implements SubmitReadingW
             summary.scrollToPosition(position);
         }
     }
+
+    void showDialog(int type, String contentString) {
+
+        mStackLevel++;
+
+        FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+        Fragment prev = getActivity().getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        switch (type) {
+
+            case MANDATORY_DIALOG_FRAGMENT:
+                AlertDialogMandatoryV2 alertDialogMandatory = AlertDialogMandatoryV2.newInstance("Alert", getString(R.string.alert_txt_madatory) + contentString, "", "OK");
+                alertDialogMandatory.setTargetFragment(this, MANDATORY_DIALOG_FRAGMENT);
+                alertDialogMandatory.show(getFragmentManager().beginTransaction(), "alertDialogMandatory");
+                break;
+
+            case SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT:
+                SubmitReadingWithoutImageDialogV2 submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialogV2.newInstance("Alert", getString(R.string.alert_txt_upload_without_image), "No", "Yes");
+                submitReadingWithoutImageDialog.setTargetFragment(this, SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT);
+                submitReadingWithoutImageDialog.show(getFragmentManager().beginTransaction(), "submitReadingWithoutImageDialog");
+                break;
+
+            case SUBMIT_DATA_WITHOUT_INTERNET:
+                SubmitWithoutInternetDialogV2 dataToSend = SubmitWithoutInternetDialogV2.newInstance("Alert", getString(R.string.after_internet_send), "", "OK");
+                dataToSend.setTargetFragment(this, SUBMIT_DATA_WITHOUT_INTERNET);
+                dataToSend.show(getFragmentManager().beginTransaction(), "dataToSend");
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            case MANDATORY_DIALOG_FRAGMENT:
+
+                if (resultCode == Activity.RESULT_OK) {
+                    DebugLog.d("CALLED MANDATORY_DIALOG_FRAGMENT");
+                    checkAndSubmitData();
+
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    // After Cancel code.
+                }
+                break;
+
+            case SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT:
+
+                if (resultCode == Activity.RESULT_OK) {
+                    DebugLog.d("CALLED SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT");
+                    submitData();
+
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    // After Cancel code.
+                }
+                break;
+
+            case SUBMIT_DATA_WITHOUT_INTERNET:
+
+                if (resultCode == Activity.RESULT_OK) {
+                    DebugLog.d("CALLED SUBMIT_DATA_WITHOUT_INTERNET");
+                    saveToDisk(getDataToSubmit());
+
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    // After Cancel code.
+                }
+                break;
+        }
+    }
 }
+

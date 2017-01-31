@@ -2,7 +2,6 @@ package com.simplysmart.service.fragment;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -13,7 +12,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,10 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.activity.BaseActivity;
 import com.simplysmart.service.activity.ImageViewActivity;
-import com.simplysmart.service.activity.VisitorActivity;
-import com.simplysmart.service.adapter.VisitorListAdapter;
+import com.simplysmart.service.adapter.VisitorImageListAdapter;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
@@ -51,10 +47,11 @@ import java.util.Locale;
 import static android.app.Activity.RESULT_OK;
 
 /**
- * Created by shailendrapsp on 30/12/16.
+ * Created by shekhar on 30/12/16.
  */
 
 public class NewVisitorFragment extends BaseFragment {
+
     private View rootView;
     private final int REQUEST_TAKE_PHOTO = 1;
     private final int REQUEST_GALLERY_PHOTO = 2;
@@ -63,7 +60,6 @@ public class NewVisitorFragment extends BaseFragment {
 
     private EditText number_of_visitor;
     private EditText details;
-    private LinearLayout take_pic_layout;
     private RecyclerView recyclerView;
     private RelativeLayout parentLayout;
     private Button submit;
@@ -163,7 +159,7 @@ public class NewVisitorFragment extends BaseFragment {
 
     private void addPicToGrid() {
         if (imageUrls != null && imageUrls.size() > 0) {
-            VisitorListAdapter visitorListAdapter = new VisitorListAdapter(getContext(), imageUrls);
+            VisitorImageListAdapter visitorListAdapter = new VisitorImageListAdapter(getContext(), imageUrls);
             GridLayoutManager glm = new GridLayoutManager(getContext(), 2);
             recyclerView.setLayoutManager(glm);
             recyclerView.setAdapter(visitorListAdapter);
@@ -355,17 +351,6 @@ public class NewVisitorFragment extends BaseFragment {
 
         mCurrentPhotoPath = image.getAbsolutePath();
         return image;
-    }
-
-    public File getTempFile(Context context, String url) {
-        File file = null;
-        try {
-            String fileName = Uri.parse(url).getLastPathSegment();
-            file = File.createTempFile(fileName, ".jpg", context.getCacheDir());
-        } catch (IOException e) {
-            // Error while creating file
-        }
-        return file;
     }
 
     private void compressAndDeleteFile(String imageUrl, boolean delete) {

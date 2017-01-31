@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.MainActivity;
-import com.simplysmart.service.adapter.SummaryListAdapter;
+import com.simplysmart.service.adapter.YesterdaySummaryListAdapter;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
@@ -67,7 +67,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
     private ArrayList<Summary> summaryList;
     private AllReadingsData allReadingData;
     private RelativeLayout mParentLayout;
-    private SummaryListAdapter adapter;
+    private YesterdaySummaryListAdapter adapter;
     private boolean allDone = false;
     private boolean initializeUpload = false;
     private Button submit, add_new_data;
@@ -239,7 +239,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        adapter = new SummaryListAdapter(summaryList, getActivity(), getFragmentManager(), yesterday);
+        adapter = new YesterdaySummaryListAdapter(summaryList, getActivity(), getFragmentManager(), yesterday);
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 

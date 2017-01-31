@@ -616,16 +616,16 @@ public class InputReadingFormActivity extends BaseActivity implements EditDialog
         if (readingListAdapter != null) {
             int pos = readingListAdapter.addElement(readingTable);
             readingList.scrollToPosition(pos);
-            if(backdated){
-                showEditDialog(readingTable,pos);
-            }
+//            if(backdated){
+//                showEditDialog(readingTable,pos);
+//            }
 
         } else {
             List<ReadingTable> list = ReadingTable.getReadings(utility_id, sensor_name);
             setDataInList(list);
-            if(backdated){
-                showEditDialog(readingTable,0);
-            }
+//            if(backdated){
+//                showEditDialog(readingTable,0);
+//            }
         }
     }
 

@@ -143,17 +143,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.submit:
-                //do this
-                Intent intent = new Intent(this, SummaryActivity.class);
-                startActivity(intent);
-                break;
             case R.id.logout:
                 AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
                         .show(getFragmentManager(), "logout");
@@ -321,9 +315,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             e.printStackTrace();
         }
 
-        List<MatrixTable> matrixList;
-        matrixList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
-
+        List<MatrixTable> matrixList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
         setDataInList(matrixList);
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -447,17 +439,12 @@ public class MainActivity extends BaseActivity implements LogoutListener {
             }
         });
 
-        if (NetworkUtilities.isInternet(this)) {
-            swipeRefreshLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    swipeRefreshLayout.setRefreshing(true);
-                    getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
-                }
-            });
-        } else {
-            setOfflineData();
-        }
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                refreshLayout();
+            }
+        });
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override

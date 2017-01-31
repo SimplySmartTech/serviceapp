@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <permission
         android:name="com.simplysmart.service.permission.C2D_MESSAGE"
@@ -20,7 +20,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".config.GlobalData"
@@ -56,25 +56,31 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".activity.SummaryActivity"
+        <activity
+            android:name=".activity.SummaryActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".activity.SensorListActivity"
+        <activity
+            android:name=".activity.SensorListActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".activity.ImageViewActivity"
+        <activity
+            android:name=".activity.ImageViewActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ThemeStyle" />
 
-        <activity android:name=".activity.AttendanceActivity"
+        <activity
+            android:name=".activity.AttendanceActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".activity.VisitorActivity"
+        <activity
+            android:name=".activity.VisitorActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|stateHidden" />
 
 
         <!-- Push Notification GCM Services & Receivers -->
@@ -91,17 +97,18 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".service.NetworkChangeReceiver"
+        <receiver
+            android:name=".service.NetworkChangeReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".service.AlarmReceiver"
-            android:exported="true"
-            android:enabled="true">
-        </receiver>
+        <receiver
+            android:name=".service.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
 
         <service
             android:name=".gcm.MyGcmListenerService"
@@ -123,17 +130,19 @@
             </intent-filter>
         </service>
 
-        <service android:enabled="true" android:name=".service.AlarmService" />
+        <service
+            android:name=".service.AlarmService"
+            android:enabled="true" />
 
         <service android:name=".service.PhotoUploadService" />
 
         <service android:name=".service.ReadingSubmitService" />
 
-        <service android:name=".service.AttendanceUploadService"/>
+        <service android:name=".service.AttendanceUploadService" />
 
-        <service android:name=".service.CheckAttendanceTimeService"/>'
+        <service android:name=".service.CheckAttendanceTimeService" />'
 
-        <service android:name=".service.VisitorInfoUploadService"/>
+        <service android:name=".service.VisitorInfoUploadService" />
 
         <!-- Google play service version -->
         <meta-data

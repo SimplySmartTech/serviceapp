@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parentLayout"
     android:layout_width="match_parent"
-    android:focusableInTouchMode="true"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -12,60 +13,55 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="8dp">
 
-            <LinearLayout
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:orientation="vertical">
+                android:padding="8dp">
 
-                <android.support.design.widget.TextInputLayout
+                <EditText
+                    android:id="@+id/noOfPersons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:padding="8dp">
+                    android:focusableInTouchMode="true"
+                    android:hint="@string/enter_number_of_person"
+                    android:inputType="number"
+                    android:maxLength="4"
+                    android:maxLines="1"
+                    android:nextFocusDown="@+id/details"
+                    android:paddingEnd="12dp"
+                    android:paddingStart="12dp"
+                    android:textSize="14sp" />
 
-                    <EditText
-                        android:id="@+id/noOfPersons"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusableInTouchMode="true"
-                        android:hint="@string/enter_number_of_person"
-                        android:inputType="number"
-                        android:maxLength="4"
-                        android:nextFocusDown="@+id/details"
-                        android:paddingStart="12dp"
-                        android:textSize="16sp"
-                        android:windowSoftInputMode="adjustPan" />
+            </android.support.design.widget.TextInputLayout>
 
-                </android.support.design.widget.TextInputLayout>
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/detailsWrapper"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
 
-                <android.support.design.widget.TextInputLayout
+                <EditText
+                    android:id="@+id/details"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="8dp">
+                    android:focusableInTouchMode="true"
+                    android:hint="@string/enter_details"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLines="5"
+                    android:paddingEnd="12sp"
+                    android:paddingStart="12dp"
+                    android:textSize="14sp" />
 
-                    <EditText
-                        android:id="@+id/details"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:focusableInTouchMode="true"
-                        android:hint="@string/enter_details"
-                        android:inputType="textCapSentences|textMultiLine"
-                        android:paddingStart="12dp"
-                        android:textSize="16sp"
-                        android:windowSoftInputMode="adjustPan" />
+            </android.support.design.widget.TextInputLayout>
 
-                </android.support.design.widget.TextInputLayout>
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/photoList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="2dp" />
-
-            </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/photoList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dp" />
 
         </LinearLayout>
 
