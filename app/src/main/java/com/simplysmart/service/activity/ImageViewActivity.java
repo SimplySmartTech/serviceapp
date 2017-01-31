@@ -230,17 +230,6 @@ public class ImageViewActivity extends BaseActivity {
         return image;
     }
 
-    public File getTempFile(Context context, String url) {
-        File file = null;
-        try {
-            String fileName = Uri.parse(url).getLastPathSegment();
-            file = File.createTempFile(fileName, ".jpg", context.getCacheDir());
-        } catch (IOException e) {
-            // Error while creating file
-        }
-        return file;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 

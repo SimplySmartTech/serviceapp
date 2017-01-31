@@ -35,7 +35,6 @@ import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.AttendanceTable;
 import com.simplysmart.service.permission.MarshmallowPermission;
 import com.simplysmart.service.service.AttendanceUploadService;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -291,17 +290,6 @@ public class AttendanceActivity extends BaseActivity {
         return image;
     }
 
-    public File getTempFile(Context context, String url) {
-        File file = null;
-        try {
-            String fileName = Uri.parse(url).getLastPathSegment();
-            file = File.createTempFile(fileName, ".jpg", context.getCacheDir());
-        } catch (IOException e) {
-            // Error while creating file
-        }
-        return file;
-    }
-
     private void compressAndDeleteFile(String imageUrl, boolean delete) {
         File imageFile = new File(imageUrl);
         String compressedPath = "";
@@ -327,24 +315,6 @@ public class AttendanceActivity extends BaseActivity {
         intent.putExtra(StringConstants.ALLOW_NEW_IMAGE, true);
         intent.putExtra(StringConstants.DISABLE_GALLERY, true);
         startActivityForResult(intent, StringConstants.IMAGE_CHANGED);
-    }
-
-    private void setPic(ImageView view, String imageUrl) {
-        File image = new File(imageUrl);
-
-        if (image.exists()) {
-            Picasso.with(this).load(image)
-                    .placeholder(R.drawable.ic_photo_black_48dp)
-                    .noFade()
-                    .fit().centerCrop()
-//                    .resize(48, 48)
-                    .error(R.drawable.ic_menu_slideshow).into(view);
-            view.setAlpha(1.0f);
-            view.setVisibility(View.VISIBLE);
-            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        }
-
-        submit.setVisibility(View.VISIBLE);
     }
 
     private void bindViews() {

@@ -33,7 +33,7 @@
                     android:nextFocusDown="@+id/details"
                     android:paddingEnd="12dp"
                     android:paddingStart="12dp"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -53,7 +53,7 @@
                     android:maxLines="5"
                     android:paddingEnd="12sp"
                     android:paddingStart="12dp"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
             </android.support.design.widget.TextInputLayout>
 
