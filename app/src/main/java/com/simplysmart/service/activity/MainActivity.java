@@ -73,28 +73,18 @@ import retrofit2.Response;
 
 public class MainActivity extends BaseActivity implements LogoutListener {
 
-    AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
-
     private TextView no_data_found, add_previous_reading;
     private RecyclerView matrixList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Button submitButton;
-    private MatrixResponse matrixResponse;
-    private int lastExpandedPosition = -1;
     private NavigationView navigationView;
-
-    private boolean savedToDisk = false;
-    private ArrayList<MatrixData> adapterData;
 
     private ArrayList<Unit> units;
     private User residentData;
 
     private boolean isRunning = true;
     private boolean backdated = false;
-    private MatrixTableAdapter adapter;
     private MatrixTableAdapter matrixTableAdapter;
-    private SimpleDateFormat sdf;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -344,8 +334,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private void updateMetricList(Intent intent) {
         int groupPosition = intent.getIntExtra("groupPosition", -1);
         int childPosition = intent.getIntExtra("childPosition", -1);
-
-        matrixResponse.getData().get(groupPosition).getSensors().get(childPosition).setChecked(true);
     }
 
     //Fetch logged user info from shared preferences
@@ -574,7 +562,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     }
 
     private void modifyPrevReadings() {
-        sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         SharedPreferences sharedPreferences = getSharedPreferences(StringConstants.NEED_TO_CHECK, MODE_PRIVATE);
         SharedPreferences.Editor edit = sharedPreferences.edit();
 
@@ -603,9 +591,9 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
             }
 
-            alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
             Intent alarmIntent = new Intent(MainActivity.this, AlarmReceiver.class);
-            pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, alarmIntent, 0);
 
             if (alarmManager != null) {
                 alarmManager.cancel(pendingIntent);

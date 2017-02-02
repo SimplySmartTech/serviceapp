@@ -23,7 +23,7 @@
     <string name="save_reading">Save Reading</string>
     <string name="error_no_data_found">No readings saved.</string>
     <string name="readings_submitted">All readings submitted.</string>
-    <string name="add_data_now">Take readings now.</string>
+    <string name="add_data_now">Take reading now.</string>
     <string name="edit_value">EDIT</string>
     <string name="add">ADD</string>
     <string name="dummy_text">Weight of the empty truck — dropdown with truck number and editable field to update or add new truck number with photo</string>
