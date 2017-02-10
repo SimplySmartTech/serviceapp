@@ -105,6 +105,7 @@ public class SummaryListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 setPic(viewHolder.photo, null);
             }
 
+            viewHolder.edit.setVisibility(View.GONE);
             viewHolder.edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

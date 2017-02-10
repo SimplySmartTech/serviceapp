@@ -1,5 +1,8 @@
 package com.simplysmart.service.fragment;
 
+import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.MainActivity;
 import com.simplysmart.service.adapter.YesterdaySummaryListAdapter;
+import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
@@ -31,13 +35,12 @@ import com.simplysmart.service.database.FinalReadingTable;
 import com.simplysmart.service.database.MatrixTable;
 import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
-import com.simplysmart.service.dialog.AlertDialogMandatory;
+import com.simplysmart.service.dialog.AlertDialogMandatoryV2;
 import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialog;
-import com.simplysmart.service.dialog.SubmitWithoutInternetDialog;
+import com.simplysmart.service.dialog.SubmitReadingWithoutImageDialogV2;
+import com.simplysmart.service.dialog.SubmitWithoutInternetDialogV2;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.EditDialogListener;
-import com.simplysmart.service.interfaces.MandatoryReading;
-import com.simplysmart.service.interfaces.SubmitWithoutInternet;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.Metric;
@@ -50,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,7 +63,7 @@ import retrofit2.Response;
  * Created by shekhar on 28/1/17.
  */
 
-public class YesterdaySummaryFragment extends BaseFragment implements SubmitReadingWithoutImageDialog.SubmitWithoutImage, SubmitWithoutInternet, MandatoryReading, EditDialogListener {
+public class YesterdaySummaryFragment extends BaseFragment implements EditDialogListener {
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
@@ -70,8 +74,14 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
     private TextView no_data_found;
     private String dateForReadings = "";
     private SimpleDateFormat sdf;
+    private ArrayList<String> dates;
 
     private View rootView;
+
+    int mStackLevel = 0;
+    public static final int MANDATORY_DIALOG_FRAGMENT = 1;
+    public static final int SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT = 2;
+    public static final int SUBMIT_DATA_WITHOUT_INTERNET = 3;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -121,53 +131,56 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
         });
     }
 
-//    private void findListOfDates() {
-//        dates = new ArrayList<>();
-//        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
-//        for (int i = 0; i < allReadings.size(); i++) {
-//            String date = allReadings.get(i).date_of_reading;
-//            if (dates.size() > 0) {
-//                if (!dates.contains(date)) {
-//                    dates.add(date);
-//                }
+    private void findListOfDates() {
+
+        dates = new ArrayList<>();
+        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
+
+        for (int i = 0; i < allReadings.size(); i++) {
+            String date = allReadings.get(i).date_of_reading;
+            if (dates.size() > 0) {
+                if (!dates.contains(date)) {
+                    dates.add(date);
+                }
+            } else {
+                dates.add(date);
+            }
+        }
+
+        Calendar c = Calendar.getInstance();
+        dateForReadings = sdf.format(c.getTimeInMillis());
+
+//        if (dates.size() > 0) {
+//            if (dates.contains(dateForReadings) && dates.size()>1) {
+//                setDataForSummary();
+//                yesterday = true;
+//                dates.remove(dateForReadings);
+//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+//                fab.setVisibility(View.VISIBLE);
 //            } else {
-//                dates.add(date);
+//                yesterday = false;
+//                dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+//                setDataForSummary();
+//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+//                fab.setVisibility(View.GONE);
 //            }
+//
+//        } else {
+//            yesterday = false;
+//            fab.setVisibility(View.GONE);
+//            dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+//            setDataForSummary();
+//            getSupportActionBar().setTitle("Summary : "+dateForReadings);
 //        }
-//
-//        Calendar c = Calendar.getInstance();
-//        dateForReadings = sdf.format(c.getTimeInMillis());
-//
-////        if (dates.size() > 0) {
-////            if (dates.contains(dateForReadings) && dates.size()>1) {
-////                setDataForSummary();
-////                yesterday = true;
-////                dates.remove(dateForReadings);
-////                getSupportActionBar().setTitle("Summary : " + dateForReadings);
-////                fab.setVisibility(View.VISIBLE);
-////            } else {
-////                yesterday = false;
-////                dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
-////                setDataForSummary();
-////                getSupportActionBar().setTitle("Summary : " + dateForReadings);
-////                fab.setVisibility(View.GONE);
-////            }
-////
-////        } else {
-////            yesterday = false;
-////            fab.setVisibility(View.GONE);
-////            dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
-////            setDataForSummary();
-////            getSupportActionBar().setTitle("Summary : "+dateForReadings);
-////        }
-//    }
+    }
 
     private void showMandatoryDialog(String mandatory) {
-        AlertDialogMandatory alertDialogMandatory = AlertDialogMandatory.newInstance("Alert", "We strongly recommend you enter the mandatory readings :" + mandatory, "", "OK");
-        alertDialogMandatory.show(getFragmentManager(), "alertDialogMandatory");
+        showDialog(MANDATORY_DIALOG_FRAGMENT, mandatory);
     }
 
     private void setDataForSummary() {
+
+        findListOfDates();
 
         int count = 0;
         summaryList = new ArrayList<>();
@@ -182,9 +195,35 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
                 if (sensorTableList != null && sensorTableList.size() > 0) {
 
                     for (SensorTable sensorTable : sensorTableList) {
-                        List<ReadingTable> readingsList = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, dateForReadings);
+                        List<ReadingTable> readingsList = new Vector<>();//ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, date);
 
-                        if (readingsList != null && readingsList.size() > 0) {
+                        String date = "";
+                        if (dates.size() > 1) {
+                            if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dates.get(1), "dd/MM/yyyy") > 0) {
+                                date = dates.get(1);
+                            } else {
+                                date = dates.get(0);
+                            }
+                        } else if (dates.size() > 0) {
+                            if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dateForReadings, "dd/MM/yyyy") >= 0) {
+                                date = "";
+                            } else if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dateForReadings, "dd/MM/yyyy") == -1) {
+                                date = "";
+                            } else {
+                                date = dates.get(0);
+                            }
+                        } else {
+                            date = "";
+                        }
+
+                        List<ReadingTable> readings = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, date);
+                        if (readings != null && readings.size() > 0) {
+                            for (ReadingTable readingTable : readings) {
+                                readingsList.add(readingTable);
+                            }
+                        }
+
+                        if (readingsList.size() > 0) {
 
                             Summary header = new Summary();
                             header.setName(matrixTable.type);
@@ -225,6 +264,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
     }
 
     private void setDataInList() {
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         adapter = new YesterdaySummaryListAdapter(summaryList, getActivity(), getFragmentManager());
         summary.setLayoutManager(linearLayoutManager);
@@ -274,7 +314,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
         if (allDone) {
             submitData();
         } else {
-            showImageNotUploadedDialog();
+            showDialog(SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT, "");
         }
     }
 
@@ -294,7 +334,9 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
-                        removeLocalData(GlobalData.getInstance().getSelectedUnitId(), dateForReadings);
+                        for (String date : dates) {
+                            removeLocalData(GlobalData.getInstance().getSelectedUnitId(), date);
+                        }
                         dismissActivitySpinner();
                         hideList();
                     } else if (response.code() == 401) {
@@ -314,12 +356,9 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
                 }
             });
         } else {
-            SubmitWithoutInternetDialog dataToSend = SubmitWithoutInternetDialog.newInstance("Alert", getString(R.string.after_internet_send), "", "OK");
-            dataToSend.setCancelable(false);
-            dataToSend.show(getFragmentManager(), "dataToSend");
+            showDialog(SUBMIT_DATA_WITHOUT_INTERNET, "");
         }
     }
-
 
     private void saveToDisk(AllReadingsData allReadingData) {
         String jsonToSend = new Gson().toJson(allReadingData);
@@ -351,11 +390,21 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
                 if (sensorTableList != null && sensorTableList.size() > 0) {
                     for (SensorTable sensorTable : sensorTableList) {
 
-                        List<ReadingTable> readings = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name, dateForReadings);
-                        if (readings != null && readings.size() > 0) {
+                        List<ReadingTable> readingsList = new Vector<>();// ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name, dateForReadings);
+
+                        for (String date : dates) {
+                            List<ReadingTable> readings = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, date);
+                            if (readings != null && readings.size() > 0) {
+                                for (ReadingTable readingTable : readings) {
+                                    readingsList.add(readingTable);
+                                }
+                            }
+                        }
+
+                        if (readingsList.size() > 0) {
 
                             ArrayList<Reading> readingToSend = new ArrayList<>();
-                            for (ReadingTable readingTable : readings) {
+                            for (ReadingTable readingTable : readingsList) {
                                 Reading reading = new Reading();
                                 if (readingTable.tare_weight != null && !readingTable.tare_weight.equalsIgnoreCase("")) {
                                     reading.setTare_weight(readingTable.tare_weight);
@@ -389,7 +438,6 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
         allReadingData.setMetrics(metrics);
         return allReadingData;
     }
-
 
     private void findAndUpdateElement(ReadingTable table) {
         String local_photo_url = table.local_photo_url;
@@ -434,21 +482,6 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
         }
     };
 
-    @Override
-    public void submitWithoutImage() {
-        submitData();
-    }
-
-    @Override
-    public void submitWithoutInternet() {
-        saveToDisk(getDataToSubmit());
-    }
-
-    @Override
-    public void continueAhead() {
-        checkAndSubmitData();
-    }
-
     private String checkAllMandatoryReadings() {
 
         String mandatory = "\n";
@@ -475,6 +508,78 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
         if (done == StringConstants.NEW_VALUE) {
             setDataForSummary();
             summary.scrollToPosition(position);
+        }
+    }
+
+    void showDialog(int type, String contentString) {
+
+        mStackLevel++;
+
+        FragmentTransaction ft = getActivity().getFragmentManager().beginTransaction();
+        Fragment prev = getActivity().getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        switch (type) {
+
+            case MANDATORY_DIALOG_FRAGMENT:
+                AlertDialogMandatoryV2 alertDialogMandatory = AlertDialogMandatoryV2.newInstance("Alert", getString(R.string.alert_txt_madatory) + contentString, "", "OK");
+                alertDialogMandatory.setTargetFragment(this, MANDATORY_DIALOG_FRAGMENT);
+                alertDialogMandatory.show(getFragmentManager().beginTransaction(), "alertDialogMandatory");
+                break;
+
+            case SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT:
+                SubmitReadingWithoutImageDialogV2 submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialogV2.newInstance("Alert", getString(R.string.alert_txt_upload_without_image), "No", "Yes");
+                submitReadingWithoutImageDialog.setTargetFragment(this, SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT);
+                submitReadingWithoutImageDialog.show(getFragmentManager().beginTransaction(), "submitReadingWithoutImageDialog");
+                break;
+
+            case SUBMIT_DATA_WITHOUT_INTERNET:
+                SubmitWithoutInternetDialogV2 dataToSend = SubmitWithoutInternetDialogV2.newInstance("Alert", getString(R.string.after_internet_send), "", "OK");
+                dataToSend.setTargetFragment(this, SUBMIT_DATA_WITHOUT_INTERNET);
+                dataToSend.show(getFragmentManager().beginTransaction(), "dataToSend");
+                break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+
+            case MANDATORY_DIALOG_FRAGMENT:
+
+                if (resultCode == Activity.RESULT_OK) {
+                    DebugLog.d("CALLED MANDATORY_DIALOG_FRAGMENT");
+                    checkAndSubmitData();
+
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    // After Cancel code.
+                }
+                break;
+
+            case SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT:
+
+                if (resultCode == Activity.RESULT_OK) {
+                    DebugLog.d("CALLED SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT");
+                    submitData();
+
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    // After Cancel code.
+                }
+                break;
+
+            case SUBMIT_DATA_WITHOUT_INTERNET:
+
+                if (resultCode == Activity.RESULT_OK) {
+                    DebugLog.d("CALLED SUBMIT_DATA_WITHOUT_INTERNET");
+                    saveToDisk(getDataToSubmit());
+
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    // After Cancel code.
+                }
+                break;
         }
     }
 

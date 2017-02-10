@@ -227,15 +227,53 @@ public class InputReadingFormActivity extends BaseActivity implements EditDialog
     }
 
     private void checkForPreviousData() {
+
         List<ReadingTable> readings = ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name);
+
         if (readings != null && readings.size() > 0) {
             String oldDate = getDate(readings.get(0).timestamp, "dd-MM-yyyy");
             String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
-            if (!oldDate.equals(newDate)) {
-                SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
-                dialog.show(getFragmentManager(), "submitDialog");
+
+            ArrayList<String> dates = new ArrayList<>();
+            List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
+
+            for (int i = 0; i < allReadings.size(); i++) {
+                String date = allReadings.get(i).date_of_reading;
+                if (dates.size() > 0) {
+                    if (!dates.contains(date)) {
+                        dates.add(date);
+                    }
+                } else {
+                    dates.add(date);
+                }
             }
 
+            if (!oldDate.equals(newDate)) {
+                if (dates.size() > 1) {
+                    if (CommonMethod.diffInDays(oldDate, "dd-MM-yyyy", newDate, "dd-MM-yyyy") <= -2) {
+                        SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "", "SUBMIT NOW");
+                        dialog.show(getFragmentManager(), "submitDialog");
+                        dialog.setCancelable(false);
+
+                    } else {
+                        SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
+                        dialog.show(getFragmentManager(), "submitDialog");
+                        dialog.setCancelable(true);
+                    }
+                } else {
+
+                    if (CommonMethod.diffInDays(oldDate, "dd-MM-yyyy", newDate, "dd-MM-yyyy") <= -2) {
+                        SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "", "SUBMIT NOW");
+                        dialog.show(getFragmentManager(), "submitDialog");
+                        dialog.setCancelable(false);
+
+                    } else {
+                        SubmitReadingDialog dialog = SubmitReadingDialog.newInstance("ALERT", "You have not submitted previous data. Would you like to submit now ?", "LATER", "SUBMIT NOW");
+                        dialog.show(getFragmentManager(), "submitDialog");
+                        dialog.setCancelable(true);
+                    }
+                }
+            }
             setDataInList(readings);
         }
     }
@@ -332,7 +370,7 @@ public class InputReadingFormActivity extends BaseActivity implements EditDialog
 
     private void initialiseViews() {
 
-        if(sensorData.placeholder!=null && !sensorData.placeholder.equalsIgnoreCase("")){
+        if (sensorData.placeholder != null && !sensorData.placeholder.equalsIgnoreCase("")) {
             mInputReadingValue.setHint(sensorData.placeholder);
         }
 

@@ -106,6 +106,7 @@ public class YesterdaySummaryListAdapter extends RecyclerView.Adapter<RecyclerVi
                 setPic(viewHolder.photo, null);
             }
 
+            viewHolder.edit.setVisibility(View.INVISIBLE);
             viewHolder.edit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

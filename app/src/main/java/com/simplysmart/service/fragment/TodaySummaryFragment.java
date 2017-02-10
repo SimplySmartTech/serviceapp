@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.MainActivity;
 import com.simplysmart.service.adapter.SummaryListAdapter;
+import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -73,6 +75,8 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
     private String dateForReadings = "";
     private SimpleDateFormat sdf;
     private boolean allDone = false;
+
+    private ArrayList<String> dates;
 
     private View rootView;
 
@@ -145,12 +149,57 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
         });
     }
 
+    private void findListOfDates() {
+
+        dates = new ArrayList<>();
+        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
+
+        for (int i = 0; i < allReadings.size(); i++) {
+            String date = allReadings.get(i).date_of_reading;
+            if (dates.size() > 0) {
+                if (!dates.contains(date)) {
+                    dates.add(date);
+                }
+            } else {
+                dates.add(date);
+            }
+        }
+
+        Calendar c = Calendar.getInstance();
+        dateForReadings = sdf.format(c.getTimeInMillis());
+
+//        if (dates.size() > 0) {
+//            if (dates.contains(dateForReadings) && dates.size()>1) {
+//                setDataForSummary();
+//                yesterday = true;
+//                dates.remove(dateForReadings);
+//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+//                fab.setVisibility(View.VISIBLE);
+//            } else {
+//                yesterday = false;
+//                dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+//                setDataForSummary();
+//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+//                fab.setVisibility(View.GONE);
+//            }
+//
+//        } else {
+//            yesterday = false;
+//            fab.setVisibility(View.GONE);
+//            dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+//            setDataForSummary();
+//            getSupportActionBar().setTitle("Summary : "+dateForReadings);
+//        }
+    }
+
     private void showMandatoryDialog(String mandatory) {
 
         showDialog(MANDATORY_DIALOG_FRAGMENT, mandatory);
     }
 
     private void setDataForSummary() {
+
+        findListOfDates();
 
         int count = 0;
         summaryList = new ArrayList<>();
@@ -165,7 +214,26 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
                 if (sensorTableList != null && sensorTableList.size() > 0) {
 
                     for (SensorTable sensorTable : sensorTableList) {
-                        List<ReadingTable> readingsList = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, dateForReadings);
+
+                        String date = "";
+                        if (dates.size() > 1) {
+                            if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dates.get(1), "dd/MM/yyyy") > 0) {
+                                date = dates.get(0);
+                            } else {
+                                date = dates.get(1);
+                            }
+                        } else if (dates.size() > 0) {
+                            if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dateForReadings, "dd/MM/yyyy") >= 0) {
+                                date = dateForReadings;
+                            } else if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dateForReadings, "dd/MM/yyyy") == -1) {
+                                date = dates.get(0);
+                            } else {
+                                date = "";
+                            }
+                        } else {
+                            date = "";
+                        }
+                        List<ReadingTable> readingsList = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, date);
 
                         if (readingsList != null && readingsList.size() > 0) {
 
@@ -259,7 +327,9 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
-                        removeLocalData(GlobalData.getInstance().getSelectedUnitId(), dateForReadings);
+                        for (String date : dates) {
+                            removeLocalData(GlobalData.getInstance().getSelectedUnitId(), date);
+                        }
                         dismissActivitySpinner();
                         hideList();
                     } else if (response.code() == 401) {
@@ -312,11 +382,19 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
                 if (sensorTableList != null && sensorTableList.size() > 0) {
                     for (SensorTable sensorTable : sensorTableList) {
 
-                        List<ReadingTable> readings = ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name, dateForReadings);
-                        if (readings != null && readings.size() > 0) {
+                        List<ReadingTable> readingsList = new Vector<>();//ReadingTable.getReadings(sensorTable.utility_identifier, sensorTable.sensor_name, dateForReadings);
+                        for (String date : dates) {
+                            List<ReadingTable> readings = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, date);
+                            if (readings != null && readings.size() > 0) {
+                                for (ReadingTable readingTable : readings) {
+                                    readingsList.add(readingTable);
+                                }
+                            }
+                        }
+                        if (readingsList.size() > 0) {
 
                             ArrayList<Reading> readingToSend = new ArrayList<>();
-                            for (ReadingTable readingTable : readings) {
+                            for (ReadingTable readingTable : readingsList) {
                                 Reading reading = new Reading();
                                 if (readingTable.tare_weight != null && !readingTable.tare_weight.equalsIgnoreCase("")) {
                                     reading.setTare_weight(readingTable.tare_weight);

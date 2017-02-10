@@ -398,18 +398,19 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
         ReadingTable readings = new Select().from(ReadingTable.class).executeSingle();
         if (readings != null) {
-            String oldDate = getDate(readings.timestamp, "dd-MM-yyyy");
-            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
-            if (!oldDate.equals(newDate)) {
-                calendar.setTimeInMillis(time - 86400000);
-                month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
-                dateOfMonth = calendar.get(Calendar.DATE);
-                buttonText = "Submit readings for " + dateOfMonth + " " + month;
-            } else {
-                month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
-                dateOfMonth = calendar.get(Calendar.DATE);
-                buttonText = "Submit readings for " + dateOfMonth + " " + month;
-            }
+//            String oldDate = getDate(readings.timestamp, "dd-MM-yyyy");
+//            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
+//            if (!oldDate.equals(newDate)) {
+//                calendar.setTimeInMillis(time - 86400000);
+//                month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
+//                dateOfMonth = calendar.get(Calendar.DATE);
+//                buttonText = "Submit readings for " + dateOfMonth + " " + month;
+//            } else {
+//                month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
+//                dateOfMonth = calendar.get(Calendar.DATE);
+//                buttonText = "Submit readings for " + dateOfMonth + " " + month;
+//            }
+            buttonText = "Submit readings";
         } else {
             month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
             dateOfMonth = calendar.get(Calendar.DATE);
