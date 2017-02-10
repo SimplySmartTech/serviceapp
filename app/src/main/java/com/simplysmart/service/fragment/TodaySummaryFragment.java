@@ -97,8 +97,8 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
             i.putExtra(StringConstants.UNIT_ID, GlobalData.getInstance().getSelectedUnitId());
             getActivity().startService(i);
         }
-        bindViews();
 
+        bindViews();
         showActivitySpinner();
         setDataForSummary();
         dismissActivitySpinner();

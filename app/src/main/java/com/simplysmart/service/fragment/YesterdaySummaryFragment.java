@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -51,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -65,24 +63,19 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
 
     private RecyclerView summary;
     private ArrayList<Summary> summaryList;
-    private AllReadingsData allReadingData;
     private RelativeLayout mParentLayout;
     private YesterdaySummaryListAdapter adapter;
     private boolean allDone = false;
-    private boolean initializeUpload = false;
     private Button submit, add_new_data;
     private TextView no_data_found;
-    private ArrayList<String> dates;
-    private FloatingActionButton fab;
     private String dateForReadings = "";
-    private boolean yesterday = true;
     private SimpleDateFormat sdf;
 
     private View rootView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_yesterday_reading,container,false);
+        rootView = inflater.inflate(R.layout.fragment_yesterday_reading, container, false);
         return rootView;
     }
 
@@ -100,17 +93,21 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
         sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         bindViews();
         showActivitySpinner();
-        findListOfDates();
+//        findListOfDates();
         setDataForSummary();
         dismissActivitySpinner();
     }
 
     private void bindViews() {
         mParentLayout = (RelativeLayout) rootView.findViewById(R.id.parentLayout);
-        allReadingData = new AllReadingsData();
-        dates = new ArrayList<>();
-
+        summary = (RecyclerView) rootView.findViewById(R.id.summary);
         submit = (Button) rootView.findViewById(R.id.submit);
+
+        sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+        Calendar c = Calendar.getInstance();
+        dateForReadings = sdf.format(c.getTimeInMillis());
+
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,52 +119,48 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
                 }
             }
         });
-
-        summary = (RecyclerView) rootView.findViewById(R.id.summary);
-        summaryList = new ArrayList<>();
-
     }
 
-    private void findListOfDates() {
-        dates = new ArrayList<>();
-        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
-        for (int i = 0; i < allReadings.size(); i++) {
-            String date = allReadings.get(i).date_of_reading;
-            if (dates.size() > 0) {
-                if (!dates.contains(date)) {
-                    dates.add(date);
-                }
-            } else {
-                dates.add(date);
-            }
-        }
-
-        Calendar c = Calendar.getInstance();
-        dateForReadings = sdf.format(c.getTimeInMillis());
-
-//        if (dates.size() > 0) {
-//            if (dates.contains(dateForReadings) && dates.size()>1) {
-//                setDataForSummary();
-//                yesterday = true;
-//                dates.remove(dateForReadings);
-//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
-//                fab.setVisibility(View.VISIBLE);
+//    private void findListOfDates() {
+//        dates = new ArrayList<>();
+//        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
+//        for (int i = 0; i < allReadings.size(); i++) {
+//            String date = allReadings.get(i).date_of_reading;
+//            if (dates.size() > 0) {
+//                if (!dates.contains(date)) {
+//                    dates.add(date);
+//                }
 //            } else {
-//                yesterday = false;
-//                dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
-//                setDataForSummary();
-//                getSupportActionBar().setTitle("Summary : " + dateForReadings);
-//                fab.setVisibility(View.GONE);
+//                dates.add(date);
 //            }
-//
-//        } else {
-//            yesterday = false;
-//            fab.setVisibility(View.GONE);
-//            dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
-//            setDataForSummary();
-//            getSupportActionBar().setTitle("Summary : "+dateForReadings);
 //        }
-    }
+//
+//        Calendar c = Calendar.getInstance();
+//        dateForReadings = sdf.format(c.getTimeInMillis());
+//
+////        if (dates.size() > 0) {
+////            if (dates.contains(dateForReadings) && dates.size()>1) {
+////                setDataForSummary();
+////                yesterday = true;
+////                dates.remove(dateForReadings);
+////                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+////                fab.setVisibility(View.VISIBLE);
+////            } else {
+////                yesterday = false;
+////                dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+////                setDataForSummary();
+////                getSupportActionBar().setTitle("Summary : " + dateForReadings);
+////                fab.setVisibility(View.GONE);
+////            }
+////
+////        } else {
+////            yesterday = false;
+////            fab.setVisibility(View.GONE);
+////            dateForReadings = sdf.format(Calendar.getInstance().getTimeInMillis());
+////            setDataForSummary();
+////            getSupportActionBar().setTitle("Summary : "+dateForReadings);
+////        }
+//    }
 
     private void showMandatoryDialog(String mandatory) {
         AlertDialogMandatory alertDialogMandatory = AlertDialogMandatory.newInstance("Alert", "We strongly recommend you enter the mandatory readings :" + mandatory, "", "OK");
@@ -175,28 +168,24 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
     }
 
     private void setDataForSummary() {
+
         int count = 0;
         summaryList = new ArrayList<>();
         List<MatrixTable> matrixTableList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
+
         if (matrixTableList != null && matrixTableList.size() > 0) {
+
             for (MatrixTable matrixTable : matrixTableList) {
+
                 List<SensorTable> sensorTableList = SensorTable.getSensorList(matrixTable.utility_id);
+
                 if (sensorTableList != null && sensorTableList.size() > 0) {
+
                     for (SensorTable sensorTable : sensorTableList) {
-                        List<ReadingTable> readingsList = new Vector<>();
-                        if(yesterday){
-                            for(String date :dates){
-                                List<ReadingTable> readings = ReadingTable.getReadings(matrixTable.utility_id,sensorTable.sensor_name,date);
-                                if(readings!=null && readings.size()>0){
-                                    for(ReadingTable readingTable : readings){
-                                        readingsList.add(readingTable);
-                                    }
-                                }
-                            }
-                        }else {
-                            readingsList = ReadingTable.getReadings(matrixTable.utility_id,sensorTable.sensor_name,dateForReadings);
-                        }
-                        if (readingsList.size() > 0) {
+                        List<ReadingTable> readingsList = ReadingTable.getReadings(matrixTable.utility_id, sensorTable.sensor_name, dateForReadings);
+
+                        if (readingsList != null && readingsList.size() > 0) {
+
                             Summary header = new Summary();
                             header.setName(matrixTable.type);
                             header.setValue(matrixTable.icon);
@@ -229,17 +218,15 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
                 }
             }
         }
-
         if (count > 0) {
             allDone = false;
         }
-
         setDataInList();
     }
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        adapter = new YesterdaySummaryListAdapter(summaryList, getActivity(), getFragmentManager(), yesterday);
+        adapter = new YesterdaySummaryListAdapter(summaryList, getActivity(), getFragmentManager());
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
@@ -307,7 +294,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                     if (response.isSuccessful()) {
-                        removeLocalData(GlobalData.getInstance().getSelectedUnitId(),dateForReadings);
+                        removeLocalData(GlobalData.getInstance().getSelectedUnitId(), dateForReadings);
                         dismissActivitySpinner();
                         hideList();
                     } else if (response.code() == 401) {
@@ -349,7 +336,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
         add_new_data.setVisibility(View.VISIBLE);
         no_data_found.setVisibility(View.VISIBLE);
         no_data_found.setText(getString(R.string.readings_submitted));
-        findListOfDates();
+//        findListOfDates();
     }
 
     private AllReadingsData getDataToSubmit() {
@@ -490,4 +477,6 @@ public class YesterdaySummaryFragment extends BaseFragment implements SubmitRead
             summary.scrollToPosition(position);
         }
     }
+
+
 }

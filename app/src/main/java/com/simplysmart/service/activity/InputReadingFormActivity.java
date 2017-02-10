@@ -512,7 +512,6 @@ public class InputReadingFormActivity extends BaseActivity implements EditDialog
         return true;
     }
 
-
     private void saveReadingToDisk() {
         if (imageTaken) {
             if (!mInputReadingValue.getText().toString().trim().equalsIgnoreCase("")) {
@@ -677,7 +676,6 @@ public class InputReadingFormActivity extends BaseActivity implements EditDialog
         });
         dialog.show();
     }
-
 
     private void dispatchTakePictureIntent() {
 

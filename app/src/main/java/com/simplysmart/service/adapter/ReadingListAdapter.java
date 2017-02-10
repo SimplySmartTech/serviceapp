@@ -108,8 +108,6 @@ public class ReadingListAdapter extends RecyclerView.Adapter<ReadingViewHolder> 
                 }
             }
         });
-
-
     }
 
     @Override

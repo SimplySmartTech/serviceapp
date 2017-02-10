@@ -24,12 +24,7 @@ import com.simplysmart.service.viewholder.SummaryViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by shekhar on 30/1/17.
@@ -43,16 +38,12 @@ public class YesterdaySummaryListAdapter extends RecyclerView.Adapter<RecyclerVi
     private Context mContext;
     private Typeface textTypeface;
     private FragmentManager fragmentManager;
-    private SimpleDateFormat sdf;
-    private boolean yesterday;
 
-    public YesterdaySummaryListAdapter(ArrayList<Summary> data, Context mContext, FragmentManager fragmentManager, boolean yesterday) {
+    public YesterdaySummaryListAdapter(ArrayList<Summary> data, Context mContext, FragmentManager fragmentManager) {
         this.data = data;
         this.mContext = mContext;
-        this.sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         this.textTypeface = Typeface.createFromAsset(mContext.getAssets(), "fontawesome-webfont.ttf");
         this.fragmentManager = fragmentManager;
-        this.yesterday = yesterday;
     }
 
     @Override
@@ -81,15 +72,8 @@ public class YesterdaySummaryListAdapter extends RecyclerView.Adapter<RecyclerVi
             viewHolder.logo.setText(Html.fromHtml(logo));
             viewHolder.logo.setTypeface(textTypeface);
             viewHolder.type.setText(type);
-            if (position == 0) {
-//                viewHolder.line.setVisibility(View.GONE);
-            }
 
-            if (yesterday) {
-                ((SummaryHeaderViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_very_light_grey));
-            } else {
-                ((SummaryHeaderViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_white));
-            }
+            ((SummaryHeaderViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_very_light_grey));
 
         } else {
             SummaryViewHolder viewHolder = (SummaryViewHolder) holder;
@@ -140,12 +124,7 @@ public class YesterdaySummaryListAdapter extends RecyclerView.Adapter<RecyclerVi
                 viewHolder.uploadImageBar.setVisibility(View.GONE);
             }
 
-            if (yesterday) {
-                ((SummaryViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_very_light_grey));
-            } else {
-                ((SummaryViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_white));
-            }
-
+            ((SummaryViewHolder) holder).parentLayout.setBackgroundColor(ContextCompat.getColor(mContext, R.color.bw_color_very_light_grey));
         }
     }
 
@@ -185,26 +164,5 @@ public class YesterdaySummaryListAdapter extends RecyclerView.Adapter<RecyclerVi
 
     public void setData(ArrayList<Summary> data) {
         this.data = data;
-    }
-
-    private boolean dateBeforeToday(long date) {
-        Calendar c = Calendar.getInstance();
-        String current = sdf.format(c.getTimeInMillis());
-        String reading = sdf.format(date);
-        Date currentDate = null;
-        Date readingDate = null;
-        try {
-            currentDate = sdf.parse(current);
-            readingDate = sdf.parse(reading);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        if (readingDate.before(currentDate)) {
-            return true;
-        } else {
-            return false;
-        }
     }
 }
