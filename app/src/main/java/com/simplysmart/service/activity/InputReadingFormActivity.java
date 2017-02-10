@@ -228,6 +228,9 @@ public class InputReadingFormActivity extends BaseActivity implements EditDialog
 
     private void checkForPreviousData() {
 
+        int count = (ReadingTable.getReadingTableRowCount());
+        DebugLog.d("COUNT : " + count);
+
         List<ReadingTable> readings = ReadingTable.getReadings(sensorData.utility_identifier, sensorData.sensor_name);
 
         if (readings != null && readings.size() > 0) {

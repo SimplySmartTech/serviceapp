@@ -3,6 +3,7 @@ package com.simplysmart.service.database;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import java.util.List;
@@ -60,6 +61,12 @@ public class ReadingTable extends Model {
         super();
     }
 
+    public static int getReadingTableRowCount() {
+        From from = new Select().from(ReadingTable.class);
+        final List<ReadingTable> list = from.execute();
+        return from.count();
+    }
+
     public static List<ReadingTable> getReadings(String utility_id, String sensor_name) {
         return new Select()
                 .from(ReadingTable.class)
@@ -115,7 +122,7 @@ public class ReadingTable extends Model {
                 .execute();
     }
 
-    public static List<ReadingTable> getAllReadingInPhone(){
+    public static List<ReadingTable> getAllReadingInPhone() {
         return new Select()
                 .from(ReadingTable.class)
                 .execute();
