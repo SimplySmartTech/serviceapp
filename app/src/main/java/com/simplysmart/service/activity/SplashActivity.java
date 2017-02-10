@@ -8,7 +8,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
 
+import com.activeandroid.query.Delete;
 import com.simplysmart.service.R;
+import com.simplysmart.service.database.AttendanceTable;
+import com.simplysmart.service.database.FinalReadingTable;
+import com.simplysmart.service.database.MatrixTable;
+import com.simplysmart.service.database.ReadingTable;
+import com.simplysmart.service.database.SensorTable;
+import com.simplysmart.service.database.TareWeightTable;
+import com.simplysmart.service.database.VisitorTable;
 
 
 public class SplashActivity extends Activity {
@@ -24,7 +32,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         //Used for force fully reset application (logout forcefully) set flag true for reset user
-        resetApplication(false);
+        resetApplication(true);
 
         switchToNextActivity();
     }
@@ -61,6 +69,14 @@ public class SplashActivity extends Activity {
                 SharedPreferences.Editor userInfoEdit = UserInfo.edit();
                 userInfoEdit.clear().apply();
                 editor.putBoolean("logoutUser", false).apply();
+
+                new Delete().from(MatrixTable.class).execute();
+                new Delete().from(SensorTable.class).execute();
+                new Delete().from(ReadingTable.class).execute();
+                new Delete().from(FinalReadingTable.class).execute();
+                new Delete().from(TareWeightTable.class).execute();
+                new Delete().from(AttendanceTable.class).execute();
+                new Delete().from(VisitorTable.class).execute();
             }
         } else {
             editor.remove("logoutUser").apply();

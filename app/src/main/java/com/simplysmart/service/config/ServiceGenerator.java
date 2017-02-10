@@ -44,7 +44,7 @@ public class ServiceGenerator {
         });
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        interceptor.setLevel(ApplicationConstant.isDebuggable?HttpLoggingInterceptor.Level.BODY: HttpLoggingInterceptor.Level.NONE);
         httpClient.addInterceptor(interceptor);
 
         OkHttpClient client = httpClient.build();

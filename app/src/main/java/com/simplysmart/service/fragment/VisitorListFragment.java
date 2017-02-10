@@ -60,6 +60,7 @@ public class VisitorListFragment extends BaseFragment implements PageSelectedLis
 
     private void showNoDataFound(boolean show) {
         TextView no_data_found = (TextView) rootView.findViewById(R.id.no_data_found);
+        no_data_found.setText("Once you add visitors information, you'll see it listed here.");
 
         if (show) {
             no_data_found.setVisibility(View.VISIBLE);
