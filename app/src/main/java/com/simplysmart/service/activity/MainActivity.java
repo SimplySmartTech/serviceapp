@@ -78,6 +78,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private SwipeRefreshLayout swipeRefreshLayout;
     private Button submitButton;
     private NavigationView navigationView;
+    private DrawerLayout drawer;
 
     private ArrayList<Unit> units;
     private User residentData;
@@ -85,6 +86,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     private boolean isRunning = true;
     private boolean backdated = false;
     private MatrixTableAdapter matrixTableAdapter;
+
+    MenuItem yesterdayButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,7 +176,11 @@ public class MainActivity extends BaseActivity implements LogoutListener {
                 setOfflineData();
             }
         } else {
-            super.onBackPressed();
+            if (drawer.isDrawerOpen(navigationView)) {
+                drawer.closeDrawers();
+            }else{
+                super.onBackPressed();
+            }
         }
     }
 
@@ -369,12 +376,13 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
 
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         setDataInHeader(navigationView);
 
         Menu menu = navigationView.getMenu();
@@ -382,6 +390,8 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         for (int i = 0; i < units.size(); i++) {
             menu.add(R.id.plants, i, StringConstants.ORDER_PLANTS, units.get(i).getName()).setIcon(R.drawable.plant_icon);
         }
+
+        yesterdayButton = menu.findItem(R.id.backdated);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         submitButton = (Button) findViewById(R.id.submit);
@@ -492,11 +502,23 @@ public class MainActivity extends BaseActivity implements LogoutListener {
     }
 
     private void setUpActivityForBackdatedEntries() {
-        add_previous_reading.setVisibility(View.VISIBLE);
-        submitButton.setVisibility(View.GONE);
-        backdated = true;
-        if (matrixTableAdapter != null) {
-            matrixTableAdapter.setBackdated(true);
+
+        if (add_previous_reading.getVisibility() == View.VISIBLE) {
+            yesterdayButton.setTitle("Add Yesterday's Reading");
+            add_previous_reading.setVisibility(View.GONE);
+            submitButton.setVisibility(View.VISIBLE);
+            backdated = false;
+            if (matrixTableAdapter != null) {
+                matrixTableAdapter.setBackdated(false);
+            }
+        } else {
+            yesterdayButton.setTitle("Add Today's Reading");
+            add_previous_reading.setVisibility(View.VISIBLE);
+            submitButton.setVisibility(View.GONE);
+            backdated = true;
+            if (matrixTableAdapter != null) {
+                matrixTableAdapter.setBackdated(true);
+            }
         }
     }
 
