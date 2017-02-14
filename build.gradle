@@ -19,6 +19,20 @@ allprojects {
     }
 }
 
+project.ext {
+    versions = [
+            minSdkVersion    : 14,
+            compileSdkVersion: 23,
+            targetSdkVersion : 23,
+            buildToolsVersion: '23.0.3'
+    ]
+
+    libraries = [
+            appCompat         : 'com.android.support:appcompat-v7:23.4.0',
+            googlePlayServices: 'com.google.android.gms:play-services-location:9.6.1'
+    ]
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

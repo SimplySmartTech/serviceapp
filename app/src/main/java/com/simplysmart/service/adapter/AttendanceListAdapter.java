@@ -22,10 +22,11 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by shailendrapsp on 27/12/16.
+ * Created by shekhar on 27/12/16.
  */
 
 public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemViewHolder> {
+
     private Context mContext;
     private List<AttendanceTable> attendanceList;
 
@@ -41,10 +42,18 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
 
     @Override
     public void onBindViewHolder(AttendanceItemViewHolder holder, int position) {
+
         final AttendanceTable table = attendanceList.get(position);
-        int pos = position;
+
         holder.date.setText(getDate(table));
         holder.time.setText(getTime(table));
+
+        if (table.coordinates != null && !table.coordinates.equalsIgnoreCase("")) {
+            holder.locationIcon.setVisibility(View.VISIBLE);
+        } else {
+            holder.locationIcon.setVisibility(View.GONE);
+        }
+
         File image = new File(table.local_photo_url);
         setPic(holder.view_pic, image);
 
@@ -80,7 +89,7 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
             m = "" + minute;
         }
 
-        return "" + h + ":" + m+" hrs";
+        return "" + h + ":" + m + " hrs";
     }
 
     private String getDate(AttendanceTable table) {
@@ -97,11 +106,12 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
 
     private void setPic(ImageView view, File image) {
         view.setVisibility(View.VISIBLE);
-        Picasso.with(mContext).load(image)
+        Picasso.with(mContext)
+                .load(image)
                 .placeholder(R.drawable.photo_default)
                 .noFade()
                 .fit().centerCrop()
-//                .resize(48, 48)
-                .error(R.drawable.photo_default).into(view);
+                .error(R.drawable.photo_default)
+                .into(view);
     }
 }

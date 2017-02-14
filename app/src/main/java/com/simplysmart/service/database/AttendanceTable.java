@@ -4,7 +4,6 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
-import com.simplysmart.service.model.attendance.Attendance;
 
 import java.util.List;
 
@@ -28,6 +27,9 @@ public class AttendanceTable extends Model {
 
     @Column(name = "synched")
     public boolean synched;
+
+    @Column(name = "coordinates")
+    public String coordinates;
 
     public AttendanceTable(){
         super();

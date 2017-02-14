@@ -6,72 +6,54 @@
     android:orientation="vertical">
 
     <include
-        android:id="@+id/toolbar_Layout"
+        android:id="@+id/toolbarLayout"
         layout="@layout/toolbar" />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardView"
-        android:visibility="gone"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_below="@id/toolbar_Layout"
-        android:layout_margin="4dp">
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_above="@+id/addAttendanceButton"
+        android:layout_below="@+id/toolbarLayout"
+        android:padding="20dp">
 
-        <LinearLayout
-            android:id="@+id/takePhotoLayout"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_horizontal"
+            android:text="Once you logged your attendance,\n you'll see it listed here \n\n\n\n Click here \nto\n add attendance\n\n\n"
+            android:textColor="@color/bw_color_dark_gray"
+            android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/take_pic_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="0.7"
-                android:gravity="center"
-                android:padding="8dp"
-                android:text="@string/click_here_to_take_photo"
-                android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/take_pic"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:layout_weight="0.2"
-                android:padding="8dp"
-                android:src="@drawable/ic_camera_alt_black_48dp" />
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="10dp"
+            android:alpha=".2"
+            android:src="@drawable/curved_arrow_gray" />
 
-            <TextView
-                android:id="@+id/submit"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="0.20"
-                android:gravity="center"
-                android:text="SUBMIT" />
-
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/attendanceList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/cardView"
+        android:layout_below="@+id/toolbarLayout"
         android:layout_marginEnd="2dp"
         android:layout_marginStart="2dp" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:src="@drawable/ic_add_white_24dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
+        android:id="@+id/addAttendanceButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add_white_24dp" />
 
 </RelativeLayout>

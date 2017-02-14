@@ -1,12 +1,59 @@
 package com.simplysmart.service.model.attendance;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
- * Created by shailendrapsp on 26/12/16.
+ * Created by shekhar on 26/12/16.
  */
 
-public class Attendance {
+public class Attendance implements Parcelable {
+
     private String image_url;
     private long time;
+    private String coordinates;
+
+    public Attendance(Parcel in) {
+        image_url = in.readString();
+        time = in.readLong();
+        coordinates = in.readString();
+    }
+
+    public Attendance() {
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(image_url);
+        dest.writeLong(time);
+        dest.writeString(coordinates);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Attendance> CREATOR = new Creator<Attendance>() {
+        @Override
+        public Attendance createFromParcel(Parcel in) {
+            return new Attendance(in);
+        }
+
+        @Override
+        public Attendance[] newArray(int size) {
+            return new Attendance[size];
+        }
+    };
+
+    public String getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(String coordinates) {
+        this.coordinates = coordinates;
+    }
 
     public String getImage_url() {
         return image_url;

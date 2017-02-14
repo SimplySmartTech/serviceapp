@@ -34,7 +34,7 @@ import retrofit2.Response;
 import static android.content.ContentValues.TAG;
 
 /**
- * Created by shailendrapsp on 27/12/16.
+ * Created by shekhar on 27/12/16.
  */
 
 public class AttendanceUploadService extends Service {
@@ -48,18 +48,23 @@ public class AttendanceUploadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         DebugLog.d("Reached Attendance upload service");
         transferUtility = Util.getTransferUtility(getApplicationContext());
 
         List<AttendanceTable> attendanceTables = AttendanceTable.getAttendanceToSubmit();
+
         if (attendanceTables != null && attendanceTables.size() > 0) {
-            DebugLog.d("size of attendancetables" + attendanceTables.size());
+
+            DebugLog.d("size of attendance tables" + attendanceTables.size());
             ArrayList<Attendance> attendanceList = new ArrayList<>();
+
             for (int i = 0; i < attendanceTables.size(); i++) {
-                Attendance a = new Attendance();
-                a.setTime(attendanceTables.get(i).timestamp);
-                a.setImage_url(attendanceTables.get(i).image_url);
-                attendanceList.add(a);
+                Attendance attendance = new Attendance();
+                attendance.setTime(attendanceTables.get(i).timestamp);
+                attendance.setImage_url(attendanceTables.get(i).image_url);
+                attendance.setCoordinates(attendanceTables.get(i).coordinates);
+                attendanceList.add(attendance);
             }
             AttendanceList al = new AttendanceList();
             al.setAttendances(attendanceList);
@@ -68,7 +73,7 @@ public class AttendanceUploadService extends Service {
                 sendAttendance(al);
             }
         } else {
-            DebugLog.d("size of attendancetables" + 0);
+            DebugLog.d("size of attendance tables" + 0);
         }
 
         List<AttendanceTable> attendances = AttendanceTable.getAttendances();
@@ -82,7 +87,6 @@ public class AttendanceUploadService extends Service {
         } else {
             DebugLog.d("size of photos to upload " + attendances.size());
         }
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -157,7 +161,7 @@ public class AttendanceUploadService extends Service {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (response.isSuccessful()) {
-                    markAsSynched(attendanceList);
+                    markAsSynced(attendanceList);
                 }
             }
 
@@ -168,7 +172,7 @@ public class AttendanceUploadService extends Service {
         });
     }
 
-    private void markAsSynched(AttendanceList attendanceList) {
+    private void markAsSynced(AttendanceList attendanceList) {
         for (int i = 0; i < attendanceList.getAttendances().size(); i++) {
             AttendanceTable at = AttendanceTable.getTable(attendanceList.getAttendances().get(i).getTime());
             at.synched = true;
@@ -176,15 +180,17 @@ public class AttendanceUploadService extends Service {
     }
 
     private void sendAttendance(AttendanceTable attendanceTable) {
-        Attendance a = new Attendance();
-        a.setImage_url(attendanceTable.image_url);
-        a.setTime(attendanceTable.timestamp);
 
-        ArrayList<Attendance> al = new ArrayList<>();
-        al.add(a);
+        Attendance attendance = new Attendance();
+        attendance.setImage_url(attendanceTable.image_url);
+        attendance.setTime(attendanceTable.timestamp);
+        attendance.setCoordinates(attendanceTable.coordinates);
+
+        ArrayList<Attendance> attendanceArrayList = new ArrayList<>();
+        attendanceArrayList.add(attendance);
 
         AttendanceList attendances = new AttendanceList();
-        attendances.setAttendances(al);
+        attendances.setAttendances(attendanceArrayList);
 
         if (NetworkUtilities.isInternet(this)) {
             sendAttendance(attendances);

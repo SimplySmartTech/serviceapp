@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,6 +34,7 @@ import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixTableAdapter;
+import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.common.VersionComprator;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
@@ -56,10 +58,12 @@ import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
 import com.simplysmart.service.service.AlarmReceiver;
+import com.yayandroid.locationmanager.LocationConfiguration;
+import com.yayandroid.locationmanager.constants.FailType;
+import com.yayandroid.locationmanager.constants.ProviderType;
 
 import org.jsoup.Jsoup;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -71,7 +75,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends BaseActivity implements LogoutListener {
+public class MainActivity extends GetLocationBaseActivity implements LogoutListener {
 
     private TextView no_data_found, add_previous_reading;
     private RecyclerView matrixList;
@@ -98,7 +102,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
 
         getUserInfo();
 
-        modifyPrevReadings();
+        getLocation();
 
         setAlarmForNotification();
 
@@ -178,7 +182,7 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         } else {
             if (drawer.isDrawerOpen(navigationView)) {
                 drawer.closeDrawers();
-            }else{
+            } else {
                 super.onBackPressed();
             }
         }
@@ -522,13 +526,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
     }
 
-    public static String getDate(long milliSeconds, String dateFormat) {
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
-    }
-
     @Override
     public void logoutUser() {
         logout();
@@ -582,21 +579,6 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         }
     }
 
-    private void modifyPrevReadings() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        SharedPreferences sharedPreferences = getSharedPreferences(StringConstants.NEED_TO_CHECK, MODE_PRIVATE);
-        SharedPreferences.Editor edit = sharedPreferences.edit();
-
-        if (sharedPreferences.getString(StringConstants.CHECK_FOR_PREVIOUS_DATE, "true").equalsIgnoreCase("true")) {
-            edit.putString(StringConstants.CHECK_FOR_PREVIOUS_DATE, "false").apply();
-            List<ReadingTable> readings = ReadingTable.getAllReadingInPhone();
-            for (ReadingTable table : readings) {
-                table.date_of_reading = sdf.format(table.timestamp);
-                table.save();
-            }
-        }
-    }
-
     private void setAlarmForNotification() {
         Calendar calendar = Calendar.getInstance();
         SharedPreferences preferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
@@ -624,6 +606,62 @@ public class MainActivity extends BaseActivity implements LogoutListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public LocationConfiguration getLocationConfiguration() {
+        return new LocationConfiguration()
+                .keepTracking(true)
+                .askForGooglePlayServices(true)
+                .askForSettingsApi(true)
+                .failOnConnectionSuspended(true)
+                .failOnSettingsApiSuspended(false)
+                .doNotUseGooglePlayServices(false)
+                .askForEnableGPS(true)
+                .setMinAccuracy(200.0f)
+                .setWaitPeriod(ProviderType.GOOGLE_PLAY_SERVICES, 5 * 1000)
+                .setWaitPeriod(ProviderType.GPS, 10 * 1000)
+                .setWaitPeriod(ProviderType.NETWORK, 5 * 1000)
+                .setGPSMessage("Would you mind to turn GPS on?")
+                .setRationalMessage("Gimme the permission!");
+    }
+
+    @Override
+    public void onLocationFailed(int failType) {
+
+        switch (failType) {
+            case FailType.PERMISSION_DENIED: {
+                DebugLog.d("Couldn't get location, because user didn't give permission!");
+                break;
+            }
+            case FailType.GP_SERVICES_NOT_AVAILABLE:
+            case FailType.GP_SERVICES_CONNECTION_FAIL: {
+                DebugLog.d("Couldn't get location, because Google Play Services not available!");
+                break;
+            }
+            case FailType.NETWORK_NOT_AVAILABLE: {
+                DebugLog.d("Couldn't get location, because network is not accessible!");
+                break;
+            }
+            case FailType.TIMEOUT: {
+                DebugLog.d("Couldn't get location, and timeout!");
+                break;
+            }
+            case FailType.GP_SERVICES_SETTINGS_DENIED: {
+                DebugLog.d("Couldn't get location, because user didn't activate providers via settingsApi!");
+                break;
+            }
+            case FailType.GP_SERVICES_SETTINGS_DIALOG: {
+                DebugLog.d("Couldn't display settingsApi dialog!");
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        DebugLog.d("coordinates : " + location.getLatitude() + "," + location.getLongitude());
+        GlobalData.getInstance().setCoordinates(location.getLatitude() + "," + location.getLongitude());
     }
 
 }

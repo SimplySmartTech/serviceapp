@@ -6,9 +6,9 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:background="@drawable/card_bg"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_bg">
 
         <ImageView
             android:id="@+id/view_pic"
@@ -16,6 +16,14 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
 
+        <ImageView
+            android:id="@+id/locationIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@color/translucentToolbar"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_location_on_black_24px" />
 
         <TextView
             android:id="@+id/time"
@@ -23,14 +31,15 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/date"
             android:layout_alignParentEnd="true"
-            android:paddingBottom="4dp"
-            android:paddingStart="4dp"
-            android:paddingTop="4dp"
+            android:layout_marginEnd="2dp"
             android:background="@color/translucentToolbar"
             android:gravity="end"
-            android:textColor="@color/bw_color_white"
+            android:paddingBottom="4dp"
             android:paddingEnd="4dp"
-            android:text="" />
+            android:paddingStart="4dp"
+            android:paddingTop="4dp"
+            android:text=""
+            android:textColor="@color/bw_color_white" />
 
         <TextView
             android:id="@+id/date"
@@ -38,13 +47,14 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
+            android:layout_marginEnd="2dp"
+            android:background="@color/translucentToolbar"
+            android:gravity="end"
             android:paddingBottom="4dp"
             android:paddingEnd="4dp"
-            android:gravity="end"
             android:paddingStart="4dp"
-            android:background="@color/translucentToolbar"
-            android:textColor="@color/bw_color_white"
-            android:text="" />
+            android:text=""
+            android:textColor="@color/bw_color_white" />
 
     </RelativeLayout>
 

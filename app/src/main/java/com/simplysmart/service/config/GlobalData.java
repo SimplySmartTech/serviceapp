@@ -1,6 +1,5 @@
 package com.simplysmart.service.config;
 
-import android.app.Application;
 import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
@@ -26,6 +25,8 @@ public class GlobalData extends com.activeandroid.app.Application {
     private String selectedUnitId;
     private String selectedUnit;
 
+    private String coordinates;
+
     private ArrayList<Unit> units;
     private AccessPolicy accessPolicy;
 
@@ -40,6 +41,14 @@ public class GlobalData extends com.activeandroid.app.Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 //        MultiDex.install(this);
+    }
+
+    public String getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(String coordinates) {
+        this.coordinates = coordinates;
     }
 
     public AccessPolicy getAccessPolicy() {

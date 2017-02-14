@@ -2,7 +2,6 @@ package com.simplysmart.service.activity;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,7 +11,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -22,14 +20,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.AttendanceListAdapter;
 import com.simplysmart.service.common.DebugLog;
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.AttendanceTable;
@@ -48,24 +45,19 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by shailendrapsp on 26/12/16.
+ * Created by shekhar on 26/12/16.
  */
 
 public class AttendanceActivity extends BaseActivity {
+
     private final int REQUEST_TAKE_PHOTO = 1;
     private final int REQUEST_GALLERY_PHOTO = 2;
     private String mCurrentPhotoPath;
     private File image;
 
-    private ImageView take_pic;
-    private ImageView view_pic;
-    private TextView submit;
     private RelativeLayout mParentLayout;
-    private LinearLayout takePhotoLayout;
-    private TextView takePhotoText;
     private RecyclerView recyclerView;
-    private CardView cardView;
-    private FloatingActionButton fab;
+    private FloatingActionButton addAttendanceButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +72,6 @@ public class AttendanceActivity extends BaseActivity {
         getSupportActionBar().setTitle(getString(R.string.attendance));
 
         bindViews();
-        initializeViews();
     }
 
     @Override
@@ -110,12 +101,10 @@ public class AttendanceActivity extends BaseActivity {
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
         if (requestCode == StringConstants.PERMISSION_CAMERA) {
-            // Request for Internet permission.
+
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission has been granted. Start Internet preview Activity.
                 dispatchTakePictureIntent();
             } else {
-                // Permission request was denied.
 //                Snackbar.make(mParentLayout, "Camera permission request was denied.",
 //                        Snackbar.LENGTH_SHORT)
 //                        .show();
@@ -123,9 +112,8 @@ public class AttendanceActivity extends BaseActivity {
         }
 
         if (requestCode == StringConstants.PERMISSION_EXTERNAL_STORAGE) {
-            // Request for Internet permission.
+
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission has been granted. Start Internet preview Activity.
                 checkCamera();
             } else {
                 // Permission request was denied.
@@ -134,7 +122,6 @@ public class AttendanceActivity extends BaseActivity {
 //                        .show();
             }
         }
-
     }
 
     @Override
@@ -187,10 +174,7 @@ public class AttendanceActivity extends BaseActivity {
     }
 
     private void checkCamera() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-
-            // Permission is already available, start Internet preview
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             dispatchTakePictureIntent();
         } else {
             new MarshmallowPermission(this, mParentLayout).checkPermissionForCamera();
@@ -198,10 +182,7 @@ public class AttendanceActivity extends BaseActivity {
     }
 
     private void checkExternalStorage() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-
-            // Permission is already available, start Internet preview
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             checkCamera();
         } else {
             new MarshmallowPermission(this, mParentLayout).checkPermissionForExternalStorage();
@@ -319,19 +300,12 @@ public class AttendanceActivity extends BaseActivity {
 
     private void bindViews() {
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
-        take_pic = (ImageView) findViewById(R.id.take_pic);
-        view_pic = (ImageView) findViewById(R.id.view_pic);
-        submit = (TextView) findViewById(R.id.submit);
-        takePhotoText = (TextView) findViewById(R.id.take_pic_text);
         recyclerView = (RecyclerView) findViewById(R.id.attendanceList);
-        cardView = (CardView) findViewById(R.id.cardView);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-    }
+        addAttendanceButton = (FloatingActionButton) findViewById(R.id.addAttendanceButton);
 
-    private void initializeViews() {
         setDataInRecyclerView();
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        addAttendanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 customImagePicker();
@@ -340,8 +314,10 @@ public class AttendanceActivity extends BaseActivity {
     }
 
     private void setDataInRecyclerView() {
+
         List<AttendanceTable> attendanceList = AttendanceTable.getAllAttendances();
-        if(attendanceList!=null && attendanceList.size()>0) {
+
+        if (attendanceList != null && attendanceList.size() > 0) {
             Collections.sort(attendanceList, new Comparator<AttendanceTable>() {
                 @Override
                 public int compare(AttendanceTable lhs, AttendanceTable rhs) {
@@ -349,9 +325,9 @@ public class AttendanceActivity extends BaseActivity {
                 }
             });
 
-            if(attendanceList.size()>7){
-                for(int i =7;i<attendanceList.size();i++){
-                    if(attendanceList.get(i).synched){
+            if (attendanceList.size() > 7) {
+                for (int i = 7; i < attendanceList.size(); i++) {
+                    if (attendanceList.get(i).synched) {
                         attendanceList.get(i).delete();
                     }
                     attendanceList.remove(i);
@@ -364,11 +340,10 @@ public class AttendanceActivity extends BaseActivity {
                 String currentDate = sdf.format(Calendar.getInstance().getTimeInMillis());
 
                 if (date.equalsIgnoreCase(currentDate)) {
-                    fab.setVisibility(View.GONE);
+                    addAttendanceButton.setVisibility(View.GONE);
                     break;
                 }
             }
-
             AttendanceListAdapter attendanceListAdapter = new AttendanceListAdapter(this, attendanceList);
             RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
             recyclerView.setLayoutManager(gridLayoutManager);
@@ -380,15 +355,17 @@ public class AttendanceActivity extends BaseActivity {
         AttendanceTable attendanceTable = new AttendanceTable();
         attendanceTable.local_photo_url = mCurrentPhotoPath;
         attendanceTable.timestamp = Calendar.getInstance().getTimeInMillis();
+
+        if (GlobalData.getInstance().getCoordinates() != null) {
+            attendanceTable.coordinates = GlobalData.getInstance().getCoordinates();
+        }
         attendanceTable.save();
 
         if (NetworkUtilities.isInternet(this)) {
             Intent i = new Intent(this, AttendanceUploadService.class);
             startService(i);
         }
-
         setDataInRecyclerView();
     }
-
 
 }
