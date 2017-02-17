@@ -12,15 +12,17 @@ public class Attendance implements Parcelable {
     private String image_url;
     private long time;
     private String coordinates;
-
-    public Attendance(Parcel in) {
-        image_url = in.readString();
-        time = in.readLong();
-        coordinates = in.readString();
-    }
+    private String address;
 
     public Attendance() {
 
+    }
+
+    protected Attendance(Parcel in) {
+        image_url = in.readString();
+        time = in.readLong();
+        coordinates = in.readString();
+        address = in.readString();
     }
 
     @Override
@@ -28,6 +30,7 @@ public class Attendance implements Parcelable {
         dest.writeString(image_url);
         dest.writeLong(time);
         dest.writeString(coordinates);
+        dest.writeString(address);
     }
 
     @Override
@@ -46,6 +49,14 @@ public class Attendance implements Parcelable {
             return new Attendance[size];
         }
     };
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public String getCoordinates() {
         return coordinates;

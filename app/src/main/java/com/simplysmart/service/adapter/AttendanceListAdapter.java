@@ -50,8 +50,18 @@ public class AttendanceListAdapter extends RecyclerView.Adapter<AttendanceItemVi
 
         if (table.coordinates != null && !table.coordinates.equalsIgnoreCase("")) {
             holder.locationIcon.setVisibility(View.VISIBLE);
+
+            if (table.address != null && !table.address.equalsIgnoreCase("")) {
+                holder.address.setText(table.address);
+                holder.address.setVisibility(View.VISIBLE);
+            } else {
+                holder.address.setVisibility(View.GONE);
+                holder.address.setText("");
+            }
         } else {
             holder.locationIcon.setVisibility(View.GONE);
+            holder.address.setVisibility(View.GONE);
+            holder.address.setText("");
         }
 
         File image = new File(table.local_photo_url);

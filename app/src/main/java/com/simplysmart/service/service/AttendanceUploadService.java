@@ -64,6 +64,7 @@ public class AttendanceUploadService extends Service {
                 attendance.setTime(attendanceTables.get(i).timestamp);
                 attendance.setImage_url(attendanceTables.get(i).image_url);
                 attendance.setCoordinates(attendanceTables.get(i).coordinates);
+                attendance.setAddress(attendanceTables.get(i).address);
                 attendanceList.add(attendance);
             }
             AttendanceList al = new AttendanceList();
@@ -185,6 +186,7 @@ public class AttendanceUploadService extends Service {
         attendance.setImage_url(attendanceTable.image_url);
         attendance.setTime(attendanceTable.timestamp);
         attendance.setCoordinates(attendanceTable.coordinates);
+        attendance.setAddress(attendanceTable.address);
 
         ArrayList<Attendance> attendanceArrayList = new ArrayList<>();
         attendanceArrayList.add(attendance);

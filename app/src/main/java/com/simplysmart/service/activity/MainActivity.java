@@ -1,5 +1,6 @@
 package com.simplysmart.service.activity;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -11,6 +12,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -35,6 +38,7 @@ import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixTableAdapter;
 import com.simplysmart.service.common.DebugLog;
+import com.simplysmart.service.common.LocationAddress;
 import com.simplysmart.service.common.VersionComprator;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
@@ -662,6 +666,27 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
     public void onLocationChanged(Location location) {
         DebugLog.d("coordinates : " + location.getLatitude() + "," + location.getLongitude());
         GlobalData.getInstance().setCoordinates(location.getLatitude() + "," + location.getLongitude());
+
+        LocationAddress.getAddressFromLocation(location.getLatitude(), location.getLongitude(), MainActivity.this, addressHandler);
     }
+
+    // Handler for get user's current location data
+    @SuppressLint("HandlerLeak")
+    private final Handler addressHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+
+            switch (msg.what) {
+                case 1:
+                    Bundle bundle = msg.getData();
+                    if (!String.valueOf(bundle.getDouble("Latitude")).trim().equalsIgnoreCase("0.0")) {
+                        GlobalData.getInstance().setUserCurrentLocationAddress(bundle.getString("address", ""));
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
 }

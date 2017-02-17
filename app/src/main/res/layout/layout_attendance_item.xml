@@ -16,14 +16,37 @@
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
 
-        <ImageView
-            android:id="@+id/locationIcon"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:background="@color/translucentToolbar"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_location_on_black_24px" />
+            android:background="@color/translucentToolbar">
+
+            <ImageView
+                android:id="@+id/locationIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/address"
+                android:layout_alignTop="@+id/address"
+                android:scaleType="center"
+                android:src="@drawable/ic_location_on_black_24px" />
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/locationIcon"
+                android:ellipsize="end"
+                android:gravity="start|top"
+                android:maxLines="2"
+                android:paddingBottom="4dp"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:paddingTop="4dp"
+                android:textColor="@color/bw_color_white"
+                android:textSize="10sp" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/time"
@@ -39,7 +62,8 @@
             android:paddingStart="4dp"
             android:paddingTop="4dp"
             android:text=""
-            android:textColor="@color/bw_color_white" />
+            android:textColor="@color/bw_color_white"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/date"
@@ -54,7 +78,8 @@
             android:paddingEnd="4dp"
             android:paddingStart="4dp"
             android:text=""
-            android:textColor="@color/bw_color_white" />
+            android:textColor="@color/bw_color_white"
+            android:textSize="12sp" />
 
     </RelativeLayout>
 

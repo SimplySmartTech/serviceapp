@@ -31,36 +31,39 @@ public class AttendanceTable extends Model {
     @Column(name = "coordinates")
     public String coordinates;
 
-    public AttendanceTable(){
+    @Column(name = "address")
+    public String address;
+
+    public AttendanceTable() {
         super();
     }
 
-    public static List<AttendanceTable> getAttendances(){
+    public static List<AttendanceTable> getAttendances() {
         return new Select()
                 .from(AttendanceTable.class)
-                .where("submitted = ?",false)
-                .where("synched = ?",false)
+                .where("submitted = ?", false)
+                .where("synched = ?", false)
                 .execute();
     }
 
-    public static List<AttendanceTable> getAttendanceToSubmit(){
+    public static List<AttendanceTable> getAttendanceToSubmit() {
         return new Select()
                 .from(AttendanceTable.class)
-                .where("submitted = ?",true)
-                .where("synched = ?",false)
+                .where("submitted = ?", true)
+                .where("synched = ?", false)
                 .execute();
     }
 
-    public static List<AttendanceTable> getAllAttendances(){
+    public static List<AttendanceTable> getAllAttendances() {
         return new Select()
                 .from(AttendanceTable.class)
                 .execute();
     }
 
-    public static AttendanceTable getTable(long timestamp){
+    public static AttendanceTable getTable(long timestamp) {
         return new Select()
                 .from(AttendanceTable.class)
-                .where("timestamp = ?",timestamp)
+                .where("timestamp = ?", timestamp)
                 .executeSingle();
     }
 }

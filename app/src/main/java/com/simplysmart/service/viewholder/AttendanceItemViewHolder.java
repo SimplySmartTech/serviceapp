@@ -16,6 +16,7 @@ public class AttendanceItemViewHolder extends RecyclerView.ViewHolder {
     public TextView date, time;
     public ImageView view_pic;
     public ImageView locationIcon;
+    public TextView address;
 
     public AttendanceItemViewHolder(View itemView) {
         super(itemView);
@@ -23,5 +24,6 @@ public class AttendanceItemViewHolder extends RecyclerView.ViewHolder {
         time = (TextView) itemView.findViewById(R.id.time);
         view_pic = (ImageView) itemView.findViewById(R.id.view_pic);
         locationIcon = (ImageView) itemView.findViewById(R.id.locationIcon);
+        address = (TextView) itemView.findViewById(R.id.address);
     }
 }

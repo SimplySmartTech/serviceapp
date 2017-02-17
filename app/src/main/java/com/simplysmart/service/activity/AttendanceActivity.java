@@ -352,6 +352,7 @@ public class AttendanceActivity extends BaseActivity {
     }
 
     private void saveAttendanceToDisk() {
+
         AttendanceTable attendanceTable = new AttendanceTable();
         attendanceTable.local_photo_url = mCurrentPhotoPath;
         attendanceTable.timestamp = Calendar.getInstance().getTimeInMillis();
@@ -359,6 +360,10 @@ public class AttendanceActivity extends BaseActivity {
         if (GlobalData.getInstance().getCoordinates() != null) {
             attendanceTable.coordinates = GlobalData.getInstance().getCoordinates();
         }
+        if (GlobalData.getInstance().getUserCurrentLocationAddress() != null) {
+            attendanceTable.address = GlobalData.getInstance().getUserCurrentLocationAddress();
+        }
+
         attendanceTable.save();
 
         if (NetworkUtilities.isInternet(this)) {
