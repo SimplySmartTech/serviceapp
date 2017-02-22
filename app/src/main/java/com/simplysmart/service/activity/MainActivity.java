@@ -256,22 +256,28 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
                     if (response.isSuccessful()) {
                         deleteAllMatrixData();
                         setMatrixData(response.body());
+
                     } else if (response.code() == 401) {
                         handleAuthorizationFailed();
                         swipeRefreshLayout.setRefreshing(false);
                     } else {
-                        APIError error = ErrorUtils.parseError(response);
-                        swipeRefreshLayout.setRefreshing(false);
-                        no_data_found.setText(error.message());
-                        no_data_found.setVisibility(View.VISIBLE);
+
+                        if (matrixTableAdapter != null) {
+                            APIError error = ErrorUtils.parseError(response);
+                            swipeRefreshLayout.setRefreshing(false);
+                            no_data_found.setText(error.message());
+                            no_data_found.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<MatrixResponse> call, Throwable t) {
                     swipeRefreshLayout.setRefreshing(false);
-                    no_data_found.setText(getResources().getString(R.string.error_in_network));
-                    no_data_found.setVisibility(View.VISIBLE);
+                    if (matrixTableAdapter != null) {
+                        no_data_found.setText(getResources().getString(R.string.error_in_network));
+                        no_data_found.setVisibility(View.VISIBLE);
+                    }
                 }
             });
         } else {
@@ -294,6 +300,7 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
 
     //Set matrix data to list
     private void setMatrixData(MatrixResponse response) {
+
         ArrayList<MatrixData> matrixDataArrayList = response.getData();
         ArrayList<TareWeight> tareWeights = response.getTare_weights();
 
