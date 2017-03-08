@@ -44,4 +44,6 @@
     <string name="alert_txt_madatory">We strongly recommend you enter the mandatory readings :</string>
     <string name="alert_txt_upload_without_image">All images have not been uploaded yet. Do you want to submit readings without uploading all images ?</string>
 
+    <string name="map_api_key">AIzaSyBE1qJ6ZJzzNzcLPPslz2im3jc6g_kDEnI</string>
+
 </resources>

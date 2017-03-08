@@ -2,7 +2,6 @@ package com.simplysmart.service.activity;
 
 import android.Manifest;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -144,6 +143,14 @@ public class ImageViewActivity extends BaseActivity {
                     .noFade()
                     .fit().centerInside()
                     .error(R.drawable.ic_menu_slideshow).into(view);
+
+//            Picasso.with(getContext())
+//                    .load("https://maps.googleapis.com/maps/api/staticmap?size=600x800&maptype=roadmap&markers=color:blue%7C18.5612215,73.7836559&key=AIzaSyBE1qJ6ZJzzNzcLPPslz2im3jc6g_kDEnI")
+//                    .placeholder(R.drawable.ic_menu_slideshow)
+//                    .noFade()
+//                    .fit().centerInside()
+//                    .error(R.drawable.ic_menu_slideshow).into(view);
+
         }
     }
 

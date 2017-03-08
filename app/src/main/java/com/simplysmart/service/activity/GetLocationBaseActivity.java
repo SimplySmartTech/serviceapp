@@ -123,14 +123,22 @@ public abstract class GetLocationBaseActivity extends LocationBaseActivity {
     //method used to show error messages
     protected void displayMessage(String errorString) {
         if (context != null) {
-            showMyDialog(context.getString(R.string.app_name), errorString, context.getString(R.string.ok_button));
+            try {
+                showMyDialog(context.getString(R.string.app_name), errorString, context.getString(R.string.ok_button));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     //show common alert dialog
     protected void showMyDialog(String title, String message, String positiveButton) {
-        AlertDialogStandard newDialog = AlertDialogStandard.newInstance(title, message, "", positiveButton);
-        newDialog.show(fragmentManager, "show dialog");
+        try {
+            AlertDialogStandard newDialog = AlertDialogStandard.newInstance(title, message, "", positiveButton);
+            newDialog.show(fragmentManager, "show dialog");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     protected void showSnackBar(View view, String message) {
@@ -382,15 +390,19 @@ public abstract class GetLocationBaseActivity extends LocationBaseActivity {
 
     public void logout() {
 
-        new Delete().from(MatrixTable.class).execute();
-        new Delete().from(SensorTable.class).execute();
-        new Delete().from(ReadingTable.class).execute();
-        new Delete().from(FinalReadingTable.class).execute();
-        new Delete().from(TareWeightTable.class).execute();
-        new Delete().from(AttendanceTable.class).execute();
-        new Delete().from(VisitorTable.class).execute();
+        try {
+            new Delete().from(MatrixTable.class).execute();
+            new Delete().from(SensorTable.class).execute();
+            new Delete().from(ReadingTable.class).execute();
+            new Delete().from(FinalReadingTable.class).execute();
+            new Delete().from(TareWeightTable.class).execute();
+            new Delete().from(AttendanceTable.class).execute();
+            new Delete().from(VisitorTable.class).execute();
 
-        handleAuthorizationFailed();
+            handleAuthorizationFailed();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static boolean deleteFile(File file) {

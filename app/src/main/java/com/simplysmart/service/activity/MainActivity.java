@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -170,6 +171,8 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
             backdated = false;
             submitButton.setVisibility(View.VISIBLE);
             add_previous_reading.setVisibility(View.GONE);
+
+            yesterdayButton.setTitle("Add Yesterday's Reading");
 
             getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
             if (NetworkUtilities.isInternet(getApplicationContext())) {
@@ -582,9 +585,13 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
                 int result = cmp.compare(onlineVersion, currentVersion);
 
                 if (result > 0 && isRunning) {
-                    AlertDialogUpdateVersion update = AlertDialogUpdateVersion.newInstance("New update available!", getResources().getString(R.string.update_app_message), "Later", "Update");
-                    update.setCancelable(false);
-                    update.show(getFragmentManager(), "Show update dialog");
+                    try {
+                        AlertDialogUpdateVersion update = AlertDialogUpdateVersion.newInstance("New update available!", getResources().getString(R.string.update_app_message), "Later", "Update");
+                        update.setCancelable(false);
+                        update.show(getFragmentManager(), "Show update dialog");
+                    } catch (Resources.NotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
