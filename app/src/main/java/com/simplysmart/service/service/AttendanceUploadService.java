@@ -52,34 +52,35 @@ public class AttendanceUploadService extends Service {
         DebugLog.d("Reached Attendance upload service");
         transferUtility = Util.getTransferUtility(getApplicationContext());
 
-        List<AttendanceTable> attendanceTables = AttendanceTable.getAttendanceToSubmit();
-
-        if (attendanceTables != null && attendanceTables.size() > 0) {
-
-            DebugLog.d("size of attendance tables" + attendanceTables.size());
-            ArrayList<Attendance> attendanceList = new ArrayList<>();
-
-            for (int i = 0; i < attendanceTables.size(); i++) {
-                Attendance attendance = new Attendance();
-                attendance.setTime(attendanceTables.get(i).timestamp);
-                attendance.setImage_url(attendanceTables.get(i).image_url);
-                attendance.setCoordinates(attendanceTables.get(i).coordinates);
-                attendance.setAddress(attendanceTables.get(i).address);
-                attendanceList.add(attendance);
-            }
-            AttendanceList al = new AttendanceList();
-            al.setAttendances(attendanceList);
-
-            if (NetworkUtilities.isInternet(getApplicationContext())) {
-                sendAttendance(al);
-            }
-        } else {
-            DebugLog.d("size of attendance tables" + 0);
-        }
+//        List<AttendanceTable> attendanceTables = AttendanceTable.getAttendanceToSubmit();
+//
+//        if (attendanceTables != null && attendanceTables.size() > 0) {
+//
+//            DebugLog.d("size of attendance tables" + attendanceTables.size());
+//            ArrayList<Attendance> attendanceList = new ArrayList<>();
+//
+//            for (int i = 0; i < attendanceTables.size(); i++) {
+//                Attendance attendance = new Attendance();
+//                attendance.setTime(attendanceTables.get(i).timestamp);
+//                attendance.setImage_url(attendanceTables.get(i).image_url);
+//                attendance.setCoordinates(attendanceTables.get(i).coordinates);
+//                attendance.setAddress(attendanceTables.get(i).address);
+//                attendanceList.add(attendance);
+//            }
+//            AttendanceList al = new AttendanceList();
+//            al.setAttendances(attendanceList);
+//
+//            if (NetworkUtilities.isInternet(getApplicationContext())) {
+//                sendAttendance(al);
+//            }
+//        } else {
+//            DebugLog.d("size of attendance tables" + 0);
+//        }
 
         List<AttendanceTable> attendances = AttendanceTable.getAttendances();
         if (attendances != null && attendances.size() > 0) {
             DebugLog.d("size of photos to upload " + attendances.size());
+
             for (AttendanceTable table : attendances) {
                 if (NetworkUtilities.isInternet(this)) {
                     beginUpload(table);
@@ -111,7 +112,7 @@ public class AttendanceUploadService extends Service {
         }
     }
 
-    class UploadListener implements TransferListener {
+    private class UploadListener implements TransferListener {
         private AttendanceTable attendanceTable;
         private String fileName;
 
@@ -136,13 +137,8 @@ public class AttendanceUploadService extends Service {
 
             if (newState == TransferState.COMPLETED) {
 
-                String url = AWSConstants.S3_URL
-                        + AWSConstants.BUCKET_NAME + "/"
-                        + AWSConstants.PATH_FOLDER
-                        + fileName;
-
+                String url = AWSConstants.S3_URL + AWSConstants.BUCKET_NAME + "/" + AWSConstants.PATH_FOLDER + fileName;
                 DebugLog.d("URL :::: " + url);
-
                 onUploadComplete(attendanceTable, url);
             }
         }
@@ -155,7 +151,8 @@ public class AttendanceUploadService extends Service {
         sendAttendance(attendanceTable);
     }
 
-    private void sendAttendance(final AttendanceList attendanceList) {
+    private void sendAttendanceToServer(final AttendanceList attendanceList) {
+
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
         Call<JsonObject> sendInterfaces = apiInterface.sendAttendances(GlobalData.getInstance().getSubDomain(), attendanceList);
         sendInterfaces.enqueue(new Callback<JsonObject>() {
@@ -195,7 +192,7 @@ public class AttendanceUploadService extends Service {
         attendances.setAttendances(attendanceArrayList);
 
         if (NetworkUtilities.isInternet(this)) {
-            sendAttendance(attendances);
+            sendAttendanceToServer(attendances);
         }
     }
 }

@@ -104,10 +104,6 @@ public class AttendanceActivity extends BaseActivity {
 
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 dispatchTakePictureIntent();
-            } else {
-//                Snackbar.make(mParentLayout, "Camera permission request was denied.",
-//                        Snackbar.LENGTH_SHORT)
-//                        .show();
             }
         }
 
@@ -115,11 +111,6 @@ public class AttendanceActivity extends BaseActivity {
 
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 checkCamera();
-            } else {
-                // Permission request was denied.
-//                Snackbar.make(mParentLayout, "External Storage permission request was denied.",
-//                        Snackbar.LENGTH_SHORT)
-//                        .show();
             }
         }
     }
@@ -169,10 +160,12 @@ public class AttendanceActivity extends BaseActivity {
         }
     }
 
+    //Check runtime permissions
     private void checkForPermissions() {
         checkExternalStorage();
     }
 
+    //Check for device camera permission
     private void checkCamera() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             dispatchTakePictureIntent();
@@ -181,6 +174,7 @@ public class AttendanceActivity extends BaseActivity {
         }
     }
 
+    //Check for device storage permission
     private void checkExternalStorage() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             checkCamera();
@@ -299,6 +293,7 @@ public class AttendanceActivity extends BaseActivity {
     }
 
     private void bindViews() {
+
         mParentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
         recyclerView = (RecyclerView) findViewById(R.id.attendanceList);
         addAttendanceButton = (FloatingActionButton) findViewById(R.id.addAttendanceButton);
@@ -313,8 +308,10 @@ public class AttendanceActivity extends BaseActivity {
         });
     }
 
+    //Set attendance on view
     private void setDataInRecyclerView() {
 
+        //Fetch attendance for local database
         List<AttendanceTable> attendanceList = AttendanceTable.getAllAttendances();
 
         if (attendanceList != null && attendanceList.size() > 0) {
@@ -325,8 +322,9 @@ public class AttendanceActivity extends BaseActivity {
                 }
             });
 
-            if (attendanceList.size() > 7) {
-                for (int i = 7; i < attendanceList.size(); i++) {
+            //Delete attendance data older then 5 days (assumed 2 attendance logged per day)
+            if (attendanceList.size() > 10) {
+                for (int i = 10; i < attendanceList.size(); i++) {
                     if (attendanceList.get(i).synched) {
                         attendanceList.get(i).delete();
                     }
@@ -334,16 +332,7 @@ public class AttendanceActivity extends BaseActivity {
                 }
             }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-            for (AttendanceTable attendanceTable : attendanceList) {
-                String date = sdf.format(attendanceTable.timestamp);
-                String currentDate = sdf.format(Calendar.getInstance().getTimeInMillis());
-
-                if (date.equalsIgnoreCase(currentDate)) {
-                    addAttendanceButton.setVisibility(View.GONE);
-                    break;
-                }
-            }
+            //Set attendance list on UI
             AttendanceListAdapter attendanceListAdapter = new AttendanceListAdapter(this, attendanceList);
             RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
             recyclerView.setLayoutManager(gridLayoutManager);
@@ -351,6 +340,7 @@ public class AttendanceActivity extends BaseActivity {
         }
     }
 
+    //Save attendance in local database
     private void saveAttendanceToDisk() {
 
         AttendanceTable attendanceTable = new AttendanceTable();
@@ -366,10 +356,13 @@ public class AttendanceActivity extends BaseActivity {
 
         attendanceTable.save();
 
+        //Start service to update attendance on server if network available
         if (NetworkUtilities.isInternet(this)) {
             Intent i = new Intent(this, AttendanceUploadService.class);
             startService(i);
         }
+
+        //Set attendance on view
         setDataInRecyclerView();
     }
 
