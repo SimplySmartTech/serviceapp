@@ -53,42 +53,42 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.android.support:design:24.0.0'
-    compile 'com.android.support:cardview-v7:24.0.0'
-
-    testCompile 'junit:junit:4.12'
-
-    compile "com.google.android.gms:play-services-gcm:9.6.1"
-
     //----- Retrofit lib used not network call
     compile('com.squareup.retrofit2:retrofit:2.0.0') {
         // exclude Retrofit’s OkHttp peer-dependency module and define your own module import
         exclude module: 'okhttp'
     }
-    compile "com.squareup.retrofit2:converter-gson:2.0.0"
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
 
     //----- AWS dependencies
+
+    //Image downloader library
+
+    //----- Handle local database operations
+
+    //Used to parse google play store page
+
+    //Location Service dependency
+    compile project(':library')
+    compile libraries.
+
+            googlePlayServices
+
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:cardview-v7:24.0.0'
+    compile 'com.google.android.gms:play-services-gcm:9.6.1'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
     compile 'com.amazonaws:aws-android-sdk-core:2.3.+'
     compile 'com.amazonaws:aws-android-sdk-cognito:2.3.+'
     compile 'com.amazonaws:aws-android-sdk-s3:2.3.+'
     compile 'com.amazonaws:aws-android-sdk-ddb:2.3.+'
-
-    //Image downloader library
     compile 'com.squareup.picasso:picasso:2.5.2'
-
-    //----- Handle local database operations
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
-
-    //Used to parse google play store page
     compile 'org.jsoup:jsoup:1.8.3'
-
-    //Location Service dependency
-    compile project(':library')
-    compile libraries.googlePlayServices
-
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
 }
 
 apply plugin: 'com.google.gms.google-services'

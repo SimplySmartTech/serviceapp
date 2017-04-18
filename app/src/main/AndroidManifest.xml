@@ -5,10 +5,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -43,49 +41,40 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activity.InputReadingFormActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
-
         <activity
             android:name=".activity.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activity.SummaryActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activity.SensorListActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activity.ImageViewActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ThemeStyle" />
-
         <activity
             android:name=".activity.AttendanceActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".activity.VisitorActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|stateHidden" />
-
 
         <!-- Push Notification GCM Services & Receivers -->
         <service android:name=".gcm.RegistrationIntentService" />
@@ -100,7 +89,6 @@
                 <category android:name="com.simplysmart.service" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".service.NetworkChangeReceiver"
             android:exported="true">
@@ -108,11 +96,10 @@
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".service.AlarmReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
 
         <service
             android:name=".gcm.MyGcmListenerService"
@@ -133,19 +120,14 @@
                 <action android:name="com.google.android.gms.iid.InstanceID" />
             </intent-filter>
         </service>
-
         <service
             android:name=".service.AlarmService"
             android:enabled="true" />
-
         <service android:name=".service.PhotoUploadService" />
-
         <service android:name=".service.ReadingSubmitService" />
-
         <service android:name=".service.AttendanceUploadService" />
-
-        <service android:name=".service.CheckAttendanceTimeService" />'
-
+        <service android:name=".service.CheckAttendanceTimeService" />
+        '
         <service android:name=".service.VisitorInfoUploadService" />
 
         <!-- Google play service version -->
@@ -161,15 +143,18 @@
         <meta-data
             android:name="AA_DB_NAME"
             android:value="ServiceAppData.db" />
-
         <meta-data
             android:name="AA_DB_VERSION"
             android:value="4" />
-
         <meta-data
             android:name="AA_MODELS"
             android:value="com.simplysmart.service.database.MatrixTable,com.simplysmart.service.database.SensorTable,com.simplysmart.service.database.TareWeightTable,com.simplysmart.service.database.ReadingTable,com.simplysmart.service.database.FinalReadingTable,com.simplysmart.service.database.AttendanceTable,com.simplysmart.service.database.VisitorTable" />
 
+        <activity
+            android:name=".activity.MainActivity_V2"
+            android:label="@string/title_activity_main__v2"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.HelpDeskActivity"></activity>
     </application>
 
 </manifest>

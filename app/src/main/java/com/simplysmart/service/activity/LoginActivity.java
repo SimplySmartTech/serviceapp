@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -169,9 +170,14 @@ public class LoginActivity extends BaseActivity {
 
                         if (response.isSuccessful()) {
                             if (response.body().isAuthenticated()) {
+
+                                Gson gson = new Gson();
+
+                                Log.d("Response",":"+gson.toJson(response.body()));
                                 llCompanySpinner.setVisibility(View.GONE);
                                 setUserData(response.body());
-                                Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                               // Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                                Intent i = new Intent(LoginActivity.this, MainActivity_V2.class);
                                 startActivity(i);
                                 finish();
 
@@ -267,7 +273,9 @@ public class LoginActivity extends BaseActivity {
 
                         if (response.isSuccessful() && response.body().getData() != null) {
                             setUserData(response.body());
-                            Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            Log.d("Response:","Response Login" + response.body());
+                            //Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                            Intent i = new Intent(LoginActivity.this, MainActivity_V2.class);
                             startActivity(i);
                             finish();
 
@@ -317,7 +325,7 @@ public class LoginActivity extends BaseActivity {
         preferencesEditor.putString("role_code", user.getRole_code());
 
         preferencesEditor.putString("unit_info", unitInfo);
-        preferencesEditor.putString("access_policy", accessPolicy);
+        preferencesEditor.putString("policy", accessPolicy);
 
         preferencesEditor.apply();
 
