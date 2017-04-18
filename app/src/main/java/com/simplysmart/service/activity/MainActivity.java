@@ -385,7 +385,7 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
             AlertDialogStandard.newInstance(getString(R.string.app_name), "No data found for this user.", "", "CLOSE")
                     .show(getFragmentManager(), "noDataFound");
         }
-        GlobalData.getInstance().setAccessPolicy(policy);
+//        GlobalData.getInstance().setAccessPolicy(policy);
     }
 
     private void initializeRemainingStuff() {

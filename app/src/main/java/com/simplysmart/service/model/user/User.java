@@ -18,8 +18,10 @@ public class User implements Parcelable {
     private String api_key;
     private String auth_token;
     private ArrayList<Unit> units;
+    private ArrayList<AccessPolicy> policy;
 
     private Company company;
+
 
     protected User(Parcel in) {
         id = in.readString();
@@ -30,6 +32,7 @@ public class User implements Parcelable {
         api_key = in.readString();
         auth_token = in.readString();
         units = in.createTypedArrayList(Unit.CREATOR);
+        policy = in.createTypedArrayList(AccessPolicy.CREATOR);
         company = in.readParcelable(Company.class.getClassLoader());
     }
 
@@ -43,6 +46,7 @@ public class User implements Parcelable {
         dest.writeString(api_key);
         dest.writeString(auth_token);
         dest.writeTypedList(units);
+        dest.writeTypedList(policy);
         dest.writeParcelable(company, flags);
     }
 
@@ -62,6 +66,14 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public ArrayList<AccessPolicy> getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(ArrayList<AccessPolicy> policy) {
+        this.policy = policy;
+    }
 
     public String getId() {
         return id;

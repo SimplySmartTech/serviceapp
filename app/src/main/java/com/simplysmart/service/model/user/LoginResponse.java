@@ -15,7 +15,6 @@ public class LoginResponse implements Parcelable {
     private LoginData data;
     private String subdomain;
     private ArrayList<CompanyList> company_list;
-    private AccessPolicy policy;
 
     protected LoginResponse(Parcel in) {
         message = in.readString();
@@ -23,7 +22,6 @@ public class LoginResponse implements Parcelable {
         data = in.readParcelable(LoginData.class.getClassLoader());
         subdomain = in.readString();
         company_list = in.createTypedArrayList(CompanyList.CREATOR);
-        policy = in.readParcelable(AccessPolicy.class.getClassLoader());
     }
 
     @Override
@@ -33,7 +31,6 @@ public class LoginResponse implements Parcelable {
         dest.writeParcelable(data, flags);
         dest.writeString(subdomain);
         dest.writeTypedList(company_list);
-        dest.writeParcelable(policy, flags);
     }
 
     @Override
@@ -53,14 +50,6 @@ public class LoginResponse implements Parcelable {
         }
     };
 
-    public AccessPolicy getPolicy() {
-        return policy;
-    }
-
-    public void setPolicy(AccessPolicy policy) {
-        this.policy = policy;
-    }
-
     public boolean isAuthenticated() {
         return authenticated;
     }
@@ -76,7 +65,6 @@ public class LoginResponse implements Parcelable {
     public void setSubdomain(String subdomain) {
         this.subdomain = subdomain;
     }
-
 
     public String getMessage() {
         return message;

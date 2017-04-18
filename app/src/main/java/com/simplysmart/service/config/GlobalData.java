@@ -29,7 +29,7 @@ public class GlobalData extends com.activeandroid.app.Application {
     private String userCurrentLocationAddress;
 
     private ArrayList<Unit> units;
-    private AccessPolicy accessPolicy;
+    private ArrayList<AccessPolicy> accessPolicy;
 
     @Override
     public void onCreate() {
@@ -52,20 +52,20 @@ public class GlobalData extends com.activeandroid.app.Application {
         this.userCurrentLocationAddress = userCurrentLocationAddress;
     }
 
+    public ArrayList<AccessPolicy> getAccessPolicy() {
+        return accessPolicy;
+    }
+
+    public void setAccessPolicy(ArrayList<AccessPolicy> accessPolicy) {
+        this.accessPolicy = accessPolicy;
+    }
+
     public String getCoordinates() {
         return coordinates;
     }
 
     public void setCoordinates(String coordinates) {
         this.coordinates = coordinates;
-    }
-
-    public AccessPolicy getAccessPolicy() {
-        return accessPolicy;
-    }
-
-    public void setAccessPolicy(AccessPolicy accessPolicy) {
-        this.accessPolicy = accessPolicy;
     }
 
     public ArrayList<Unit> getUnits() {

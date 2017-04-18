@@ -3,6 +3,8 @@ package com.simplysmart.service.model.user;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by shekhar on 12/08/16.
  */
@@ -16,6 +18,11 @@ public class AccessPolicy implements Parcelable {
     private String background;
     private String logo_url;
 
+    private String name;
+
+    @SerializedName("default")
+    private boolean defaultVal;
+
     protected AccessPolicy(Parcel in) {
         electricity = in.readByte() != 0;
         water = in.readByte() != 0;
@@ -24,6 +31,8 @@ public class AccessPolicy implements Parcelable {
         ewallet = in.readByte() != 0;
         background = in.readString();
         logo_url = in.readString();
+        name = in.readString();
+        defaultVal = in.readByte() != 0;
     }
 
     @Override
@@ -35,6 +44,8 @@ public class AccessPolicy implements Parcelable {
         dest.writeByte((byte) (ewallet ? 1 : 0));
         dest.writeString(background);
         dest.writeString(logo_url);
+        dest.writeString(name);
+        dest.writeByte((byte) (defaultVal ? 1 : 0));
     }
 
     @Override
@@ -53,6 +64,22 @@ public class AccessPolicy implements Parcelable {
             return new AccessPolicy[size];
         }
     };
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isDefaultVal() {
+        return defaultVal;
+    }
+
+    public void setDefaultVal(boolean defaultVal) {
+        this.defaultVal = defaultVal;
+    }
 
     public String getBackground() {
         return background;

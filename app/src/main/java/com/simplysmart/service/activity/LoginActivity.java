@@ -22,13 +22,13 @@ import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.ErrorUtils;
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.gcm.QuickstartPreferences;
 import com.simplysmart.service.gcm.RegistrationIntentService;
 import com.simplysmart.service.model.common.APIError;
-import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.LoginRequest;
 import com.simplysmart.service.model.user.LoginResponse;
 import com.simplysmart.service.model.user.User;
@@ -173,11 +173,16 @@ public class LoginActivity extends BaseActivity {
 
                                 Gson gson = new Gson();
 
-                                Log.d("Response",":"+gson.toJson(response.body()));
+                                Log.d("Response", ":" + gson.toJson(response.body()));
                                 llCompanySpinner.setVisibility(View.GONE);
                                 setUserData(response.body());
-                               // Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                                Intent i = new Intent(LoginActivity.this, MainActivity_V2.class);
+
+                                Intent i;
+                                if (GlobalData.getInstance().getSubDomain().equalsIgnoreCase("demo")) {
+                                    i = new Intent(LoginActivity.this, MainActivity_V2.class);
+                                } else {
+                                    i = new Intent(LoginActivity.this, MainActivity.class);
+                                }
                                 startActivity(i);
                                 finish();
 
@@ -273,7 +278,7 @@ public class LoginActivity extends BaseActivity {
 
                         if (response.isSuccessful() && response.body().getData() != null) {
                             setUserData(response.body());
-                            Log.d("Response:","Response Login" + response.body());
+                            Log.d("Response:", "Response Login" + response.body());
                             //Intent i = new Intent(LoginActivity.this, MainActivity.class);
                             Intent i = new Intent(LoginActivity.this, MainActivity_V2.class);
                             startActivity(i);
@@ -306,9 +311,6 @@ public class LoginActivity extends BaseActivity {
         User user = response.getData().getUser();
         String unitInfo = gson.toJson(user);
 
-        AccessPolicy policy = response.getPolicy();
-        String accessPolicy = gson.toJson(policy);
-
         SharedPreferences UserInfo = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         SharedPreferences.Editor preferencesEditor = UserInfo.edit();
 
@@ -324,8 +326,9 @@ public class LoginActivity extends BaseActivity {
         preferencesEditor.putString("subdomain", response.getSubdomain());
         preferencesEditor.putString("role_code", user.getRole_code());
 
+        GlobalData.getInstance().setSubDomain(response.getSubdomain());
+
         preferencesEditor.putString("unit_info", unitInfo);
-        preferencesEditor.putString("policy", accessPolicy);
 
         preferencesEditor.apply();
 
