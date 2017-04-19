@@ -178,10 +178,10 @@ public class LoginActivity extends BaseActivity {
                                 setUserData(response.body());
 
                                 Intent i;
-                                if (GlobalData.getInstance().getSubDomain().equalsIgnoreCase("demo")) {
-                                    i = new Intent(LoginActivity.this, MainActivity_V2.class);
-                                } else {
+                                if (GlobalData.getInstance().getSubDomain().equalsIgnoreCase("mailhem")) {
                                     i = new Intent(LoginActivity.this, MainActivity.class);
+                                } else {
+                                    i = new Intent(LoginActivity.this, MainActivity_V2.class);
                                 }
                                 startActivity(i);
                                 finish();

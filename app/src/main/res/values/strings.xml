@@ -47,4 +47,45 @@
     <string name="map_api_key">AIzaSyBE1qJ6ZJzzNzcLPPslz2im3jc6g_kDEnI</string>
     <string name="title_activity_main__v2">MainActivity_V2</string>
 
+
+    <!-- Icon text string-->
+    <string name="icon_helpdesk">&#xe600;</string>
+    <string name="icon_electricity">&#xe602;</string>
+    <string name="icon_shoping">&#xe603;</string>
+    <string name="icon_dth">&#xe604;</string>
+    <string name="icon_ewallet">&#xe60a;</string>
+    <string name="icon_water">&#xe60b;</string>
+    <string name="icon_myflat">&#xe606;</string>
+    <string name="icon_notification">&#xe607;</string>
+    <string name="icon_send">&#xe619;</string>
+    <string name="icon_civil">&#xe611;</string>
+    <string name="icon_billing">&#xe60d;</string>
+    <string name="icon_infra">&#xe613;</string>
+    <string name="icon_it">&#xe612;</string>
+    <string name="icon_others">&#xe616;</string>
+    <string name="icon_lock">&#xe615;</string>
+    <string name="icon_unlock">&#xe61d;</string>
+    <string name="icon_smile">&#xe61a;</string>
+    <string name="icon_sad">&#xe618;</string>
+    <string name="icon_photo">&#xe617;</string>
+    <string name="icon_add">&#xe60c;</string>
+    <string name="icon_bulb">&#xe61f;</string>
+    <string name="icon_slash">&#xe623;</string>
+    <string name="icon_camera">&#xe611;</string>
+    <string name="icon_meter">&#xe621;</string>
+    <string name="icon_assign">&#xe61c;</string>
+    <string name="icon_rupee">&#xe622;</string>
+    <string name="icon_thunder">&#xe625;</string>
+    <string name="icon_planner">&#xe626;</string>
+    <string name="icon_sign_out">&#xf011;</string>
+    <string name="icon_calendar_normal">&#xE62D;</string>
+    <string name="icon_calendar_selected">&#xE62C;</string>
+    <string name="icon_wallet_topup">&#xE628;</string>
+    <string name="icon_maintenance">&#xE62E;</string>
+
+    <string name="icon_left_arrow">&#xF104;</string>
+    <string name="icon_right_arrow">&#xF105;</string>
+    <string name="icon_top_arrow">&#xF106;</string>
+    <string name="icon_bottom_arrow">&#xF107;</string>
+
 </resources>

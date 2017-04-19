@@ -2,6 +2,7 @@ package com.simplysmart.service.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -14,25 +15,39 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
+import com.simplysmart.service.adapter.ComplaintsListAdapter;
+import com.simplysmart.service.adapter.HelpdeskListAdapter;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.common.LocationAddress;
 import com.simplysmart.service.common.VersionComprator;
 import com.simplysmart.service.config.GlobalData;
+import com.simplysmart.service.config.NetworkUtilities;
+import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogUpdateVersion;
+import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.LogoutListener;
+import com.simplysmart.service.model.helpdesk.Complaint;
+import com.simplysmart.service.model.helpdesk.ComplaintData;
+import com.simplysmart.service.model.helpdesk.ComplaintLists;
+import com.simplysmart.service.model.helpdesk.ComplaintsResponse;
+import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
 import com.simplysmart.service.model.user.User;
 import com.yayandroid.locationmanager.LocationConfiguration;
 import com.yayandroid.locationmanager.constants.FailType;
@@ -40,13 +55,21 @@ import com.yayandroid.locationmanager.constants.ProviderType;
 
 import org.jsoup.Jsoup;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutListener {
 
     private TextView no_data_found, add_previous_reading;
-    private RecyclerView complaintList;
+    private ListView complaintList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private NavigationView navigationView;
     private DrawerLayout drawer;
+    private HelpdeskListAdapter complaintsListAdapter;
 
     private User residentData;
 
@@ -140,7 +163,8 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(GlobalData.getInstance().getSelectedUnit());
+        getSupportActionBar().setTitle("Complaints" +
+                "");
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout_v2);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -160,12 +184,37 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
         no_data_found = (TextView) findViewById(R.id.no_data_found);
-        complaintList = (RecyclerView) findViewById(R.id.complaintList);
+        complaintList = (ListView) findViewById(R.id.complaintList);
+
 
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
+
                 //TODO: call to fetch complaint
+                swipeRefreshLayout.setRefreshing(true);
+                ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+                Call<HelpDeskResponse> complaintsResponseCall = apiInterface.getComplaintsData("1");
+                complaintsResponseCall.enqueue(new Callback<HelpDeskResponse>() {
+                    @Override
+                    public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        if (response.isSuccessful()){
+
+                        setComplaintsData(response.body());
+                        Log.d("Response Sucess",response.body().toString());}
+                        else {
+                            Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
+                            Log.d("Response Failed",response.body().toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(MainActivity_V2.this,"Network Error",Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
 
@@ -173,6 +222,65 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
             @Override
             public void onRefresh() {
                 //TODO: call to fetch complaint
+
+                swipeRefreshLayout.setRefreshing(true);
+                ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+                Call<HelpDeskResponse> complaintsResponseCall = apiInterface.getComplaintsData("1");
+                complaintsResponseCall.enqueue(new Callback<HelpDeskResponse>() {
+                    @Override
+                    public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        if (response.isSuccessful()){
+                            setComplaintsData(response.body());
+                            Log.d("Response Sucess",response.body().toString());}
+                        else {
+                            Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
+                            Log.d("Response Failed",response.body().toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
+                        swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(MainActivity_V2.this,"Network Error",Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+//                switch (item.getGroupId()){
+//                    case R.id.plants :
+//                        if (item.getTitle().equals("helpdesk")){
+//                        Intent intent = new Intent(MainActivity_V2.this,HelpDeskActivity.class);
+//                        startActivity(intent);
+////                            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+////                            Call<ComplaintsResponse> complaintsResponseCall = apiInterface.getComplaintsData("1");
+////                            complaintsResponseCall.enqueue(new Callback<ComplaintsResponse>() {
+////                                @Override
+////                                public void onResponse(Call<ComplaintsResponse> call, Response<ComplaintsResponse> response) {
+////                                    if (response.isSuccessful()){
+////                                        setComplaintsData(response.body());
+////                                        Log.d("Response Sucess",response.body().toString());}
+////                                    else {
+////                                        Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
+////                                        Log.d("Response Failed",response.body().toString());
+////                                    }
+////                                }
+////
+////                                @Override
+////                                public void onFailure(Call<ComplaintsResponse> call, Throwable t) {
+////                                    Toast.makeText(MainActivity_V2.this,"Network Error",Toast.LENGTH_LONG).show();
+////                                }
+////                            });
+//                        return true;
+//                        }
+//                    default:
+//                        return true;
+//                }
+                return false;
             }
         });
 
@@ -184,6 +292,41 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         finish();
     }
 
+    public void getComplaintRespnse(){
+
+    }
+
+
+    public void setComplaintsData(HelpDeskResponse complaintsResponse){
+        ArrayList<ComplaintLists> complaintDataArrayList = complaintsResponse.getData().getComplaintLists();
+        Log.d("Response Size:", ":"+complaintDataArrayList.size());
+        setComplaintsDatainList(complaintDataArrayList);
+
+    }
+
+    public void setComplaintsDatainList(ArrayList<ComplaintLists> complaintDataList){
+        complaintsListAdapter = new HelpdeskListAdapter(this,  complaintDataList);
+        RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.canScrollVertically();
+        //complaintList.setLayoutManager(linearLayoutManager);
+        complaintList.setAdapter(complaintsListAdapter);
+        complaintList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (complaintsListAdapter.getData().get(position).getAasm_state().equals("")){
+
+                }
+                else
+                {
+                    if (NetworkUtilities.isInternet(MainActivity_V2.this)){
+                        Intent detailedActivityIntent = new Intent(MainActivity_V2.this,ComplaintDetailScreenActivity.class);
+                        detailedActivityIntent.putExtra("complaint_id",complaintsListAdapter.getData().get(position).getId());
+                        startActivity(detailedActivityIntent);
+                    }
+                }
+            }
+        });
+    }
     private void setDataInHeader(NavigationView navigationView) {
 
         navigationView.inflateHeaderView(R.layout.nav_header_main);

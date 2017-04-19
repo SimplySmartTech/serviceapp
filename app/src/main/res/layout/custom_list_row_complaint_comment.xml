@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bw_color_white"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/botsworth_chat_bubble"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/rectangular_round_border_gray"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/txt_comment_botswoth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/bw_color_black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txt_time_botswoth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_comment_botswoth"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/bw_color_black"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/resident_chat_bubble"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginStart="60sp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/rectangular_round_border"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/txt_comment_resident"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/bw_color_white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txt_time_resident"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/txt_comment_resident"
+            android:textColor="@color/bw_color_white"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+</LinearLayout>

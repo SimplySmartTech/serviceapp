@@ -154,7 +154,10 @@
             android:name=".activity.MainActivity_V2"
             android:label="@string/title_activity_main__v2"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activity.HelpDeskActivity"></activity>
+        <activity android:name=".activity.HelpDeskActivity" />
+        <activity android:name=".activity.ComplaintDetailScreenActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>
