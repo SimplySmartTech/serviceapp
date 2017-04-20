@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -17,6 +19,7 @@ import com.simplysmart.service.adapter.CommentListAdapter;
 import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.AppConstant;
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.model.helpdesk.Complaint;
 import com.simplysmart.service.model.helpdesk.ComplaintChat;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
@@ -39,6 +42,8 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     private CommentListAdapter adapter;
     private RelativeLayout ll_new_comment;
 
+    private boolean isClosed ;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +54,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle("Complaint Details");
+        getSupportActionBar().setTitle("Complaints Details");
 
         initializeView();
         CommonMethod.hideKeyboard(this);
@@ -58,6 +63,13 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             complaint_id = getIntent().getStringExtra("complaint_id");
             getComplaintDetail(complaint_id);
         }
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem reset = menu.findItem(R.id.update_menu);
+        reset.setVisible(isClosed);
+
+        return true;
     }
 
     @Override
@@ -76,6 +88,13 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
                 } else {
                     super.onBackPressed();
                 }
+                break;
+            case R.id.update_menu :
+                Log.d("Update","Upadte clicked");
+                Intent updateStatusActivity = new Intent(this,UpdateComplaintStatusActivity.class);
+                updateStatusActivity.putExtra("complaint",complaint);
+                startActivity(updateStatusActivity);
+                break;
         }
         return true;
     }
@@ -126,8 +145,19 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         if (complaint.getAasm_state() != null && !complaint.getAasm_state().equalsIgnoreCase("closed")) {
             ll_new_comment.setVisibility(View.VISIBLE);
+
         } else {
             ll_new_comment.setVisibility(View.GONE);
+
+        }
+
+        if (complaint.getAasm_state().equalsIgnoreCase("closed")){
+            isClosed = false;
+            invalidateOptionsMenu();
+        }
+        else{
+            isClosed = true;
+            invalidateOptionsMenu();
         }
 
         complaintStatus.setText(getString(R.string.icon_assign) + complaint.getAasm_state());
@@ -135,11 +165,11 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         textComplaintNo.setText("# " + complaint.getNumber());
         textUnitNo.setText(complaint.getUnit_info());
 
-        if (complaint.getAasm_state().equalsIgnoreCase("assigned")) {
+//        if (complaint.getAasm_state().equalsIgnoreCase("assigned")) {
             complaintStatus.setOnClickListener(openDialogClick);
-        } else {
-            complaintStatus.setOnClickListener(null);
-        }
+//        } else {
+//            complaintStatus.setOnClickListener(null);
+//        }
 
         adapter = new CommentListAdapter(this, complaint.getSorted_activities());
         commentList.setAdapter(adapter);
@@ -168,6 +198,14 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             postComplaintComment(complaint_id);
         }
     };
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.update_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
 
     private void getComplaintDetail(String compliant_id) {
 

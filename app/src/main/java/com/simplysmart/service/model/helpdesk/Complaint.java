@@ -10,9 +10,20 @@ import java.util.ArrayList;
  */
 public class Complaint implements Parcelable {
 
-    private String aasm_state,created_at,description,number,of_type,unit_info,category_name,sub_category_name;
+    private String aasm_state,created_at,description,number,of_type,unit_info,category_name,sub_category_name,priority,state_action;
     private String assigned_name,id;
     private ArrayList<ComplaintChat> sorted_activities;
+    private ArrayList<PermittedActions> permitted_events;
+
+    private String resolved_reason;
+    private String blocked_reason;
+    private String rejected_reason;
+    private String closed_reason;
+
+    public Complaint(){
+
+    }
+
 
     protected Complaint(Parcel in) {
         aasm_state = in.readString();
@@ -23,9 +34,16 @@ public class Complaint implements Parcelable {
         unit_info = in.readString();
         category_name = in.readString();
         sub_category_name = in.readString();
+        priority = in.readString();
+        state_action = in.readString();
         assigned_name = in.readString();
         id = in.readString();
         sorted_activities = in.createTypedArrayList(ComplaintChat.CREATOR);
+        permitted_events = in.createTypedArrayList(PermittedActions.CREATOR);
+        resolved_reason = in.readString();
+        blocked_reason = in.readString();
+        rejected_reason = in.readString();
+        closed_reason = in.readString();
     }
 
     public static final Creator<Complaint> CREATOR = new Creator<Complaint>() {
@@ -40,24 +58,12 @@ public class Complaint implements Parcelable {
         }
     };
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getPriority() {
+        return priority;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(aasm_state);
-        dest.writeString(created_at);
-        dest.writeString(description);
-        dest.writeString(number);
-        dest.writeString(of_type);
-        dest.writeString(unit_info);
-        dest.writeString(category_name);
-        dest.writeString(sub_category_name);
-        dest.writeString(assigned_name);
-        dest.writeString(id);
-        dest.writeList(sorted_activities);
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 
     public String getAasm_state() {
@@ -146,5 +152,90 @@ public class Complaint implements Parcelable {
 
     public void setSorted_activities(ArrayList<ComplaintChat> sorted_activities) {
         this.sorted_activities = sorted_activities;
+    }
+    public ArrayList<PermittedActions> getPermittedActions() {
+        return permitted_events;
+    }
+
+    public void setPermittedActions(ArrayList<PermittedActions> permittedActions) {
+        this.permitted_events = permittedActions;
+    }
+
+
+
+
+    public String getState_action() {
+        return state_action;
+    }
+
+    public void setState_action(String state_action) {
+        this.state_action = state_action;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(aasm_state);
+        dest.writeString(created_at);
+        dest.writeString(description);
+        dest.writeString(number);
+        dest.writeString(of_type);
+        dest.writeString(unit_info);
+        dest.writeString(category_name);
+        dest.writeString(sub_category_name);
+        dest.writeString(priority);
+        dest.writeString(state_action);
+        dest.writeString(assigned_name);
+        dest.writeString(id);
+        dest.writeTypedList(sorted_activities);
+        dest.writeTypedList(permitted_events);
+        dest.writeString(resolved_reason);
+        dest.writeString(blocked_reason);
+        dest.writeString(rejected_reason);
+        dest.writeString(closed_reason);
+    }
+
+    public ArrayList<PermittedActions> getPermitted_events() {
+        return permitted_events;
+    }
+
+    public void setPermitted_events(ArrayList<PermittedActions> permitted_events) {
+        this.permitted_events = permitted_events;
+    }
+
+    public String getResolved_reason() {
+        return resolved_reason;
+    }
+
+    public void setResolved_reason(String resolved_reason) {
+        this.resolved_reason = resolved_reason;
+    }
+
+    public String getBlocked_reason() {
+        return blocked_reason;
+    }
+
+    public void setBlocked_reason(String blocked_reason) {
+        this.blocked_reason = blocked_reason;
+    }
+
+    public String getRejected_reason() {
+        return rejected_reason;
+    }
+
+    public void setRejected_reason(String rejected_reason) {
+        this.rejected_reason = rejected_reason;
+    }
+
+    public String getClosed_reason() {
+        return closed_reason;
+    }
+
+    public void setClosed_reason(String closed_reason) {
+        this.closed_reason = closed_reason;
     }
 }

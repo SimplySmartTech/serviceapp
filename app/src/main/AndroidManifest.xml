@@ -155,9 +155,13 @@
             android:label="@string/title_activity_main__v2"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activity.HelpDeskActivity" />
-        <activity android:name=".activity.ComplaintDetailScreenActivity"
+        <activity
+            android:name=".activity.ComplaintDetailScreenActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activity.UpdateComplaintStatusActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

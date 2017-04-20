@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.simplysmart.service.activity.UpdateComplaintStatusActivity">
+    <LinearLayout
+        android:id="@+id/header_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <include layout="@layout/toolbar" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="8dp"
+        android:layout_below="@+id/header_bar"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/projectText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="Complaint state"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/colorPrimary"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/projectListContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rectangular_round_rectangle">
+
+            <Spinner
+                android:id="@+id/permissions_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:spinnerMode="dropdown"
+                android:textColor="@color/colorPrimary" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/comment_text"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:ems="10"
+            android:padding="10dp"
+            android:layout_margin="10dp"
+            android:inputType="textMultiLine"
+            android:background="@drawable/rectangular_round_rectangle"
+            />
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/update_status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/update"
+            android:layout_weight="0.5"
+            android:onClick="callUpdate"/>
+        <Button
+            android:id="@+id/add_subTicketBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Add Sub-Ticket"
+            android:layout_weight="0.5"
+            />
+    </LinearLayout>
+</RelativeLayout>

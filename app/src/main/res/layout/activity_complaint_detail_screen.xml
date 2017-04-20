@@ -8,7 +8,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <include layout="@layout/toolbar" />
+        <include layout="@layout/toolbar"
+        />
+
     </LinearLayout>
 
     <RelativeLayout
@@ -156,6 +158,7 @@
             android:divider="@android:color/transparent"
             android:scrollbars="none">
 
+
         </ListView>
     </LinearLayout>
 
@@ -167,6 +170,7 @@
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
         android:padding="5dp"
+        android:layout_alignParentBottom="true"
         android:visibility="gone">
 
         <EditText
@@ -177,9 +181,9 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="10dp"
             android:layout_toStartOf="@+id/btn_send"
-            android:background="@drawable/ractangular_border_red"
+            android:paddingBottom="5dp"
             android:hint="Type a message"
-            android:padding="8dp"
+            android:padding="12dp"
             android:singleLine="true"
             android:textColor="@color/bw_color_black"
             android:textSize="16sp" />
@@ -204,7 +208,7 @@
         android:layout_marginEnd="15dp"
         android:layout_marginStart="15dp"
         android:padding="10dp"
-        android:visibility="invisible">
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/img_one"
@@ -245,11 +249,5 @@
             android:textSize="22sp" />
 
     </RelativeLayout>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Update Status"
-        android:layout_alignParentBottom="true"/>
-
 
 </RelativeLayout>

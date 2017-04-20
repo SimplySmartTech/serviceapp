@@ -20,6 +20,7 @@
     <string name="reading_image">Reading Image</string>
     <string name="submit">Submit</string>
     <string name="logout">Logout</string>
+    <string name="update">Update</string>
     <string name="save_reading">Save Reading</string>
     <string name="error_no_data_found">No readings saved.</string>
     <string name="readings_submitted">All readings submitted.</string>

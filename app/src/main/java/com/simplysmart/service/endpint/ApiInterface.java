@@ -7,22 +7,21 @@ import com.simplysmart.service.model.attendance.AttendanceList;
 import com.simplysmart.service.model.helpdesk.ComplaintChatRequest;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintDetailResponse;
-import com.simplysmart.service.model.helpdesk.ComplaintsResponse;
+import com.simplysmart.service.model.helpdesk.ComplaintUpdateRequest;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
+import com.simplysmart.service.model.helpdesk.MessageResponseClass;
 import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.user.LoginRequest;
 import com.simplysmart.service.model.user.LoginResponse;
 import com.simplysmart.service.model.visitors.VisitorPost;
-import com.simplysmart.service.model.visitors.Visitors;
-
-import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -73,5 +72,10 @@ public interface ApiInterface {
     Call<ComplaintChatResponse> postComment(@Path("complaintId") String complaintId,
                                             @Query("subdomain") String subDomain,
                                             @Body ComplaintChatRequest request);
+
+    @PUT("/cms/complaints/{complaintId}")
+    Call<MessageResponseClass> updateComplaintStatus(@Path("complaintId") String complaintId,
+                                                     @Query("subdomain") String subDomain,
+                                                     @Body ComplaintUpdateRequest complaint);
 
 }
