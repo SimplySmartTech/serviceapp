@@ -1,8 +1,12 @@
 package com.simplysmart.service.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -13,13 +17,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.CommentListAdapter;
 import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.AppConstant;
-import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.model.helpdesk.Complaint;
 import com.simplysmart.service.model.helpdesk.ComplaintChat;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
@@ -42,7 +44,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     private CommentListAdapter adapter;
     private RelativeLayout ll_new_comment;
 
-    private boolean isClosed ;
+    private boolean isClosed;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,19 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(updateList,
+                new IntentFilter("updateList"));
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(updateList);
+        super.onDestroy();
+    }
+
+    @Override
     protected int getStatusBarColor() {
         return R.color.colorPrimaryDark;
     }
@@ -89,10 +104,10 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
                     super.onBackPressed();
                 }
                 break;
-            case R.id.update_menu :
-                Log.d("Update","Upadte clicked");
-                Intent updateStatusActivity = new Intent(this,UpdateComplaintStatusActivity.class);
-                updateStatusActivity.putExtra("complaint",complaint);
+            case R.id.update_menu:
+                Log.d("Update", "Upadte clicked");
+                Intent updateStatusActivity = new Intent(this, UpdateComplaintStatusActivity.class);
+                updateStatusActivity.putExtra("complaint", complaint);
                 startActivity(updateStatusActivity);
                 break;
         }
@@ -101,7 +116,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
     private void initializeView() {
 
-      //  textTypeface = Typeface.createFromAsset(getAssets(), AppConstant.FONT_EUROSTILE_REGULAR_MID);
+        //  textTypeface = Typeface.createFromAsset(getAssets(), AppConstant.FONT_EUROSTILE_REGULAR_MID);
 
         TextView helpdesk_logo = (TextView) findViewById(R.id.helpdesk_logo);
         TextView category_logo = (TextView) findViewById(R.id.category_logo);
@@ -135,7 +150,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         unit_logo.setText(getString(R.string.icon_myflat));
         buttonSend.setText(getString(R.string.icon_send));
 
-       // imgCountTextView.setOnClickListener(openGalleryClick);
+        // imgCountTextView.setOnClickListener(openGalleryClick);
         buttonSend.setOnClickListener(postCommentClick);
 
         ll_new_comment = (RelativeLayout) findViewById(R.id.ll_new_comment);
@@ -151,11 +166,10 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         }
 
-        if (complaint.getAasm_state().equalsIgnoreCase("closed")){
+        if (complaint.getAasm_state().equalsIgnoreCase("closed")) {
             isClosed = false;
             invalidateOptionsMenu();
-        }
-        else{
+        } else {
             isClosed = true;
             invalidateOptionsMenu();
         }
@@ -166,7 +180,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         textUnitNo.setText(complaint.getUnit_info());
 
 //        if (complaint.getAasm_state().equalsIgnoreCase("assigned")) {
-            complaintStatus.setOnClickListener(openDialogClick);
+        complaintStatus.setOnClickListener(openDialogClick);
 //        } else {
 //            complaintStatus.setOnClickListener(null);
 //        }
@@ -201,11 +215,9 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.update_menu,menu);
+        getMenuInflater().inflate(R.menu.update_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
-
-
 
     private void getComplaintDetail(String compliant_id) {
 
@@ -258,5 +270,13 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         commentList.smoothScrollToPosition(adapter.getCount());
 
     }
+
+    private BroadcastReceiver updateList = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getComplaintDetail(complaint_id);
+        }
+    };
 }
 

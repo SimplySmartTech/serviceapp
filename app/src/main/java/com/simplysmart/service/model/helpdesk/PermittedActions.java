@@ -10,7 +10,7 @@ import android.os.Parcelable;
 public class PermittedActions implements Parcelable {
 
     private String event;
-    private  boolean comment_required;
+    private boolean comment_required;
 
     protected PermittedActions(Parcel in) {
         event = in.readString();
@@ -47,7 +47,6 @@ public class PermittedActions implements Parcelable {
     public void setEvent(String event) {
         this.event = event;
     }
-
 
 
     public boolean isComment_required() {

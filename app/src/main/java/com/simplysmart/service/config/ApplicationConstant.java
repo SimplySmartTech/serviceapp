@@ -7,9 +7,9 @@ public class ApplicationConstant {
 
     //Api url component
     public static final String PROTOCOL = "http://";
- //   public static final String DOMAIN ="192.168.1.59:3000";// "api.simplysmart.tech";
+    public static final String DOMAIN ="192.168.1.59:3000";// "api.simplysmart.tech";
  //   public static final String DOMAIN ="api.simplysmart.tech";
-    public static final String DOMAIN ="township.xrbia.com";
+//    public static final String DOMAIN ="township.xrbia.com";
 
     public static final String SERVER_URL = PROTOCOL + DOMAIN;
 

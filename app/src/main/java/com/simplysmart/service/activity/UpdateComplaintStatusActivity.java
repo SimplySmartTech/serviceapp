@@ -2,17 +2,17 @@ package com.simplysmart.service.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.ServiceGenerator;
@@ -33,49 +33,43 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
     private Spinner permittedActionSpinner;
     private Complaint complaint;
     private EditText commentEditText;
-    ArrayList<String> permissionsList;
-    ArrayList<PermittedActions> permitedActions;
-    private boolean isTextFieldEnabled;
-    Intent intent;
-    String spinnerSelectedOption;
 
+    private ArrayList<String> events = new ArrayList<>();
+    private ArrayList<Boolean> comment_required = new ArrayList<>();
 
+    private RelativeLayout parentLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_complaint_status);
 
+        complaint = getIntent().getParcelableExtra("complaint");
 
-        intent = getIntent();
-        complaint = intent.getParcelableExtra("complaint");
-
-
-
-
-        permissionsList = new ArrayList<>();
         permittedActionSpinner = (Spinner) findViewById(R.id.permissions_spinner);
-        permittedActionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                                             @Override
-                                                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                                                 spinnerSelected(position,id);
-                                                                 spinnerSelectedOption = permissionsList.get(position);
-                                                             }
+        parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
 
-                                                             @Override
-                                                             public void onNothingSelected(AdapterView<?> parent) {
+        for (PermittedActions permittedActions : complaint.getPermitted_events()) {
+            events.add(permittedActions.getEvent());
+            comment_required.add(permittedActions.isComment_required());
+        }
 
-                                                             }
-                                                         });
-                commentEditText = (EditText) findViewById(R.id.comment_text);
-
-
-         getPermissionList();
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,permissionsList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, events);
         adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-
         permittedActionSpinner.setAdapter(adapter);
+
+        permittedActionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        commentEditText = (EditText) findViewById(R.id.comment_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -84,116 +78,6 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Update");
     }
-
-    private void spinnerSelected(int position, long id) {
-
-        if (!permitedActions.get(position).isComment_required() ){
-            commentEditText.setEnabled(false);
-            isTextFieldEnabled = false;
-            //commentEditText.setBackground(R.drawable);
-
-        }
-        else {
-            commentEditText.setEnabled(true);
-            isTextFieldEnabled = true;
-
-        }
-
-    }
-
-    private void getPermissionList() {
-
-        permitedActions = complaint.getPermittedActions();
-        for (int i = 0 ; i < permitedActions.size() ; i++ ){
-            if (!(permitedActions.get(i).isComment_required())){
-                commentEditText.setEnabled(false);
-                isTextFieldEnabled = false;
-            }
-            else {
-                commentEditText.setEnabled(true);
-                isTextFieldEnabled = true;
-            }
-            permissionsList.add(i,permitedActions.get(i).getEvent());
-        }
-
-    }
-
-
-
-    @Override
-    protected int getStatusBarColor() {
-        return 0;
-    }
-
-    public void callUpdate(View view){
-
-    if (isTextFieldEnabled && !commentEditText.getText().toString().equals("")) {
-
-        Toast.makeText(UpdateComplaintStatusActivity.this, "Calling API", Toast.LENGTH_LONG).show();
-
-        Complaint complaintObject = new Complaint();
-        complaintObject.setId(complaint.getId());
-        complaintObject.setPriority(complaint.getPriority());
-        complaintObject.setOf_type(complaint.getOf_type());
-        complaintObject.setUnit_info(complaint.getUnit_info());
-        complaintObject.setCategory_name(complaint.getCategory_name());
-        complaintObject.setState_action(spinnerSelectedOption);
-
-
-        // cos
-
-        ComplaintUpdateRequest complaintUpdateRequest = new ComplaintUpdateRequest();
-
-
-
-        if (isTextFieldEnabled) {
-            String reasonText = commentEditText.getText().toString();
-            if (spinnerSelectedOption.equals("Resolve")) {
-                complaintObject.setResolved_reason(reasonText);
-            }
-            if (spinnerSelectedOption.equals("Block")) {
-                complaintObject.setBlocked_reason(reasonText);
-            }
-            if (spinnerSelectedOption.equals("Reject")) {
-                complaintObject.setRejected_reason(reasonText);
-            }
-            if (spinnerSelectedOption.equals("Close")) {
-
-                complaintObject.setClosed_reason(reasonText);
-            }
-
-        }
-
-        complaintUpdateRequest.setComplaint(complaintObject);
-
-
-
-        Gson gson = new Gson();
-        Log.d("ComplaintReq:", gson.toJson(complaintUpdateRequest));
-        Log.d("SpinnerSel:", spinnerSelectedOption);
-        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-        Call<MessageResponseClass> complaintsResponseCall = apiInterface.updateComplaintStatus(complaintObject.getId(), GlobalData.getInstance().getSubDomain() ,complaintUpdateRequest);
-        complaintsResponseCall.enqueue(new Callback<MessageResponseClass>() {
-            @Override
-            public void onResponse(Call<MessageResponseClass> call, Response<MessageResponseClass> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(UpdateComplaintStatusActivity.this, "Complaint status is updated successfully", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(UpdateComplaintStatusActivity.this, "Response Error" + response.code(), Toast.LENGTH_LONG).show();
-
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MessageResponseClass> call, Throwable t) {
-                Toast.makeText(UpdateComplaintStatusActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-    else {
-        Toast.makeText(UpdateComplaintStatusActivity.this, "Please Enter Comment in Text boxF", Toast.LENGTH_LONG).show();
-    }
-}
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -210,4 +94,78 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
         }
         return true;
     }
+
+    @Override
+    protected int getStatusBarColor() {
+        return 0;
+    }
+
+    public void callUpdate(View view) {
+
+        String event = permittedActionSpinner.getSelectedItem().toString();
+        int eventPosition = permittedActionSpinner.getSelectedItemPosition();
+
+        Complaint complaintObject = new Complaint();
+        complaintObject.setId(complaint.getId());
+        complaintObject.setPriority(complaint.getPriority());
+        complaintObject.setOf_type(complaint.getOf_type());
+        complaintObject.setUnit_info(complaint.getUnit_info());
+        complaintObject.setCategory_name(complaint.getCategory_name());
+        complaintObject.setState_action(event);
+
+        ComplaintUpdateRequest complaintUpdateRequest = new ComplaintUpdateRequest();
+
+        String reasonText = commentEditText.getText().toString();
+
+        if (comment_required.get(eventPosition) && commentEditText.getText().toString().trim().isEmpty()) {
+            showSnackBar(parentLayout, "Please enter comment.");
+            return;
+        }
+
+        switch (event) {
+            case "Resolve":
+                complaintObject.setResolved_reason(reasonText);
+
+                break;
+            case "Block":
+                complaintObject.setBlocked_reason(reasonText);
+
+                break;
+            case "Reject":
+                complaintObject.setRejected_reason(reasonText);
+
+                break;
+            case "Close":
+                complaintObject.setClosed_reason(reasonText);
+                break;
+        }
+
+        complaintUpdateRequest.setComplaint(complaintObject);
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        Call<MessageResponseClass> complaintsResponseCall = apiInterface.updateComplaintStatus(complaintObject.getId(),
+                GlobalData.getInstance().getSubDomain(),
+                complaintUpdateRequest);
+
+        complaintsResponseCall.enqueue(new Callback<MessageResponseClass>() {
+            @Override
+            public void onResponse(Call<MessageResponseClass> call, Response<MessageResponseClass> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(UpdateComplaintStatusActivity.this, "Complaint status is updated successfully", Toast.LENGTH_LONG).show();
+                    Intent i = new Intent("updateList");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
+                    finish();
+                } else {
+                    Toast.makeText(UpdateComplaintStatusActivity.this, "Response Error" + response.code(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageResponseClass> call, Throwable t) {
+                Toast.makeText(UpdateComplaintStatusActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
 }
