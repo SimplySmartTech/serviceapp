@@ -1,35 +1,35 @@
 {
   "project_info": {
-    "project_number": "290115473097",
-    "firebase_url": "https://simplysmartservice-165310.firebaseio.com",
-    "project_id": "simplysmartservice-165310",
-    "storage_bucket": "simplysmartservice-165310.appspot.com"
+    "project_number": "963314002363",
+    "firebase_url": "https://xrbiaservice.firebaseio.com",
+    "project_id": "xrbiaservice",
+    "storage_bucket": "xrbiaservice.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:290115473097:android:4d65c5f3e5fc6fae",
+        "mobilesdk_app_id": "1:963314002363:android:57efd3219869f774",
         "android_client_info": {
-          "package_name": "com.simplysmart.service"
+          "package_name": "com.xrbia.service"
         }
       },
       "oauth_client": [
         {
-          "client_id": "290115473097-ugmb529slp1gj7gm1rfab2dn898t9ujb.apps.googleusercontent.com",
+          "client_id": "963314002363-7h7o09qek6vg6ski81lclnb361lnh96a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.simplysmart.service",
+            "package_name": "com.xrbia.service",
             "certificate_hash": "f3b01d6bf5118f94c92ef0486239e1b5e1db3038"
           }
         },
         {
-          "client_id": "290115473097-5iet2p8d2gkpk5qq6ce7otefcga8tu5g.apps.googleusercontent.com",
+          "client_id": "963314002363-24p2rf1fropquajo400fjuh4hue1ka9o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAvsjZhQcxP9z2KCF7AFBdu0XlO7Vr9mO4"
+          "current_key": "AIzaSyAz3Kk2Wv1v51sKKK8kNqhV7mW3MWSbDjQ"
         }
       ],
       "services": {
@@ -40,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "290115473097-5iet2p8d2gkpk5qq6ce7otefcga8tu5g.apps.googleusercontent.com",
+              "client_id": "963314002363-24p2rf1fropquajo400fjuh4hue1ka9o.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
