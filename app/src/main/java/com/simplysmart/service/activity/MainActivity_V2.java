@@ -62,7 +62,7 @@ import retrofit2.Response;
 
 public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutListener {
 
-    private TextView no_data_found, add_previous_reading;
+    private TextView no_data_found;
     private ListView complaintList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private NavigationView navigationView;
@@ -79,10 +79,7 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         setContentView(R.layout.activity_main__v2);
 
         isRunning = true;
-
         getUserInfo();
-
-//        getLocation();
     }
 
     private void checkForUpdate() {
@@ -94,8 +91,8 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
     protected void onStart() {
         super.onStart();
         isRunning = true;
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(updateList,
-                new IntentFilter("updateList"));
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(UpdateDetails,
+                new IntentFilter("UpdateDetails"));
     }
 
     @Override
@@ -108,7 +105,7 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
     @Override
     protected void onDestroy() {
         isRunning = false;
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(updateList);
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UpdateDetails);
         super.onDestroy();
     }
 
@@ -187,104 +184,30 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         no_data_found = (TextView) findViewById(R.id.no_data_found);
         complaintList = (ListView) findViewById(R.id.complaintList);
 
-
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
 
-                //TODO: call to fetch complaint
                 swipeRefreshLayout.setRefreshing(true);
-                ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-                Call<HelpDeskResponse> complaintsResponseCall = apiInterface.getComplaintsData("1");
-                complaintsResponseCall.enqueue(new Callback<HelpDeskResponse>() {
-                    @Override
-                    public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
-                        swipeRefreshLayout.setRefreshing(false);
-                        if (response.isSuccessful()){
+                getComplaintResponse();
 
-                        setComplaintsData(response.body());
-                        Log.d("Response Sucess",response.body().toString());}
-                        else {
-                            Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
-                            Log.d("Response Failed",response.body().toString());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
-                        swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(MainActivity_V2.this,"Network Error",Toast.LENGTH_LONG).show();
-                    }
-                });
             }
         });
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //TODO: call to fetch complaint
-
                 swipeRefreshLayout.setRefreshing(true);
-                ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-                Call<HelpDeskResponse> complaintsResponseCall = apiInterface.getComplaintsData("1");
-                complaintsResponseCall.enqueue(new Callback<HelpDeskResponse>() {
-                    @Override
-                    public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
-                        swipeRefreshLayout.setRefreshing(false);
-                        if (response.isSuccessful()){
-                            setComplaintsData(response.body());
-                            Log.d("Response Sucess",response.body().toString());}
-                        else {
-                            Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
-                            Log.d("Response Failed",response.body().toString());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
-                        swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(MainActivity_V2.this,"Network Error",Toast.LENGTH_LONG).show();
-                    }
-                });
+                getComplaintResponse();
             }
         });
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
-//                switch (item.getGroupId()){
-//                    case R.id.plants :
-//                        if (item.getTitle().equals("helpdesk")){
-//                        Intent intent = new Intent(MainActivity_V2.this,HelpDeskActivity.class);
-//                        startActivity(intent);
-////                            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-////                            Call<ComplaintsResponse> complaintsResponseCall = apiInterface.getComplaintsData("1");
-////                            complaintsResponseCall.enqueue(new Callback<ComplaintsResponse>() {
-////                                @Override
-////                                public void onResponse(Call<ComplaintsResponse> call, Response<ComplaintsResponse> response) {
-////                                    if (response.isSuccessful()){
-////                                        setComplaintsData(response.body());
-////                                        Log.d("Response Sucess",response.body().toString());}
-////                                    else {
-////                                        Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
-////                                        Log.d("Response Failed",response.body().toString());
-////                                    }
-////                                }
-////
-////                                @Override
-////                                public void onFailure(Call<ComplaintsResponse> call, Throwable t) {
-////                                    Toast.makeText(MainActivity_V2.this,"Network Error",Toast.LENGTH_LONG).show();
-////                                }
-////                            });
-//                        return true;
-//                        }
-//                    default:
-//                        return true;
-//                }
                 return false;
             }
         });
-
     }
 
     @Override
@@ -293,41 +216,62 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         finish();
     }
 
-    public void getComplaintRespnse(){
+    public void getComplaintResponse() {
 
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        Call<HelpDeskResponse> complaintsResponseCall = apiInterface.getComplaintsData("1", "Pending");
+
+        complaintsResponseCall.enqueue(new Callback<HelpDeskResponse>() {
+            @Override
+            public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
+                swipeRefreshLayout.setRefreshing(false);
+
+                if (response.isSuccessful()) {
+                    setComplaintsData(response.body());
+                    Log.d("Response Sucess", response.body().toString());
+                } else {
+                    Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
+                    Log.d("Response Failed", response.body().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(MainActivity_V2.this, "Network Error", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
-
-    public void setComplaintsData(HelpDeskResponse complaintsResponse){
+    public void setComplaintsData(HelpDeskResponse complaintsResponse) {
         ArrayList<ComplaintLists> complaintDataArrayList = complaintsResponse.getData().getComplaintLists();
-        Log.d("Response Size:", ":"+complaintDataArrayList.size());
+        Log.d("Response Size:", ":" + complaintDataArrayList.size());
         setComplaintsDatainList(complaintDataArrayList);
-
     }
 
-    public void setComplaintsDatainList(ArrayList<ComplaintLists> complaintDataList){
-        complaintsListAdapter = new HelpdeskListAdapter(this,  complaintDataList);
+    public void setComplaintsDatainList(ArrayList<ComplaintLists> complaintDataList) {
+
+        complaintsListAdapter = new HelpdeskListAdapter(this, complaintDataList);
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.canScrollVertically();
         //complaintList.setLayoutManager(linearLayoutManager);
+
         complaintList.setAdapter(complaintsListAdapter);
         complaintList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (complaintsListAdapter.getData().get(position).getAasm_state().equals("")){
 
-                }
-                else
-                {
-                    if (NetworkUtilities.isInternet(MainActivity_V2.this)){
-                        Intent detailedActivityIntent = new Intent(MainActivity_V2.this,ComplaintDetailScreenActivity.class);
-                        detailedActivityIntent.putExtra("complaint_id",complaintsListAdapter.getData().get(position).getId());
+                if (!complaintsListAdapter.getData().get(position).getAasm_state().equalsIgnoreCase("")) {
+                    if (NetworkUtilities.isInternet(MainActivity_V2.this)) {
+                        Intent detailedActivityIntent = new Intent(MainActivity_V2.this, ComplaintDetailScreenActivity.class);
+                        detailedActivityIntent.putExtra("complaint_id", complaintsListAdapter.getData().get(position).getId());
                         startActivity(detailedActivityIntent);
                     }
                 }
             }
         });
     }
+
     private void setDataInHeader(NavigationView navigationView) {
 
         navigationView.inflateHeaderView(R.layout.nav_header_main);
@@ -471,32 +415,11 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         }
     };
 
-    private BroadcastReceiver updateList = new BroadcastReceiver() {
+    private BroadcastReceiver UpdateDetails = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            swipeRefreshLayout.setRefreshing(true);
-            ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-            Call<HelpDeskResponse> complaintsResponseCall = apiInterface.getComplaintsData("1");
-            complaintsResponseCall.enqueue(new Callback<HelpDeskResponse>() {
-                @Override
-                public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
-                    swipeRefreshLayout.setRefreshing(false);
-                    if (response.isSuccessful()){
-                        setComplaintsData(response.body());
-                        Log.d("Response Sucess",response.body().toString());}
-                    else {
-                        Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
-                        Log.d("Response Failed",response.body().toString());
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
-                    swipeRefreshLayout.setRefreshing(false);
-                    Toast.makeText(MainActivity_V2.this,"Network Error",Toast.LENGTH_LONG).show();
-                }
-            });
+            getComplaintResponse();
         }
     };
 

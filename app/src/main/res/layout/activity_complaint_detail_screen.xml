@@ -9,40 +9,7 @@
         android:layout_height="wrap_content">
 
         <include layout="@layout/toolbar" />
-
     </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/header_complaint"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/bw_color_red"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/helpdesk_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="5dp"
-            android:layout_marginStart="15dp"
-            android:gravity="center"
-            android:textColor="@color/bw_color_white"
-            android:textSize="35sp" />
-
-        <TextView
-            android:id="@+id/txt_helpdesk"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/helpdesk_logo"
-            android:gravity="center_vertical"
-            android:text="Help Desk"
-            android:textColor="@color/bw_color_white"
-            android:textSize="18sp" />
-
-    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/title_layout"
@@ -61,7 +28,7 @@
             android:layout_marginStart="15dp"
             android:gravity="center"
             android:textColor="@color/bw_color_red"
-            android:textSize="28sp" />
+            android:textSize="30sp" />
 
         <TextView
             android:id="@+id/txt_subcategory"
@@ -69,12 +36,10 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/category_logo"
-            android:layout_toStartOf="@+id/unit_logo"
             android:gravity="center_vertical"
             android:textColor="@color/bw_color_red"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
-
 
         <TextView
             android:id="@+id/unit_logo"
@@ -85,7 +50,7 @@
             android:layout_toStartOf="@+id/txt_unit_no"
             android:gravity="center"
             android:textColor="@color/bw_color_red"
-            android:textSize="24sp" />
+            android:textSize="25sp" />
 
         <TextView
             android:id="@+id/txt_unit_no"
@@ -96,7 +61,7 @@
             android:layout_marginEnd="15dp"
             android:gravity="center_vertical"
             android:textColor="@color/bw_color_red"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
     </RelativeLayout>
@@ -157,7 +122,6 @@
             android:divider="@android:color/transparent"
             android:scrollbars="none">
 
-
         </ListView>
     </LinearLayout>
 
@@ -167,25 +131,35 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom_layout"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="15dp"
-        android:padding="5dp"
-        android:visibility="gone">
+        android:background="@drawable/card_bg"
+        android:paddingBottom="5dp"
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="5dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/cameraButton"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:padding="4dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_camera" />
 
         <EditText
             android:id="@+id/edit_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_marginEnd="10dp"
+            android:layout_toEndOf="@+id/cameraButton"
             android:layout_toStartOf="@+id/btn_send"
             android:hint="Type a message"
+            android:maxLines="1"
             android:padding="12dp"
-            android:paddingBottom="5dp"
-            android:singleLine="true"
             android:textColor="@color/bw_color_black"
-            android:textSize="16sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/btn_send"
@@ -197,56 +171,6 @@
             android:gravity="center"
             android:textColor="@color/bw_color_white"
             android:textSize="18sp" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/bottom_layout"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="15dp"
-        android:padding="10dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/img_one"
-            android:layout_width="40dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rectangular_round_border" />
-
-        <ImageView
-            android:id="@+id/img_two"
-            android:layout_width="40dp"
-            android:layout_height="50dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/img_one"
-            android:background="@drawable/rectangular_round_border" />
-
-        <TextView
-            android:id="@+id/img_count"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/img_two"
-            android:background="@drawable/rectangular_round_border"
-            android:gravity="center"
-            android:text="+8"
-            android:textColor="@color/bw_color_white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/img_add"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@+id/img_count"
-            android:background="@drawable/ractangular_border_red"
-            android:gravity="center"
-            android:text="+"
-            android:textColor="@color/bw_color_red"
-            android:textSize="22sp" />
-
     </RelativeLayout>
 
 </RelativeLayout>

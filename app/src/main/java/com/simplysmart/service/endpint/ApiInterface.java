@@ -50,19 +50,20 @@ public interface ApiInterface {
                                        @Body AllReadingsData allReadingsData);
 
     @GET("/api/attendances")
-    Call<AttendanceAt> getAttendanceTime(@Query("subdomain")String subdomain);
+    Call<AttendanceAt> getAttendanceTime(@Query("subdomain") String subdomain);
 
     @POST("/api/attendances")
     Call<JsonObject> sendAttendances(
-            @Query("subdomain")String subdomain,
+            @Query("subdomain") String subdomain,
             @Body AttendanceList list);
 
     @POST("/api/visitors")
-    Call<JsonObject> sendVisitors(@Query("subdomain")String subdomain,
+    Call<JsonObject> sendVisitors(@Query("subdomain") String subdomain,
                                   @Body VisitorPost post);
 
     @GET("/cms/complaints")
-    Call<HelpDeskResponse> getComplaintsData(@Query("page")String pageNumber);
+    Call<HelpDeskResponse> getComplaintsData(@Query("page") String pageNumber,
+                                             @Query("state") String state);
 
     @GET("/cms/complaints/{complaintId}")
     Call<ComplaintDetailResponse> getComplaintDetails(@Path("complaintId") String complaintId,
