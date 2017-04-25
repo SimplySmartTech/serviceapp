@@ -40,7 +40,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
         Log.d(TAG, data.toString());
         String code = data.getString("code");
-        String message = data.getString("message");
+        String message = data.getString("data");
         Log.d(TAG, "Notification code: " + code);
         Log.d(TAG, "Message: " + message);
 

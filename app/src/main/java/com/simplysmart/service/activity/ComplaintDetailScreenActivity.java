@@ -9,6 +9,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -43,6 +44,8 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     private CommentListAdapter adapter;
     private RelativeLayout ll_new_comment;
     private boolean isFromPush;
+
+    private boolean isClosed;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,6 +99,19 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.update_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem reset = menu.findItem(R.id.update_menu);
+        reset.setVisible(isClosed);
+
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -114,6 +130,12 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
                     }
                     super.onBackPressed();
                 }
+                break;
+            case R.id.update_menu:
+                Intent updateStatusActivity = new Intent(this, UpdateComplaintStatusActivity.class);
+                updateStatusActivity.putExtra("complaint", complaint);
+                startActivity(updateStatusActivity);
+                break;
         }
         return true;
     }
@@ -171,6 +193,14 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             ll_new_comment.setVisibility(View.VISIBLE);
         } else {
             ll_new_comment.setVisibility(View.GONE);
+        }
+
+        if (complaint.getAasm_state().equalsIgnoreCase("closed")) {
+            isClosed = false;
+            invalidateOptionsMenu();
+        } else {
+            isClosed = true;
+            invalidateOptionsMenu();
         }
 
         complaintStatus.setText(getString(R.string.icon_assign) + complaint.getAasm_state());
@@ -285,4 +315,8 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             getComplaintDetail(intent.getStringExtra("complaint_id"));
         }
     };
+
+
 }
+
+

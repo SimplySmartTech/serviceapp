@@ -152,7 +152,7 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
             public void onResponse(Call<MessageResponseClass> call, Response<MessageResponseClass> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(UpdateComplaintStatusActivity.this, "Complaint status is updated successfully", Toast.LENGTH_LONG).show();
-                    Intent i = new Intent("updateList");
+                    Intent i = new Intent("updateDetails");
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
                     finish();
                 } else {
