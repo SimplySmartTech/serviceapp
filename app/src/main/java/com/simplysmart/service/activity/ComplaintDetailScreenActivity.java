@@ -4,12 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -22,6 +21,7 @@ import com.simplysmart.service.adapter.CommentListAdapter;
 import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.AppConstant;
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.model.helpdesk.Complaint;
 import com.simplysmart.service.model.helpdesk.ComplaintChat;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
@@ -35,7 +35,6 @@ import java.util.ArrayList;
  */
 public class ComplaintDetailScreenActivity extends BaseActivity {
 
-    private Typeface textTypeface;
     private Complaint complaint;
     private EditText editComment;
     private TextView complaintStatus, textSubcategory, textUnitNo, textComplaintNo, buttonSend;
@@ -43,8 +42,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     private String complaint_id = "";
     private CommentListAdapter adapter;
     private RelativeLayout ll_new_comment;
-
-    private boolean isClosed;
+    private boolean isFromPush;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,35 +54,40 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle("Complaints Details");
+        getSupportActionBar().setTitle("Help desk");
 
         initializeView();
         CommonMethod.hideKeyboard(this);
 
-        if (getIntent().getExtras() != null) {
+        if (getIntent() != null && getIntent().getExtras() != null) {
+            isFromPush = getIntent().getBooleanExtra("UPDATED_FROM_PUSH", false);
+            if (isFromPush) loadUserData();
+
             complaint_id = getIntent().getStringExtra("complaint_id");
             getComplaintDetail(complaint_id);
         }
     }
 
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem reset = menu.findItem(R.id.update_menu);
-        reset.setVisible(isClosed);
-
-        return true;
+    @Override
+    public void onBackPressed() {
+        if (isFromPush) {
+            Intent intent = new Intent(ComplaintDetailScreenActivity.this, MainActivity_V2.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(updateList,
-                new IntentFilter("updateList"));
-    }
+    private void loadUserData() {
 
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(updateList);
-        super.onDestroy();
+        SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+
+        GlobalData.getInstance().setAuthToken(UserInfo.getString("auth_token", ""));
+        GlobalData.getInstance().setApi_key(UserInfo.getString("api_key", ""));
+        GlobalData.getInstance().setSubDomain(UserInfo.getString("subdomain", ""));
+        GlobalData.getInstance().setRole_code(UserInfo.getString("role_code", ""));
     }
 
     @Override
@@ -97,28 +100,42 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
 
-                if (getFragmentManager().getBackStackEntryCount() > 0) {
-                    getSupportActionBar().show();
-                    getFragmentManager().popBackStack();
+                if (isFromPush) {
+                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, MainActivity_V2.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 } else {
+                    if (getFragmentManager().getBackStackEntryCount() > 0) {
+                        getSupportActionBar().show();
+                        getFragmentManager().popBackStack();
+                    } else {
+                        super.onBackPressed();
+                    }
                     super.onBackPressed();
                 }
-                break;
-            case R.id.update_menu:
-                Log.d("Update", "Upadte clicked");
-                Intent updateStatusActivity = new Intent(this, UpdateComplaintStatusActivity.class);
-                updateStatusActivity.putExtra("complaint", complaint);
-                startActivity(updateStatusActivity);
-                break;
         }
         return true;
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(UpdateActivity,
+                new IntentFilter("UpdateActivity"));
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(UpdateDetails,
+                new IntentFilter("UpdateDetails"));
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UpdateActivity);
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UpdateDetails);
+        super.onDestroy();
+    }
+
     private void initializeView() {
 
-        //  textTypeface = Typeface.createFromAsset(getAssets(), AppConstant.FONT_EUROSTILE_REGULAR_MID);
-
-        TextView helpdesk_logo = (TextView) findViewById(R.id.helpdesk_logo);
         TextView category_logo = (TextView) findViewById(R.id.category_logo);
         TextView unit_logo = (TextView) findViewById(R.id.unit_logo);
 
@@ -128,29 +145,21 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         editComment = (EditText) findViewById(R.id.edit_comment);
 
         complaintStatus = (TextView) findViewById(R.id.complaint_status);
-        TextView imgCountTextView = (TextView) findViewById(R.id.img_count);
 
         commentList = (ListView) findViewById(R.id.comment_list);
         buttonSend = (TextView) findViewById(R.id.btn_send);
 
         Typeface iconTypeface = Typeface.createFromAsset(getAssets(), AppConstant.FONT_BOTSWORTH);
-        helpdesk_logo.setTypeface(iconTypeface);
         category_logo.setTypeface(iconTypeface);
         unit_logo.setTypeface(iconTypeface);
         buttonSend.setTypeface(iconTypeface);
 
         complaintStatus.setTypeface(iconTypeface);
-        textSubcategory.setTypeface(textTypeface);
-        textUnitNo.setTypeface(textTypeface);
-        textComplaintNo.setTypeface(textTypeface);
-        editComment.setTypeface(textTypeface);
 
-        helpdesk_logo.setText(getString(R.string.icon_helpdesk));
         category_logo.setText(getString(R.string.icon_electricity));
         unit_logo.setText(getString(R.string.icon_myflat));
         buttonSend.setText(getString(R.string.icon_send));
 
-        // imgCountTextView.setOnClickListener(openGalleryClick);
         buttonSend.setOnClickListener(postCommentClick);
 
         ll_new_comment = (RelativeLayout) findViewById(R.id.ll_new_comment);
@@ -160,18 +169,8 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         if (complaint.getAasm_state() != null && !complaint.getAasm_state().equalsIgnoreCase("closed")) {
             ll_new_comment.setVisibility(View.VISIBLE);
-
         } else {
             ll_new_comment.setVisibility(View.GONE);
-
-        }
-
-        if (complaint.getAasm_state().equalsIgnoreCase("closed")) {
-            isClosed = false;
-            invalidateOptionsMenu();
-        } else {
-            isClosed = true;
-            invalidateOptionsMenu();
         }
 
         complaintStatus.setText(getString(R.string.icon_assign) + complaint.getAasm_state());
@@ -179,11 +178,11 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         textComplaintNo.setText("# " + complaint.getNumber());
         textUnitNo.setText(complaint.getUnit_info());
 
-//        if (complaint.getAasm_state().equalsIgnoreCase("assigned")) {
-        complaintStatus.setOnClickListener(openDialogClick);
-//        } else {
-//            complaintStatus.setOnClickListener(null);
-//        }
+        if (complaint.getAasm_state().equalsIgnoreCase("assigned")) {
+            complaintStatus.setOnClickListener(openDialogClick);
+        } else {
+            complaintStatus.setOnClickListener(null);
+        }
 
         adapter = new CommentListAdapter(this, complaint.getSorted_activities());
         commentList.setAdapter(adapter);
@@ -198,26 +197,12 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         }
     };
 
-//    private final View.OnClickListener openGalleryClick = new View.OnClickListener() {
-//        @Override
-//        public void onClick(View v) {
-//            Intent newIntent = new Intent(ComplaintDetailScreenActivity.this, PhotoGalleryActivity.class);
-//            startActivity(newIntent);
-//        }
-//    };
-
     private final View.OnClickListener postCommentClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             postComplaintComment(complaint_id);
         }
     };
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.update_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
 
     private void getComplaintDetail(String compliant_id) {
 
@@ -271,12 +256,33 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
     }
 
-    private BroadcastReceiver updateList = new BroadcastReceiver() {
+    private BroadcastReceiver UpdateActivity = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            getComplaintDetail(complaint_id);
+            ComplaintChat activity = intent.getParcelableExtra("UPDATED_ACTIVITY_INFO");
+            if (activity != null) {
+                ArrayList<ComplaintChat> chats = new ArrayList<>();
+                chats.add(activity);
+
+                if (adapter != null) {
+                    adapter.addData(chats);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    adapter = new CommentListAdapter(ComplaintDetailScreenActivity.this, complaint.getSorted_activities());
+                    commentList.setAdapter(adapter);
+                }
+                editComment.setText("");
+                commentList.smoothScrollToPosition(adapter.getCount());
+            }
+        }
+    };
+
+    private BroadcastReceiver UpdateDetails = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getComplaintDetail(intent.getStringExtra("complaint_id"));
         }
     };
 }
-
