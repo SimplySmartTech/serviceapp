@@ -25,6 +25,4 @@
 
     <include layout="@layout/content_main_activity__v2" />
 
-    <include layout ="@layout/custom_error_layout"/>
-
 </android.support.design.widget.CoordinatorLayout>

@@ -1,6 +1,7 @@
 package com.simplysmart.service.activity;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -29,25 +30,25 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.HelpdeskListAdapter;
+import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.common.LocationAddress;
 import com.simplysmart.service.common.VersionComprator;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.NetworkUtilities;
-import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.dialog.AlertDialogLogout;
 import com.simplysmart.service.dialog.AlertDialogUpdateVersion;
-import com.simplysmart.service.endpint.ApiInterface;
+import com.simplysmart.service.fragment.HelpDeskScreenClose;
 import com.simplysmart.service.interfaces.LogoutListener;
 import com.simplysmart.service.model.helpdesk.ComplaintLists;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
 import com.simplysmart.service.model.user.User;
+import com.simplysmart.service.request.CreateRequest;
 import com.yayandroid.locationmanager.LocationConfiguration;
 import com.yayandroid.locationmanager.constants.FailType;
 import com.yayandroid.locationmanager.constants.ProviderType;
@@ -55,10 +56,6 @@ import com.yayandroid.locationmanager.constants.ProviderType;
 import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutListener {
 
@@ -72,6 +69,7 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
     private User residentData;
 
     private boolean isRunning = true;
+    private boolean isHome = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,19 +113,38 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         return true;
     }
 
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem reset = menu.findItem(R.id.action_history);
+        reset.setVisible(isHome);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                isHome = true;
+                invalidateOptionsMenu();
+                if (getFragmentManager().getBackStackEntryCount() > 1) {
+                    getFragmentManager().popBackStack();
+                } else {
+                    super.onBackPressed();
+                }
+                break;
+            case R.id.action_history:
+                isHome = false;
+                invalidateOptionsMenu();
+                Fragment historyComplaint = new HelpDeskScreenClose();
+                getFragmentManager().beginTransaction().addToBackStack(null)
+                        .replace(R.id.llContent, historyComplaint).commitAllowingStateLoss();
+                break;
 
-        switch (id) {
             case R.id.logout:
                 AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
                         .show(getFragmentManager(), "logout");
                 break;
-            default:
-                break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     @Override
@@ -161,8 +178,7 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Complaints" +
-                "");
+        getSupportActionBar().setTitle("Complaints");
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout_v2);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -218,27 +234,27 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
     public void getComplaintResponse() {
 
-        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-        Call<HelpDeskResponse> complaintsResponseCall = apiInterface.getComplaintsData("1", "Pending");
-
-        complaintsResponseCall.enqueue(new Callback<HelpDeskResponse>() {
+        CreateRequest.getInstance().getComplaintList("pending", "1", new ApiCallback<HelpDeskResponse>() {
             @Override
-            public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
-                swipeRefreshLayout.setRefreshing(false);
+            public void onSuccess(HelpDeskResponse response) {
 
-                if (response.isSuccessful()) {
-                    setComplaintsData(response.body());
-                    Log.d("Response Sucess", response.body().toString());
+                if (response.getData().hasComplaints()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                    no_data_found.setVisibility(View.GONE);
+                    setComplaintsData(response);
                 } else {
-                    Toast.makeText(MainActivity_V2.this, "Response failed", Toast.LENGTH_LONG).show();
-                    Log.d("Response Failed", response.body().toString());
+                    swipeRefreshLayout.setRefreshing(false);
+                    no_data_found.setVisibility(View.VISIBLE);
+                    no_data_found.setText("No complaint assigned to you.");
                 }
+
             }
 
             @Override
-            public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
+            public void onFailure(String error) {
                 swipeRefreshLayout.setRefreshing(false);
-                Toast.makeText(MainActivity_V2.this, "Network Error", Toast.LENGTH_LONG).show();
+                no_data_found.setVisibility(View.VISIBLE);
+                no_data_found.setText(error);
             }
         });
     }
@@ -423,4 +439,14 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         }
     };
 
+    @Override
+    public void onBackPressed() {
+        isHome = true;
+        invalidateOptionsMenu();
+        if (getFragmentManager().getBackStackEntryCount() > 1) {
+            getFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

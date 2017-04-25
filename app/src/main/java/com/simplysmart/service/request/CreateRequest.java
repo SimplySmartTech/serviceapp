@@ -1,21 +1,15 @@
 package com.simplysmart.service.request;
 
-import android.content.Context;
-
-
 import com.simplysmart.service.callback.ApiCallback;
-import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.endpint.ApiInterface;
-
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.helpdesk.ComplaintChatRequest;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintDetailResponse;
-import com.simplysmart.service.model.user.LoginRequest;
-import com.simplysmart.service.model.user.LoginResponse;
+import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -317,30 +311,30 @@ public class CreateRequest {
 //        });
 //    }
 //
-//    public void getComplaintList(String state, int page, final ApiCallback<HelpDeskResponse> callback) {
-//
-//        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-//        Call<HelpDeskResponse> responseCall = apiInterface.getComplaintList(AppSessionData.getInstance().getSubdomain(), state, page);
-//
-//        responseCall.enqueue(new Callback<HelpDeskResponse>() {
-//
-//            @Override
-//            public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
-//
-//                if (response.isSuccessful()) {
-//                    callback.onSuccess(response.body());
-//                } else {
-//                    APIError error = ErrorUtils.parseError(response);
-//                    callback.onFailure(error.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
-//
-//            }
-//        });
-//    }
+    public void getComplaintList(String state, String page, final ApiCallback<HelpDeskResponse> callback) {
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        Call<HelpDeskResponse> responseCall = apiInterface.getComplaintsData(GlobalData.getInstance().getSubDomain(), state, page);
+
+        responseCall.enqueue(new Callback<HelpDeskResponse>() {
+
+            @Override
+            public void onResponse(Call<HelpDeskResponse> call, Response<HelpDeskResponse> response) {
+
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    APIError error = ErrorUtils.parseError(response);
+                    callback.onFailure(error.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HelpDeskResponse> call, Throwable t) {
+
+            }
+        });
+    }
 
     public void getComplaintDetails(String complaintId, final ApiCallback<ComplaintDetailResponse> callback) {
 

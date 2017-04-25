@@ -62,8 +62,9 @@ public interface ApiInterface {
                                   @Body VisitorPost post);
 
     @GET("/cms/complaints")
-    Call<HelpDeskResponse> getComplaintsData(@Query("page") String pageNumber,
-                                             @Query("state") String state);
+    Call<HelpDeskResponse> getComplaintsData(@Query("subdomain") String subDomain,
+                                             @Query("aasm_state") String state,
+                                             @Query("page") String pageNumber);
 
     @GET("/cms/complaints/{complaintId}")
     Call<ComplaintDetailResponse> getComplaintDetails(@Path("complaintId") String complaintId,
