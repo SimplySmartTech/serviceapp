@@ -127,8 +127,10 @@
         <service android:name=".service.ReadingSubmitService" />
         <service android:name=".service.AttendanceUploadService" />
         <service android:name=".service.CheckAttendanceTimeService" />
-        '
+
         <service android:name=".service.VisitorInfoUploadService" />
+
+        <service android:name=".service.FetchCategories" />
 
         <!-- Google play service version -->
         <meta-data
@@ -156,7 +158,9 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
-        <activity android:name=".activity.HelpDeskActivity" />
+        <activity android:name=".activity.CreateComplaintActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <activity
             android:name=".activity.ComplaintDetailScreenActivity"
