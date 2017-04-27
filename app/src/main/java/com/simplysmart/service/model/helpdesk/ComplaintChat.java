@@ -7,18 +7,34 @@ import android.os.Parcelable;
 /**
  * Created by shekhar on 24/11/15.
  */
-public class ComplaintChat implements Parcelable {
+public class ComplaintChat implements Parcelable{
 
     private String created_at;
     private String text;
     private String resource_type;
-    //private Resident resource;
+//    private Resident resource;
+    private String image_url;
 
     protected ComplaintChat(Parcel in) {
         created_at = in.readString();
         text = in.readString();
         resource_type = in.readString();
-        //resource = in.readParcelable(Resident.class.getClassLoader());
+//        resource = in.readParcelable(Resident.class.getClassLoader());
+        image_url = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(created_at);
+        dest.writeString(text);
+        dest.writeString(resource_type);
+//        dest.writeParcelable(resource, flags);
+        dest.writeString(image_url);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<ComplaintChat> CREATOR = new Creator<ComplaintChat>() {
@@ -33,17 +49,12 @@ public class ComplaintChat implements Parcelable {
         }
     };
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getImage_url() {
+        return image_url;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(created_at);
-        dest.writeString(text);
-        dest.writeString(resource_type);
-//        dest.writeParcelable(resource,flags);
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
     public String getCreated_at() {

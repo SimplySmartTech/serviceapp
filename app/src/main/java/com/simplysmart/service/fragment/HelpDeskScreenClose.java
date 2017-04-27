@@ -41,7 +41,7 @@ public class HelpDeskScreenClose extends Fragment implements SwipeRefreshLayout.
 
     //Pagination Configuration
     private Integer page_no = 1;
-    private String complaint_status = "closed";
+    private String complaint_status = "Resolved";
     private boolean loadingMore = false;
     private View footer;
 

@@ -63,7 +63,7 @@ public interface ApiInterface {
 
     @GET("/cms/complaints")
     Call<HelpDeskResponse> getComplaintsData(@Query("subdomain") String subDomain,
-                                             @Query("aasm_state") String state,
+                                             @Query("state") String state,
                                              @Query("page") String pageNumber);
 
     @GET("/cms/complaints/{complaintId}")

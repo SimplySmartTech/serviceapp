@@ -234,7 +234,7 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
     public void getComplaintResponse() {
 
-        CreateRequest.getInstance().getComplaintList("pending", "1", new ApiCallback<HelpDeskResponse>() {
+        CreateRequest.getInstance().getComplaintList("Pending", "1", new ApiCallback<HelpDeskResponse>() {
             @Override
             public void onSuccess(HelpDeskResponse response) {
 

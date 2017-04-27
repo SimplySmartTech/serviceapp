@@ -36,7 +36,7 @@ public class CreateRequest {
         GlobalData.getInstance().setSubDomain(subDomain);
     }
 
-//    public void loginRequest(Context context, String packageName, String mobileNumber, String pinNumber, String gcmToken, final ApiCallback<LoginResponse> callback) {
+    //    public void loginRequest(Context context, String packageName, String mobileNumber, String pinNumber, String gcmToken, final ApiCallback<LoginResponse> callback) {
 //
 //        LoginRequest request = new LoginRequest();
 //        LoginRequest.Session session = new LoginRequest.Session();
@@ -361,13 +361,14 @@ public class CreateRequest {
         });
     }
 
-    public void postComment(String complaintId, String comment, final ApiCallback<ComplaintChatResponse> callback) {
+    public void postComment(String complaintId, String comment, String image_url, final ApiCallback<ComplaintChatResponse> callback) {
 
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
 
         ComplaintChatRequest request = new ComplaintChatRequest();
         ComplaintChatRequest.Activity activity = new ComplaintChatRequest.Activity();
         activity.setText(comment);
+        activity.setImage_url(image_url);
         request.setActivity(activity);
 
         Call<ComplaintChatResponse> responseCall = apiInterface.postComment(complaintId, GlobalData.getInstance().getSubDomain(), request);
