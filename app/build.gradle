@@ -6,7 +6,7 @@ android {
     buildToolsVersion '25.0.0'
 
     defaultConfig {
-        applicationId "com.simplysmart.service"
+        applicationId "com.xrbia.service"
         minSdkVersion 17
         targetSdkVersion 24
         versionCode 11
