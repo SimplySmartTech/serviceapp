@@ -79,15 +79,15 @@
             android:id="@+id/update_status"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="0.5"
             android:onClick="callUpdate"
             android:text="@string/update" />
 
         <Button
-            android:id="@+id/add_subTicketBtn"
+            android:id="@+id/createSubTicketButton"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="0.5"
             android:text="Add Sub-Ticket"
             android:visibility="gone" />

@@ -49,6 +49,7 @@ import com.simplysmart.service.model.helpdesk.ComplaintLists;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
 import com.simplysmart.service.model.user.User;
 import com.simplysmart.service.request.CreateRequest;
+import com.simplysmart.service.service.FetchCategories;
 import com.yayandroid.locationmanager.LocationConfiguration;
 import com.yayandroid.locationmanager.constants.FailType;
 import com.yayandroid.locationmanager.constants.ProviderType;
@@ -78,6 +79,9 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
         isRunning = true;
         getUserInfo();
+
+        Intent msgIntent = new Intent(this, FetchCategories.class);
+        startService(msgIntent);
     }
 
     private void checkForUpdate() {
