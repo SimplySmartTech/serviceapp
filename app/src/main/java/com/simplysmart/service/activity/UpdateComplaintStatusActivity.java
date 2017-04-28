@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -39,7 +38,6 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
     private ArrayList<Boolean> comment_required = new ArrayList<>();
 
     private RelativeLayout parentLayout;
-    private Button createSubTicketButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +48,6 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
 
         permittedActionSpinner = (Spinner) findViewById(R.id.permissions_spinner);
         parentLayout = (RelativeLayout) findViewById(R.id.parentLayout);
-
-        createSubTicketButton = (Button) findViewById(R.id.createSubTicketButton);
 
         for (PermittedActions permittedActions : complaint.getPermitted_events()) {
             events.add(permittedActions.getEvent());
@@ -81,8 +77,6 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Update");
-
-        createSubTicketButton.setOnClickListener(createSubTicketClick);
     }
 
     @Override
@@ -172,15 +166,6 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
             }
         });
     }
-
-    View.OnClickListener createSubTicketClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent updateStatusActivity = new Intent(UpdateComplaintStatusActivity.this, CreateComplaintActivity.class);
-            updateStatusActivity.putExtra("complaint", complaint);
-            startActivity(updateStatusActivity);
-        }
-    };
 
 
 }

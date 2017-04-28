@@ -7,15 +7,14 @@ public class ApplicationConstant {
 
     //Api url component
     public static final String PROTOCOL = "http://";
-    public static final String DOMAIN ="192.168.1.59:3000";// "api.simplysmart.tech";
+//    public static final String DOMAIN ="192.168.1.59:3000";// "api.simplysmart.tech";
 //    public static final String DOMAIN ="api.simplysmart.tech";
-//    public static final String DOMAIN ="township.xrbia.com";
+    public static final String DOMAIN ="township.xrbia.com";
 
     public static final String SERVER_URL = PROTOCOL + DOMAIN;
 
     // Http request header content
     public static final String ACCEPT_TYPE = "application/vnd.botsworth.v1+json";
-    public static final String ACCEPT_TYPE_V2 = "application/vnd.botsworth.v2+json";
     public static final String CONTENT_TYPE = "application/json";
     public static final String CONTENT_LOCALE = "en-US";
 

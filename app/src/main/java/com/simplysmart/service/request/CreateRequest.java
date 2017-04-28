@@ -4,16 +4,12 @@ import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.config.ErrorUtils;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.ServiceGenerator;
-import com.simplysmart.service.config.ServiceGeneratorV2;
 import com.simplysmart.service.endpint.ApiInterface;
-import com.simplysmart.service.model.category.Category;
 import com.simplysmart.service.model.common.APIError;
 import com.simplysmart.service.model.helpdesk.ComplaintChatRequest;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintDetailResponse;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
-
-import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -184,30 +180,30 @@ public class CreateRequest {
 //        });
 //    }
 //
-    public void fetchCategories(final ApiCallback<ArrayList<Category>> callback) {
-
-        ApiInterface apiInterface = ServiceGeneratorV2.createService(ApiInterface.class);
-        Call<ArrayList<Category>> responseCall = apiInterface.fetchCategories(GlobalData.getInstance().getSubDomain());
-
-        responseCall.enqueue(new Callback<ArrayList<Category>>() {
-
-            @Override
-            public void onResponse(Call<ArrayList<Category>> call, Response<ArrayList<Category>> response) {
-
-                if (response.isSuccessful()) {
-                    callback.onSuccess(response.body());
-                } else {
-                    APIError error = ErrorUtils.parseError(response);
-                    callback.onFailure(error.message());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<Category>> call, Throwable t) {
-
-            }
-        });
-    }
+//    public void fetchCategories(final ApiCallback<CategoriesResponse> callback) {
+//
+//        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+//        Call<CategoriesResponse> responseCall = apiInterface.fetchCategories(AppSessionData.getInstance().getSubdomain());
+//
+//        responseCall.enqueue(new Callback<CategoriesResponse>() {
+//
+//            @Override
+//            public void onResponse(Call<CategoriesResponse> call, Response<CategoriesResponse> response) {
+//
+//                if (response.isSuccessful()) {
+//                    callback.onSuccess(response.body());
+//                } else {
+//                    APIError error = ErrorUtils.parseError(response);
+//                    callback.onFailure(error.message());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<CategoriesResponse> call, Throwable t) {
+//
+//            }
+//        });
+//    }
 //
 //    public void fetchCredential(final ApiCallback<CloudinaryCredential> callback) {
 //
