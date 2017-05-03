@@ -4,10 +4,12 @@ package com.simplysmart.service.endpint;
 import com.google.gson.JsonObject;
 import com.simplysmart.service.model.attendance.AttendanceAt;
 import com.simplysmart.service.model.attendance.AttendanceList;
-import com.simplysmart.service.model.category.Category;
+import com.simplysmart.service.model.category.CategoryResponse;
+import com.simplysmart.service.model.common.CommonResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintChatRequest;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintDetailResponse;
+import com.simplysmart.service.model.helpdesk.ComplaintRequest;
 import com.simplysmart.service.model.helpdesk.ComplaintUpdateRequest;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
 import com.simplysmart.service.model.helpdesk.MessageResponseClass;
@@ -17,8 +19,6 @@ import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.user.LoginRequest;
 import com.simplysmart.service.model.user.LoginResponse;
 import com.simplysmart.service.model.visitors.VisitorPost;
-
-import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -67,7 +67,7 @@ public interface ApiInterface {
 
     //Fetch categories
     @GET("/cms/categories")
-    Call<ArrayList<Category>> fetchCategories(@Query("subdomain") String subDomain);
+    Call<CategoryResponse> fetchCategories(@Query("subdomain") String subDomain);
 
     @GET("/cms/complaints")
     Call<HelpDeskResponse> getComplaintsData(@Query("subdomain") String subDomain,
@@ -87,5 +87,10 @@ public interface ApiInterface {
     Call<MessageResponseClass> updateComplaintStatus(@Path("complaintId") String complaintId,
                                                      @Query("subdomain") String subDomain,
                                                      @Body ComplaintUpdateRequest complaint);
+
+
+    @POST("/cms/complaints")
+    Call<CommonResponse> createNewTicket(@Query("subdomain") String subDomain,
+                                         @Body ComplaintRequest request);
 
 }

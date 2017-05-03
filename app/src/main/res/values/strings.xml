@@ -89,4 +89,11 @@
     <string name="icon_top_arrow">&#xF106;</string>
     <string name="icon_bottom_arrow">&#xF107;</string>
 
+    <string-array name="priority">
+        <item>Regular</item>
+        <item>High</item>
+        <item>Medium</item>
+        <item>Low</item>
+    </string-array>
+
 </resources>

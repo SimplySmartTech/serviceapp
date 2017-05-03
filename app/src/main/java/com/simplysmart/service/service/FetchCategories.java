@@ -7,10 +7,8 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.simplysmart.service.callback.ApiCallback;
-import com.simplysmart.service.model.category.Category;
+import com.simplysmart.service.model.category.CategoryResponse;
 import com.simplysmart.service.request.CreateRequest;
-
-import java.util.ArrayList;
 
 /**
  * Created by shekhar on 27/4/17.
@@ -28,9 +26,9 @@ public class FetchCategories extends IntentService {
 
     private void fetchCategories() {
 
-        CreateRequest.getInstance().fetchCategories(new ApiCallback<ArrayList<Category>>() {
+        CreateRequest.getInstance().fetchCategories(new ApiCallback<CategoryResponse>() {
             @Override
-            public void onSuccess(ArrayList<Category> response) {
+            public void onSuccess(CategoryResponse response) {
 
                 Gson gson = new Gson();
                 String data = gson.toJson(response);

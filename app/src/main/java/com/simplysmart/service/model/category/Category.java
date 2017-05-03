@@ -11,18 +11,18 @@ import java.util.ArrayList;
 
 public class Category implements Parcelable {
 
+    private String name;
     private String id;
     private String department_id;
-    private String name;
     private String of_type;
     private String short_name;
     private String department_name;
     private ArrayList<SubCategory> sub_categories;
 
     protected Category(Parcel in) {
+        name = in.readString();
         id = in.readString();
         department_id = in.readString();
-        name = in.readString();
         of_type = in.readString();
         short_name = in.readString();
         department_name = in.readString();
@@ -31,9 +31,9 @@ public class Category implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
         dest.writeString(id);
         dest.writeString(department_id);
-        dest.writeString(name);
         dest.writeString(of_type);
         dest.writeString(short_name);
         dest.writeString(department_name);
@@ -111,5 +111,10 @@ public class Category implements Parcelable {
 
     public void setSub_categories(ArrayList<SubCategory> sub_categories) {
         this.sub_categories = sub_categories;
+    }
+
+    @Override
+    public String toString() {
+        return this.name; // What to display in the Spinner list.
     }
 }

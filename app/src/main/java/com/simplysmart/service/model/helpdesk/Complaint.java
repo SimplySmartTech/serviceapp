@@ -3,6 +3,9 @@ package com.simplysmart.service.model.helpdesk;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.simplysmart.service.model.user.Unit;
+import com.simplysmart.service.model.user.User;
+
 import java.util.ArrayList;
 
 /**
@@ -10,8 +13,19 @@ import java.util.ArrayList;
  */
 public class Complaint implements Parcelable {
 
-    private String aasm_state,created_at,description,number,of_type,unit_info,category_name,sub_category_name,priority,state_action;
-    private String assigned_name,id;
+    private String aasm_state;
+    private String created_at;
+    private String description;
+    private String number;
+    private String of_type;
+    private String unit_info;
+    private String category_name;
+    private String sub_category_name;
+    private String priority;
+    private String state_action;
+    private String assigned_name;
+    private String id;
+
     private ArrayList<ComplaintChat> sorted_activities;
     private ArrayList<PermittedActions> permitted_events;
 
@@ -20,10 +34,13 @@ public class Complaint implements Parcelable {
     private String rejected_reason;
     private String closed_reason;
 
-    public Complaint(){
+    private Unit unit;
+
+    private User resident;
+
+    public Complaint() {
 
     }
-
 
     protected Complaint(Parcel in) {
         aasm_state = in.readString();
@@ -44,6 +61,37 @@ public class Complaint implements Parcelable {
         blocked_reason = in.readString();
         rejected_reason = in.readString();
         closed_reason = in.readString();
+        unit = in.readParcelable(Unit.class.getClassLoader());
+        resident = in.readParcelable(User.class.getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(aasm_state);
+        dest.writeString(created_at);
+        dest.writeString(description);
+        dest.writeString(number);
+        dest.writeString(of_type);
+        dest.writeString(unit_info);
+        dest.writeString(category_name);
+        dest.writeString(sub_category_name);
+        dest.writeString(priority);
+        dest.writeString(state_action);
+        dest.writeString(assigned_name);
+        dest.writeString(id);
+        dest.writeTypedList(sorted_activities);
+        dest.writeTypedList(permitted_events);
+        dest.writeString(resolved_reason);
+        dest.writeString(blocked_reason);
+        dest.writeString(rejected_reason);
+        dest.writeString(closed_reason);
+        dest.writeParcelable(unit, flags);
+        dest.writeParcelable(resident, flags);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Complaint> CREATOR = new Creator<Complaint>() {
@@ -57,6 +105,22 @@ public class Complaint implements Parcelable {
             return new Complaint[size];
         }
     };
+
+    public User getResident() {
+        return resident;
+    }
+
+    public void setResident(User resident) {
+        this.resident = resident;
+    }
+
+    public Unit getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Unit unit) {
+        this.unit = unit;
+    }
 
     public String getPriority() {
         return priority;
@@ -153,6 +217,7 @@ public class Complaint implements Parcelable {
     public void setSorted_activities(ArrayList<ComplaintChat> sorted_activities) {
         this.sorted_activities = sorted_activities;
     }
+
     public ArrayList<PermittedActions> getPermittedActions() {
         return permitted_events;
     }
@@ -162,41 +227,12 @@ public class Complaint implements Parcelable {
     }
 
 
-
-
     public String getState_action() {
         return state_action;
     }
 
     public void setState_action(String state_action) {
         this.state_action = state_action;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(aasm_state);
-        dest.writeString(created_at);
-        dest.writeString(description);
-        dest.writeString(number);
-        dest.writeString(of_type);
-        dest.writeString(unit_info);
-        dest.writeString(category_name);
-        dest.writeString(sub_category_name);
-        dest.writeString(priority);
-        dest.writeString(state_action);
-        dest.writeString(assigned_name);
-        dest.writeString(id);
-        dest.writeTypedList(sorted_activities);
-        dest.writeTypedList(permitted_events);
-        dest.writeString(resolved_reason);
-        dest.writeString(blocked_reason);
-        dest.writeString(rejected_reason);
-        dest.writeString(closed_reason);
     }
 
     public ArrayList<PermittedActions> getPermitted_events() {
