@@ -307,15 +307,18 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
     private void getComplaintDetail(String compliant_id) {
 
+        showActivitySpinner();
         CreateRequest.getInstance().getComplaintDetails(compliant_id, new ApiCallback<ComplaintDetailResponse>() {
             @Override
             public void onSuccess(ComplaintDetailResponse response) {
+                dismissActivitySpinner();
                 parseComplaintDetailResponse(response);
             }
 
             @Override
             public void onFailure(String error) {
-
+                dismissActivitySpinner();
+                showSnackBar(ll_new_comment, error);
             }
         });
     }
