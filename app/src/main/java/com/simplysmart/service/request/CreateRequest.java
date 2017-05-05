@@ -109,31 +109,31 @@ public class CreateRequest {
 //        });
 //    }
 //
-//    public void logoutRequestWithSubDomain(final ApiCallback<CommonResponse> callback) {
-//
-//        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-//
-//        Call<CommonResponse> loginResponseCall = apiInterface.residentLogout(AppSessionData.getInstance().getSubdomain());
-//
-//        loginResponseCall.enqueue(new Callback<CommonResponse>() {
-//
-//            @Override
-//            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
-//
-//                if (response.isSuccessful()) {
-//                    callback.onSuccess(response.body());
-//                } else {
-//                    APIError error = ErrorUtils.parseError(response);
-//                    callback.onFailure(error.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<CommonResponse> call, Throwable t) {
-//
-//            }
-//        });
-//    }
+    public void logoutRequestWithSubDomain(final ApiCallback<CommonResponse> callback) {
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<CommonResponse> loginResponseCall = apiInterface.residentLogout(GlobalData.getInstance().getSubDomain());
+
+        loginResponseCall.enqueue(new Callback<CommonResponse>() {
+
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    APIError error = ErrorUtils.parseError(response);
+                    callback.onFailure(error.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+
+            }
+        });
+    }
 //
 //    public void changePassword(String residentId, ChangePasswordRequest request, final ApiCallback<CommonResponse> callback) {
 //

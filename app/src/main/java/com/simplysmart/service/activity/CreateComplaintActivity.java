@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -250,6 +251,23 @@ public class CreateComplaintActivity extends BaseActivity implements View.OnClic
     @Override
     protected int getStatusBarColor() {
         return 0;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+
+                if (getFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportActionBar().show();
+                    getFragmentManager().popBackStack();
+                } else {
+                    super.onBackPressed();
+                }
+                super.onBackPressed();
+                break;
+        }
+        return true;
     }
 
     @Override

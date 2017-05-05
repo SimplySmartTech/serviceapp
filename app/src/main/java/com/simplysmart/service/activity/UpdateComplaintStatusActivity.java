@@ -82,6 +82,12 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Update");
 
+        if (complaint.getAasm_state() != null && complaint.getAasm_state().equalsIgnoreCase("inprogress")) {
+            createSubTicketButton.setVisibility(View.VISIBLE);
+        } else {
+            createSubTicketButton.setVisibility(View.GONE);
+        }
+
         createSubTicketButton.setOnClickListener(createSubTicketClick);
     }
 
@@ -148,6 +154,7 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
 
         complaintUpdateRequest.setComplaint(complaintObject);
 
+        showActivitySpinner();
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
         Call<MessageResponseClass> complaintsResponseCall = apiInterface.updateComplaintStatus(complaintObject.getId(),
                 GlobalData.getInstance().getSubDomain(),
@@ -156,6 +163,7 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
         complaintsResponseCall.enqueue(new Callback<MessageResponseClass>() {
             @Override
             public void onResponse(Call<MessageResponseClass> call, Response<MessageResponseClass> response) {
+                dismissActivitySpinner();
                 if (response.isSuccessful()) {
                     Toast.makeText(UpdateComplaintStatusActivity.this, "Complaint status is updated successfully", Toast.LENGTH_LONG).show();
                     Intent i = new Intent("updateDetails");
@@ -168,6 +176,7 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
 
             @Override
             public void onFailure(Call<MessageResponseClass> call, Throwable t) {
+                dismissActivitySpinner();
                 Toast.makeText(UpdateComplaintStatusActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
             }
         });

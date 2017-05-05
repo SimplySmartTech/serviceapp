@@ -14,7 +14,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.interfaces.LogoutListener;
+import com.simplysmart.service.model.common.CommonResponse;
+import com.simplysmart.service.request.CreateRequest;
 
 
 public class AlertDialogLogout extends DialogFragment implements View.OnClickListener {
@@ -74,18 +77,35 @@ public class AlertDialogLogout extends DialogFragment implements View.OnClickLis
             dismiss();
         }
         if (v.getId() == R.id.dialogButtonPositive) {
-
-            SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-            userInfo.edit().clear().apply();
-
-            SharedPreferences gcmToken = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            gcmToken.edit().clear().apply();
-
-            LogoutListener logoutListener = (LogoutListener) getActivity();
-            logoutListener.logoutUser();
-            dismiss();
+            postLogoutRequest();
         }
     }
 
+    private void postLogoutRequest() {
+
+        CreateRequest.getInstance().logoutRequestWithSubDomain(new ApiCallback<CommonResponse>() {
+            @Override
+            public void onSuccess(CommonResponse response) {
+                clearUserSessionData();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                clearUserSessionData();
+            }
+        });
+    }
+
+    private void clearUserSessionData() {
+        SharedPreferences userInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        userInfo.edit().clear().apply();
+
+        SharedPreferences gcmToken = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        gcmToken.edit().clear().apply();
+
+        LogoutListener logoutListener = (LogoutListener) getActivity();
+        logoutListener.logoutUser();
+        dismiss();
+    }
 }
 

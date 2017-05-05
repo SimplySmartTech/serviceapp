@@ -21,7 +21,9 @@ import com.simplysmart.service.model.user.LoginResponse;
 import com.simplysmart.service.model.visitors.VisitorPost;
 
 import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -36,6 +38,13 @@ public interface ApiInterface {
     //User login
     @POST("/api/sessions/sign_in")
     Call<LoginResponse> residentLogin(@Body LoginRequest request);
+
+    @DELETE("/api/sessions")
+    void logOut(Callback<CommonResponse> callback);
+
+    //Resident logout
+    @DELETE("/api/sessions/sign_out")
+    Call<CommonResponse> residentLogout(@Query("subdomain") String subDomain);
 
     @POST("/api/sessions/sign_in")
     Call<LoginResponse> residentLoginWithSubDomain(@Query("subdomain") String subDomain, @Body LoginRequest request);

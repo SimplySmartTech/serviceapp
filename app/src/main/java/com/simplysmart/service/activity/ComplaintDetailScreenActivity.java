@@ -233,7 +233,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (adapter.getData().get(position).getImage_url() != null && !adapter.getData().get(position).getImage_url().equalsIgnoreCase("")) {
-                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, ImageViewActivity.class);
+                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, ImageViewNormalActivity.class);
                     intent.putExtra("photoPath", adapter.getData().get(position).getImage_url());
                     startActivity(intent);
                 }
@@ -372,26 +372,31 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             ComplaintChat activity = intent.getParcelableExtra("UPDATED_ACTIVITY_INFO");
 
+            DebugLog.d("NEW MESSAGE COMING-------------------------- service");
+
             if (activity != null && intent.getStringExtra("complaint_id").equalsIgnoreCase(complaint_id)) {
                 ArrayList<ComplaintChat> chats = new ArrayList<>();
                 chats.add(activity);
 
-                if (adapter != null) {
-                    adapter.addData(chats);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    adapter = new CommentListAdapter(ComplaintDetailScreenActivity.this, complaint.getSorted_activities());
-                    commentList.setAdapter(adapter);
+                try {
+                    if (adapter != null) {
+                        adapter.addData(chats);
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        adapter = new CommentListAdapter(ComplaintDetailScreenActivity.this, complaint.getSorted_activities());
+                        commentList.setAdapter(adapter);
+                    }
+                    new Handler().postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            commentList.smoothScrollToPosition(adapter.getCount());
+                        }
+                    }, 100);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 editComment.setText("");
-
-                new Handler().postDelayed(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        commentList.smoothScrollToPosition(adapter.getCount());
-                    }
-                }, 100);
             }
         }
     };
