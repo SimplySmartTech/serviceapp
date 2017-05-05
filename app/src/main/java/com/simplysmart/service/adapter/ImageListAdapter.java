@@ -19,12 +19,10 @@ import java.util.ArrayList;
 public class ImageListAdapter extends BaseAdapter {
     private Context mContext;
     private ArrayList<String> urlList;
-    private ArrayList<String> typeList;
 
-    public ImageListAdapter(Context context, ArrayList<String> values, ArrayList<String> type) {
+    public ImageListAdapter(Context context, ArrayList<String> values) {
         this.mContext = context;
         this.urlList = values;
-        this.typeList = type;
     }
 
     @Override
@@ -60,10 +58,10 @@ public class ImageListAdapter extends BaseAdapter {
 
         DebugLog.d("image url : " + urlList.get(position));
 
-        if (!urlList.get(position).isEmpty() && !typeList.get(position).isEmpty() && typeList.get(position).equalsIgnoreCase("other")){
+        if (!urlList.get(position).isEmpty()) {
             Picasso.with(mContext).load(urlList.get(position))
                     .placeholder(R.drawable.progress_animation).error(R.drawable.loading_border).into(holder.thumbImage);
-        }else{
+        } else {
             holder.thumbImage.setImageResource(R.drawable.loading_border);
         }
 

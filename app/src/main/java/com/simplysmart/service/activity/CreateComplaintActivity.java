@@ -30,10 +30,12 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
+import com.simplysmart.service.adapter.ImageListAdapter;
 import com.simplysmart.service.aws.AWSConstants;
 import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.common.DebugLog;
+import com.simplysmart.service.custom.HorizontalListView;
 import com.simplysmart.service.model.category.Category;
 import com.simplysmart.service.model.category.CategoryResponse;
 import com.simplysmart.service.model.category.SubCategory;
@@ -65,6 +67,8 @@ public class CreateComplaintActivity extends BaseActivity implements View.OnClic
 
     private RadioGroup complaintType;
     private RadioGroup isDependentRadio;
+
+    private HorizontalListView imageListView;
 
     private LinearLayout ll_parent;
     private Context context;
@@ -107,6 +111,8 @@ public class CreateComplaintActivity extends BaseActivity implements View.OnClic
         categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
         subCategorySpinner = (Spinner) findViewById(R.id.subCategorySpinner);
         prioritySpinner = (Spinner) findViewById(R.id.unitSpinner);
+
+        imageListView = (HorizontalListView) findViewById(R.id.imageListView);
 
         unitInfo = (EditText) findViewById(R.id.unitInfo);
         additionInfo = (EditText) findViewById(R.id.additionInfo);
@@ -422,7 +428,8 @@ public class CreateComplaintActivity extends BaseActivity implements View.OnClic
                 DebugLog.d("URL :::: " + url);
 
                 imageUrlList.add(url);
-
+                ImageListAdapter imageListAdapter = new ImageListAdapter(context, imageUrlList);
+                imageListView.setAdapter(imageListAdapter);
 
             }
         }

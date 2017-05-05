@@ -270,7 +270,13 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         adapter = new CommentListAdapter(this, complaint.getSorted_activities());
         commentList.setAdapter(adapter);
-        commentList.smoothScrollToPosition(adapter.getCount());
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                commentList.smoothScrollToPosition(adapter.getCount());
+            }
+        }, 100);
     }
 
     private final View.OnClickListener openDialogClick = new View.OnClickListener() {
@@ -347,7 +353,13 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         adapter.addData(chats);
         adapter.notifyDataSetChanged();
         editComment.setText("");
-        commentList.smoothScrollToPosition(adapter.getCount());
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                commentList.smoothScrollToPosition(adapter.getCount());
+            }
+        }, 100);
 
     }
 
@@ -356,7 +368,8 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             ComplaintChat activity = intent.getParcelableExtra("UPDATED_ACTIVITY_INFO");
-            if (activity != null) {
+
+            if (activity != null && intent.getStringExtra("complaint_id").equalsIgnoreCase(complaint_id)) {
                 ArrayList<ComplaintChat> chats = new ArrayList<>();
                 chats.add(activity);
 
@@ -368,7 +381,14 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
                     commentList.setAdapter(adapter);
                 }
                 editComment.setText("");
-                commentList.smoothScrollToPosition(adapter.getCount());
+
+                new Handler().postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        commentList.smoothScrollToPosition(adapter.getCount());
+                    }
+                }, 100);
             }
         }
     };

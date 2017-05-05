@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="100dp"
+    android:layout_width="60dp"
     android:layout_height="wrap_content"
     android:background="@color/bw_color_light_gray"
     android:orientation="horizontal"
@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/thumbImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_centerHorizontal="true"
         android:scaleType="centerCrop"
         android:src="@drawable/loading_border"
@@ -16,8 +16,9 @@
 
     <TextView
         android:id="@+id/deleteImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="35dp"
+        android:layout_height="30dp"
+        android:visibility="gone"
         android:layout_alignParentEnd="true"
         android:background="@android:drawable/ic_input_delete"
         android:textColor="@color/bw_color_black"

@@ -244,10 +244,12 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
                 if (response.getData().hasComplaints()) {
                     swipeRefreshLayout.setRefreshing(false);
+                    complaintList.setVisibility(View.VISIBLE);
                     no_data_found.setVisibility(View.GONE);
                     setComplaintsData(response);
                 } else {
                     swipeRefreshLayout.setRefreshing(false);
+                    complaintList.setVisibility(View.GONE);
                     no_data_found.setVisibility(View.VISIBLE);
                     no_data_found.setText("No complaint assigned to you.");
                 }
