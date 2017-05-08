@@ -5,6 +5,7 @@
     android:gravity="center_vertical"
     android:paddingBottom="5dp"
     android:paddingEnd="5dp"
+    android:paddingStart="5dp"
     android:paddingTop="5dp">
 
     <FrameLayout
@@ -16,33 +17,28 @@
 
         <TextView
             android:id="@+id/helpdesk_logo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginBottom="5dp"
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
             android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:textColor="@color/bw_color_black"
-            android:textSize="35sp" />
-
-        <TextView
-            android:id="@+id/helpdesk_count"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="top|end"
             android:background="@drawable/circle_red"
             android:gravity="center"
-            android:textColor="@color/bw_color_white" />
+            android:text="EL"
+            android:textColor="@color/bw_color_white"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
     </FrameLayout>
 
     <LinearLayout
         android:id="@+id/ll_mid_panal"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_toEndOf="@+id/ll_left_panal"
+        android:layout_toStartOf="@+id/helpdesk_complaint_no"
         android:orientation="vertical"
         android:paddingBottom="10dp"
         android:paddingTop="5dp">
@@ -53,10 +49,10 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center_vertical"
+            android:maxLines="1"
             android:padding="3dp"
-            android:singleLine="true"
             android:textColor="@color/bw_color_black"
-            android:textSize="16sp" />
+            android:textSize="15sp" />
 
         <TextView
             android:id="@+id/helpdesk_desc"
@@ -64,20 +60,9 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="center_vertical"
+            android:maxLines="2"
             android:padding="3dp"
-            android:singleLine="true"
-            android:textColor="@color/bw_color_black"
-            android:textSize="14sp"
-            />
-        <TextView
-            android:id="@+id/helpdesk_priority"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:padding="3dp"
-            android:singleLine="true"
-            android:textColor="@color/bw_color_black"
+            android:textColor="@color/bw_color_dark_gray"
             android:textSize="14sp" />
 
     </LinearLayout>
@@ -88,11 +73,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:gravity="center_vertical"
+        android:maxLines="1"
         android:paddingEnd="5dp"
         android:paddingStart="5dp"
         android:paddingTop="10dp"
         android:textColor="@color/bw_color_black"
-        android:textSize="12sp" />
-
+        android:textSize="12sp"
+        android:textStyle="bold" />
 
 </RelativeLayout>
