@@ -37,4 +37,9 @@
     <color name="translucentToolbar">#20607D8B</color>
 
     <color name = "reading_list_background_color">#FFF5B09F</color>
+
+    <color name="priority_regular">#428bca</color>
+    <color name="priority_high">#d9534f</color>
+    <color name="priority_medium">#f0ad4e</color>
+    <color name="priority_low">#999999</color>
 </resources>

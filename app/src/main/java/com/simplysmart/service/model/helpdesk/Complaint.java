@@ -25,6 +25,7 @@ public class Complaint implements Parcelable {
     private String state_action;
     private String assigned_name;
     private String id;
+    private String category_short_name;
 
     private ArrayList<ComplaintChat> sorted_activities;
     private ArrayList<PermittedActions> permitted_events;
@@ -55,6 +56,7 @@ public class Complaint implements Parcelable {
         state_action = in.readString();
         assigned_name = in.readString();
         id = in.readString();
+        category_short_name = in.readString();
         sorted_activities = in.createTypedArrayList(ComplaintChat.CREATOR);
         permitted_events = in.createTypedArrayList(PermittedActions.CREATOR);
         resolved_reason = in.readString();
@@ -79,6 +81,7 @@ public class Complaint implements Parcelable {
         dest.writeString(state_action);
         dest.writeString(assigned_name);
         dest.writeString(id);
+        dest.writeString(category_short_name);
         dest.writeTypedList(sorted_activities);
         dest.writeTypedList(permitted_events);
         dest.writeString(resolved_reason);
@@ -105,6 +108,14 @@ public class Complaint implements Parcelable {
             return new Complaint[size];
         }
     };
+
+    public String getCategory_short_name() {
+        return category_short_name;
+    }
+
+    public void setCategory_short_name(String category_short_name) {
+        this.category_short_name = category_short_name;
+    }
 
     public User getResident() {
         return resident;

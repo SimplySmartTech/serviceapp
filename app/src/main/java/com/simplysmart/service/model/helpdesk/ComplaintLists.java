@@ -18,15 +18,8 @@ public class ComplaintLists implements Parcelable {
     private String unread_comments;
     private String id;
     private String aasm_state;
+    private String category_short_name;
     private String priority;
-
-    public String getPriority() {
-        return priority;
-    }
-
-    public void setPriority(String priority) {
-        this.priority = priority;
-    }
 
     protected ComplaintLists(Parcel in) {
         complaint_category_name = in.readString();
@@ -38,6 +31,8 @@ public class ComplaintLists implements Parcelable {
         unread_comments = in.readString();
         id = in.readString();
         aasm_state = in.readString();
+        category_short_name = in.readString();
+        priority = in.readString();
     }
 
     @Override
@@ -51,6 +46,8 @@ public class ComplaintLists implements Parcelable {
         dest.writeString(unread_comments);
         dest.writeString(id);
         dest.writeString(aasm_state);
+        dest.writeString(category_short_name);
+        dest.writeString(priority);
     }
 
     @Override
@@ -69,6 +66,22 @@ public class ComplaintLists implements Parcelable {
             return new ComplaintLists[size];
         }
     };
+
+    public String getCategory_short_name() {
+        return category_short_name;
+    }
+
+    public void setCategory_short_name(String category_short_name) {
+        this.category_short_name = category_short_name;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
 
     public String getComplaint_category_name() {
         return complaint_category_name;
