@@ -114,7 +114,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (isFromPush) {
-            Intent intent = new Intent(ComplaintDetailScreenActivity.this, MainActivity_V2.class);
+            Intent intent = new Intent(ComplaintDetailScreenActivity.this, HelpDeskScreenActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
@@ -157,7 +157,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             case android.R.id.home:
 
                 if (isFromPush) {
-                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, MainActivity_V2.class);
+                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, HelpDeskScreenActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();

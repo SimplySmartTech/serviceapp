@@ -177,7 +177,7 @@ public class CreateComplaintActivity extends BaseActivity implements View.OnClic
             @Override
             public void onSuccess(CommonResponse response) {
                 Toast.makeText(CreateComplaintActivity.this, response.getMessage(), Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(CreateComplaintActivity.this, MainActivity_V2.class);
+                Intent intent = new Intent(CreateComplaintActivity.this, HelpDeskScreenActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }

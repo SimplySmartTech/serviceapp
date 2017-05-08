@@ -48,7 +48,7 @@ public class SplashActivity extends Activity {
 
                 Intent i;
                 if (isLogin) {
-                    i = new Intent(SplashActivity.this, MainActivity_V2.class);
+                    i = new Intent(SplashActivity.this, HelpDeskScreenActivity.class);
                 } else {
                     i = new Intent(SplashActivity.this, LoginActivity.class);
                 }

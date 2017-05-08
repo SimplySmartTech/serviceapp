@@ -181,7 +181,7 @@ public class LoginActivity extends BaseActivity {
                                 if (GlobalData.getInstance().getSubDomain().equalsIgnoreCase("mailhem")) {
                                     i = new Intent(LoginActivity.this, MainActivity.class);
                                 } else {
-                                    i = new Intent(LoginActivity.this, MainActivity_V2.class);
+                                    i = new Intent(LoginActivity.this, HelpDeskScreenActivity.class);
                                 }
                                 startActivity(i);
                                 finish();
@@ -280,7 +280,7 @@ public class LoginActivity extends BaseActivity {
                             setUserData(response.body());
                             Log.d("Response:", "Response Login" + response.body());
                             //Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                            Intent i = new Intent(LoginActivity.this, MainActivity_V2.class);
+                            Intent i = new Intent(LoginActivity.this, HelpDeskScreenActivity.class);
                             startActivity(i);
                             finish();
 
