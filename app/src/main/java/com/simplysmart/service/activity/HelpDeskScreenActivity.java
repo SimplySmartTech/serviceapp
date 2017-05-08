@@ -58,7 +58,7 @@ import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
 
-public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutListener {
+public class HelpDeskScreenActivity extends GetLocationBaseActivity implements LogoutListener {
 
     private TextView no_data_found;
     private ListView complaintList;
@@ -244,10 +244,12 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
                 if (response.getData().hasComplaints()) {
                     swipeRefreshLayout.setRefreshing(false);
+                    complaintList.setVisibility(View.VISIBLE);
                     no_data_found.setVisibility(View.GONE);
                     setComplaintsData(response);
                 } else {
                     swipeRefreshLayout.setRefreshing(false);
+                    complaintList.setVisibility(View.GONE);
                     no_data_found.setVisibility(View.VISIBLE);
                     no_data_found.setText("No complaint assigned to you.");
                 }
@@ -282,8 +284,8 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 if (!complaintsListAdapter.getData().get(position).getAasm_state().equalsIgnoreCase("")) {
-                    if (NetworkUtilities.isInternet(MainActivity_V2.this)) {
-                        Intent detailedActivityIntent = new Intent(MainActivity_V2.this, ComplaintDetailScreenActivity.class);
+                    if (NetworkUtilities.isInternet(HelpDeskScreenActivity.this)) {
+                        Intent detailedActivityIntent = new Intent(HelpDeskScreenActivity.this, ComplaintDetailScreenActivity.class);
                         detailedActivityIntent.putExtra("complaint_id", complaintsListAdapter.getData().get(position).getId());
                         startActivity(detailedActivityIntent);
                     }
@@ -313,7 +315,7 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
 
             String newVersion = null;
             try {
-                newVersion = Jsoup.connect("https://play.google.com/store/apps/details?id=" + MainActivity_V2.this.getPackageName() + "&hl=it")
+                newVersion = Jsoup.connect("https://play.google.com/store/apps/details?id=" + HelpDeskScreenActivity.this.getPackageName() + "&hl=it")
                         .timeout(30000)
                         .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                         .referrer("http://www.google.com")
@@ -413,7 +415,7 @@ public class MainActivity_V2 extends GetLocationBaseActivity implements LogoutLi
         DebugLog.d("coordinates : " + location.getLatitude() + "," + location.getLongitude());
         GlobalData.getInstance().setCoordinates(location.getLatitude() + "," + location.getLongitude());
 
-        LocationAddress.getAddressFromLocation(location.getLatitude(), location.getLongitude(), MainActivity_V2.this, addressHandler);
+        LocationAddress.getAddressFromLocation(location.getLatitude(), location.getLongitude(), HelpDeskScreenActivity.this, addressHandler);
     }
 
     // Handler for get user's current location data

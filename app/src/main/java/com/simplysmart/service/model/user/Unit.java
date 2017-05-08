@@ -13,7 +13,8 @@ public class Unit implements Parcelable {
     private String building;
     private String id;
 
-    protected Unit(Parcel in) {
+
+    public Unit(Parcel in) {
         info = in.readString();
         name = in.readString();
         building = in.readString();

@@ -67,6 +67,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/ThemeStyle" />
         <activity
+            android:name=".activity.ImageViewNormalActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/ThemeStyle" />
+        <activity
             android:name=".activity.AttendanceActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -153,12 +157,13 @@
             android:value="com.simplysmart.service.database.MatrixTable,com.simplysmart.service.database.SensorTable,com.simplysmart.service.database.TareWeightTable,com.simplysmart.service.database.ReadingTable,com.simplysmart.service.database.FinalReadingTable,com.simplysmart.service.database.AttendanceTable,com.simplysmart.service.database.VisitorTable" />
 
         <activity
-            android:name=".activity.MainActivity_V2"
+            android:name=".activity.HelpDeskScreenActivity"
             android:label="@string/title_activity_main__v2"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
-        <activity android:name=".activity.CreateComplaintActivity"
+        <activity
+            android:name=".activity.CreateComplaintActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 

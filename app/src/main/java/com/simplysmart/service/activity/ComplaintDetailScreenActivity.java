@@ -114,7 +114,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (isFromPush) {
-            Intent intent = new Intent(ComplaintDetailScreenActivity.this, MainActivity_V2.class);
+            Intent intent = new Intent(ComplaintDetailScreenActivity.this, HelpDeskScreenActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
@@ -157,7 +157,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             case android.R.id.home:
 
                 if (isFromPush) {
-                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, MainActivity_V2.class);
+                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, HelpDeskScreenActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
@@ -233,7 +233,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (adapter.getData().get(position).getImage_url() != null && !adapter.getData().get(position).getImage_url().equalsIgnoreCase("")) {
-                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, ImageViewActivity.class);
+                    Intent intent = new Intent(ComplaintDetailScreenActivity.this, ImageViewNormalActivity.class);
                     intent.putExtra("photoPath", adapter.getData().get(position).getImage_url());
                     startActivity(intent);
                 }
@@ -270,7 +270,13 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         adapter = new CommentListAdapter(this, complaint.getSorted_activities());
         commentList.setAdapter(adapter);
-        commentList.smoothScrollToPosition(adapter.getCount());
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                commentList.smoothScrollToPosition(adapter.getCount());
+            }
+        }, 100);
     }
 
     private final View.OnClickListener openDialogClick = new View.OnClickListener() {
@@ -301,15 +307,18 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
     private void getComplaintDetail(String compliant_id) {
 
+        showActivitySpinner();
         CreateRequest.getInstance().getComplaintDetails(compliant_id, new ApiCallback<ComplaintDetailResponse>() {
             @Override
             public void onSuccess(ComplaintDetailResponse response) {
+                dismissActivitySpinner();
                 parseComplaintDetailResponse(response);
             }
 
             @Override
             public void onFailure(String error) {
-
+                dismissActivitySpinner();
+                showSnackBar(ll_new_comment, error);
             }
         });
     }
@@ -347,7 +356,13 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         adapter.addData(chats);
         adapter.notifyDataSetChanged();
         editComment.setText("");
-        commentList.smoothScrollToPosition(adapter.getCount());
+        new Handler().postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                commentList.smoothScrollToPosition(adapter.getCount());
+            }
+        }, 100);
 
     }
 
@@ -356,19 +371,32 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             ComplaintChat activity = intent.getParcelableExtra("UPDATED_ACTIVITY_INFO");
-            if (activity != null) {
+
+            DebugLog.d("NEW MESSAGE COMING-------------------------- service");
+
+            if (activity != null && intent.getStringExtra("complaint_id").equalsIgnoreCase(complaint_id)) {
                 ArrayList<ComplaintChat> chats = new ArrayList<>();
                 chats.add(activity);
 
-                if (adapter != null) {
-                    adapter.addData(chats);
-                    adapter.notifyDataSetChanged();
-                } else {
-                    adapter = new CommentListAdapter(ComplaintDetailScreenActivity.this, complaint.getSorted_activities());
-                    commentList.setAdapter(adapter);
+                try {
+                    if (adapter != null) {
+                        adapter.addData(chats);
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        adapter = new CommentListAdapter(ComplaintDetailScreenActivity.this, complaint.getSorted_activities());
+                        commentList.setAdapter(adapter);
+                    }
+                    new Handler().postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            commentList.smoothScrollToPosition(adapter.getCount());
+                        }
+                    }, 100);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 editComment.setText("");
-                commentList.smoothScrollToPosition(adapter.getCount());
             }
         }
     };

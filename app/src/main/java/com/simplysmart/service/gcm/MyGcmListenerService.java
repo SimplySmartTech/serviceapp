@@ -103,6 +103,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
             Intent i = new Intent("UpdateActivity");
             i.putExtra("UPDATED_ACTIVITY_INFO", response.getActivity());
+            i.putExtra("complaint_id", notification.getNoticeable_id());
             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(i);
 
             Intent intent = new Intent(this, ComplaintDetailScreenActivity.class);

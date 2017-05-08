@@ -6,14 +6,15 @@ import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.ServiceGeneratorV2;
 import com.simplysmart.service.endpint.ApiInterface;
-import com.simplysmart.service.model.category.Category;
+import com.simplysmart.service.model.category.CategoryResponse;
 import com.simplysmart.service.model.common.APIError;
+import com.simplysmart.service.model.common.CommonResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintChatRequest;
 import com.simplysmart.service.model.helpdesk.ComplaintChatResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintDetailResponse;
+import com.simplysmart.service.model.helpdesk.ComplaintRequest;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
-
-import java.util.ArrayList;
+import com.simplysmart.service.model.helpdesk.NewComplaint;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -108,31 +109,31 @@ public class CreateRequest {
 //        });
 //    }
 //
-//    public void logoutRequestWithSubDomain(final ApiCallback<CommonResponse> callback) {
-//
-//        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-//
-//        Call<CommonResponse> loginResponseCall = apiInterface.residentLogout(AppSessionData.getInstance().getSubdomain());
-//
-//        loginResponseCall.enqueue(new Callback<CommonResponse>() {
-//
-//            @Override
-//            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
-//
-//                if (response.isSuccessful()) {
-//                    callback.onSuccess(response.body());
-//                } else {
-//                    APIError error = ErrorUtils.parseError(response);
-//                    callback.onFailure(error.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<CommonResponse> call, Throwable t) {
-//
-//            }
-//        });
-//    }
+    public void logoutRequestWithSubDomain(final ApiCallback<CommonResponse> callback) {
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+
+        Call<CommonResponse> loginResponseCall = apiInterface.residentLogout(GlobalData.getInstance().getSubDomain());
+
+        loginResponseCall.enqueue(new Callback<CommonResponse>() {
+
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    APIError error = ErrorUtils.parseError(response);
+                    callback.onFailure(error.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+
+            }
+        });
+    }
 //
 //    public void changePassword(String residentId, ChangePasswordRequest request, final ApiCallback<CommonResponse> callback) {
 //
@@ -184,15 +185,15 @@ public class CreateRequest {
 //        });
 //    }
 //
-    public void fetchCategories(final ApiCallback<ArrayList<Category>> callback) {
+    public void fetchCategories(final ApiCallback<CategoryResponse> callback) {
 
         ApiInterface apiInterface = ServiceGeneratorV2.createService(ApiInterface.class);
-        Call<ArrayList<Category>> responseCall = apiInterface.fetchCategories(GlobalData.getInstance().getSubDomain());
+        Call<CategoryResponse> responseCall = apiInterface.fetchCategories(GlobalData.getInstance().getSubDomain());
 
-        responseCall.enqueue(new Callback<ArrayList<Category>>() {
+        responseCall.enqueue(new Callback<CategoryResponse>() {
 
             @Override
-            public void onResponse(Call<ArrayList<Category>> call, Response<ArrayList<Category>> response) {
+            public void onResponse(Call<CategoryResponse> call, Response<CategoryResponse> response) {
 
                 if (response.isSuccessful()) {
                     callback.onSuccess(response.body());
@@ -203,7 +204,7 @@ public class CreateRequest {
             }
 
             @Override
-            public void onFailure(Call<ArrayList<Category>> call, Throwable t) {
+            public void onFailure(Call<CategoryResponse> call, Throwable t) {
 
             }
         });
@@ -289,31 +290,31 @@ public class CreateRequest {
 //        });
 //    }
 //
-//    public void createNewComplaint(NewComplaint complaint, final ApiCallback<CommonResponse> callback) {
-//
-//        ComplaintRequest complaintRequest = new ComplaintRequest();
-//        complaintRequest.setComplaint(complaint);
-//
-//        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-//        Call<CommonResponse> responseCall = apiInterface.createNewResponse(AppSessionData.getInstance().getSubdomain(), complaintRequest);
-//
-//        responseCall.enqueue(new Callback<CommonResponse>() {
-//            @Override
-//            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
-//                if (response.isSuccessful()) {
-//                    callback.onSuccess(response.body());
-//                } else {
-//                    APIError error = ErrorUtils.parseError(response);
-//                    callback.onFailure(error.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<CommonResponse> call, Throwable t) {
-//
-//            }
-//        });
-//    }
+    public void createNewComplaint(NewComplaint complaint, final ApiCallback<CommonResponse> callback) {
+
+        ComplaintRequest complaintRequest = new ComplaintRequest();
+        complaintRequest.setComplaint(complaint);
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        Call<CommonResponse> responseCall = apiInterface.createNewTicket(GlobalData.getInstance().getSubDomain(), complaintRequest);
+
+        responseCall.enqueue(new Callback<CommonResponse>() {
+            @Override
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    APIError error = ErrorUtils.parseError(response);
+                    callback.onFailure(error.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
+
+            }
+        });
+    }
 //
     public void getComplaintList(String state, String page, final ApiCallback<HelpDeskResponse> callback) {
 
