@@ -173,6 +173,12 @@ public class CommentListAdapter extends BaseAdapter {
                         .placeholder(R.drawable.default_avatar_user)
                         .error(R.drawable.default_avatar_user)
                         .into(viewHolder.inputPhoto);
+            } else {
+                Picasso.with(mContext)
+                        .load(R.drawable.default_avatar_user)
+                        .placeholder(R.drawable.default_avatar_user)
+                        .error(R.drawable.default_avatar_user)
+                        .into(viewHolder.inputPhoto);
             }
         }
 
