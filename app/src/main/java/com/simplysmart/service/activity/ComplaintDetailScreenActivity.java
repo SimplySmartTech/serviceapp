@@ -55,6 +55,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
 /**
@@ -81,8 +82,11 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
     private static String mCurrentPhotoPath;
 
     private ImageView cameraButton;
+    private TextView category_logo;
 
     private TransferUtility transferUtility;
+
+    private HashMap<String, Integer> priorityColorMap = new HashMap<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,6 +102,11 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Help desk");
+
+        priorityColorMap.put("Regular", R.drawable.circle_priority_regular);
+        priorityColorMap.put("High", R.drawable.circle_priority_high);
+        priorityColorMap.put("Medium", R.drawable.circle_priority_medium);
+        priorityColorMap.put("Low", R.drawable.circle_priority_low);
 
         initializeView();
         CommonMethod.hideKeyboard(this);
@@ -198,7 +207,7 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
     private void initializeView() {
 
-        TextView category_logo = (TextView) findViewById(R.id.category_logo);
+        category_logo = (TextView) findViewById(R.id.category_logo);
         TextView unit_logo = (TextView) findViewById(R.id.unit_logo);
 
         textSubcategory = (TextView) findViewById(R.id.txt_subcategory);
@@ -215,7 +224,6 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         cameraButton.setOnClickListener(cameraClick);
 
         Typeface iconTypeface = Typeface.createFromAsset(getAssets(), AppConstant.FONT_BOTSWORTH);
-        category_logo.setTypeface(iconTypeface);
         unit_logo.setTypeface(iconTypeface);
         buttonSend.setTypeface(iconTypeface);
 
@@ -262,10 +270,15 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
         textComplaintNo.setText("# " + complaint.getNumber());
         textUnitNo.setText(complaint.getUnit_info());
 
-        if (complaint.getAasm_state().equalsIgnoreCase("assigned")) {
+        if (complaint.getAasm_state() != null && complaint.getAasm_state().equalsIgnoreCase("assigned")) {
             complaintStatus.setOnClickListener(openDialogClick);
         } else {
             complaintStatus.setOnClickListener(null);
+        }
+
+        category_logo.setText(complaint.getCategory_short_name());
+        if (priorityColorMap.containsKey(complaint.getPriority())) {
+            category_logo.setBackgroundResource(priorityColorMap.get(complaint.getPriority()));
         }
 
         adapter = new CommentListAdapter(this, complaint.getSorted_activities());
@@ -379,9 +392,11 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
                 chats.add(activity);
 
                 try {
-                    if (adapter != null) {
-                        adapter.addData(chats);
-                        adapter.notifyDataSetChanged();
+                    if (adapter != null && adapter.getData().size() > 0) {
+                        if (!adapter.getData().get(adapter.getData().size() - 1).getId().equalsIgnoreCase(activity.getId())) {
+                            adapter.addData(chats);
+                            adapter.notifyDataSetChanged();
+                        }
                     } else {
                         adapter = new CommentListAdapter(ComplaintDetailScreenActivity.this, complaint.getSorted_activities());
                         commentList.setAdapter(adapter);

@@ -6,54 +6,123 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:id="@+id/botsworth_chat_bubble"
+        android:id="@+id/system_chat_bubble"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:layout_marginEnd="110dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/chat_input_bubble"
-        android:padding="10dp">
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20sp">
 
-        <LinearLayout
-            android:id="@+id/loadingImage"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:gravity="center">
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="5dp"
+            android:background="@drawable/rectangular_fill_system_message_bg"
+            android:padding="4dp">
 
-            <ProgressBar
+            <TextView
+                android:id="@+id/systemTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="80dp" />
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/bw_color_black"
+                android:textSize="10sp" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/systemComment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/systemTime"
+                android:layout_centerHorizontal="true"
+                android:paddingBottom="3dp"
+                android:paddingTop="3dp"
+                android:textColor="@color/bw_color_black"
+                android:textSize="12sp" />
 
-        <ImageView
-            android:id="@+id/activityImage"
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/botsworth_chat_bubble"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/inputPhoto"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/default_avatar_user" />
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_alignParentTop="true"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:scaleType="centerCrop"
-            android:visibility="visible" />
+            android:layout_marginEnd="80dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/inputPhoto"
+            android:background="@drawable/chat_input_bubble"
+            android:paddingBottom="6dp"
+            android:paddingEnd="10dp"
+            android:paddingStart="15dp"
+            android:paddingTop="6dp">
 
-        <TextView
-            android:id="@+id/txt_comment_botswoth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/activityImage"
-            android:textColor="@color/bw_color_black"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/nameOther"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:gravity="start"
+                android:textColor="@color/bw_color_black"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/txt_time_botswoth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_below="@+id/txt_comment_botswoth"
-            android:paddingTop="5dp"
-            android:textColor="@color/bw_color_black"
-            android:textSize="12sp" />
+            <LinearLayout
+                android:id="@+id/loadingImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@+id/nameOther"
+                android:gravity="center"
+                android:visibility="gone">
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="80dp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/activityImage"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@+id/nameOther"
+                android:layout_marginBottom="5dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/txt_comment_botswoth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/activityImage"
+                android:paddingBottom="6dp"
+                android:paddingTop="7dp"
+                android:textColor="@color/bw_color_black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txt_time_botswoth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/txt_comment_botswoth"
+                android:textColor="@color/bw_color_black"
+                android:textSize="12sp" />
+        </RelativeLayout>
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -70,16 +139,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#88ffffff"
-            android:paddingBottom="10dp"
+            android:paddingBottom="6dp"
             android:paddingEnd="15dp"
             android:paddingStart="10dp"
-            android:paddingTop="10dp">
+            android:paddingTop="6dp">
+
+            <TextView
+                android:id="@+id/nameResident"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:gravity="start"
+                android:text="You"
+                android:textColor="@color/bw_color_black"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/loadingImageResident"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:gravity="center">
+                android:layout_below="@+id/nameResident"
+                android:gravity="center"
+                android:visibility="gone">
 
                 <ProgressBar
                     android:layout_width="wrap_content"
@@ -92,35 +174,28 @@
                 android:id="@+id/activityImageResident"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_alignParentTop="true"
+                android:layout_below="@+id/nameResident"
                 android:layout_marginBottom="5dp"
                 android:scaleType="centerCrop"
-                android:visibility="visible" />
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/txt_comment_resident"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/activityImageResident"
+                android:paddingBottom="7dp"
+                android:paddingTop="6dp"
                 android:textColor="@color/bw_color_black"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/txt_time_resident_dummy"
-                android:layout_width="wrap_content"
+                android:id="@+id/txt_time_resident"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_below="@+id/txt_comment_resident"
-                android:padding="3dp"
-                android:textColor="@color/bw_color_black"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/txt_time_resident"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_below="@+id/txt_time_resident_dummy"
+                android:gravity="end"
                 android:textColor="@color/bw_color_black"
                 android:textSize="12sp" />
         </RelativeLayout>

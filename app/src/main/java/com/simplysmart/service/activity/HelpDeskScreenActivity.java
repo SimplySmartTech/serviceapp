@@ -101,7 +101,9 @@ public class HelpDeskScreenActivity extends GetLocationBaseActivity implements L
     protected void onResume() {
         super.onResume();
         isRunning = true;
-        checkForUpdate();
+//        checkForUpdate();
+        getComplaintResponse();
+
     }
 
     @Override

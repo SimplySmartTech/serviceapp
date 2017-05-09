@@ -3,32 +3,38 @@ package com.simplysmart.service.model.helpdesk;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.simplysmart.service.model.user.User;
+
 
 /**
  * Created by shekhar on 24/11/15.
  */
-public class ComplaintChat implements Parcelable{
+public class ComplaintChat implements Parcelable {
 
+    private String id;
     private String created_at;
     private String text;
     private String resource_type;
-//    private Resident resource;
+    private User resource;
     private String image_url;
 
+
     protected ComplaintChat(Parcel in) {
+        id = in.readString();
         created_at = in.readString();
         text = in.readString();
         resource_type = in.readString();
-//        resource = in.readParcelable(Resident.class.getClassLoader());
+        resource = in.readParcelable(User.class.getClassLoader());
         image_url = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeString(created_at);
         dest.writeString(text);
         dest.writeString(resource_type);
-//        dest.writeParcelable(resource, flags);
+        dest.writeParcelable(resource, flags);
         dest.writeString(image_url);
     }
 
@@ -48,6 +54,14 @@ public class ComplaintChat implements Parcelable{
             return new ComplaintChat[size];
         }
     };
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getImage_url() {
         return image_url;
@@ -81,11 +95,11 @@ public class ComplaintChat implements Parcelable{
         this.resource_type = resource_type;
     }
 
-//    public Resident getResource() {
-//        return resource;
-//    }
-//
-//    public void setResource(Resident resource) {
-//        this.resource = resource;
-//    }
+    public User getResource() {
+        return resource;
+    }
+
+    public void setResource(User resource) {
+        this.resource = resource;
+    }
 }
