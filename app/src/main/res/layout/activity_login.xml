@@ -10,7 +10,7 @@
         android:layout_centerHorizontal="true"
         android:paddingEnd="5dp"
         android:paddingStart="5dp"
-        android:src="@drawable/simply_smart_logo" />
+        android:src="@drawable/xrbia_logo" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
