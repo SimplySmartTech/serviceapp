@@ -176,6 +176,7 @@ public class HelpDeskScreenActivity extends GetLocationBaseActivity implements L
         Log.d("Json Unit :", gson.toJson(residentData));
 
         GlobalData.getInstance().setAccessPolicy(residentData.getPolicy());
+        GlobalData.getInstance().setUserId(residentData.getId());
 
         initializeRemainingStuff();
     }

@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.model.helpdesk.ComplaintChat;
 import com.simplysmart.service.util.ParseDateFormat;
 import com.squareup.picasso.Picasso;
@@ -108,7 +109,7 @@ public class CommentListAdapter extends BaseAdapter {
                 e.printStackTrace();
             }
 
-        } else if (complaintChats.get(position).getResource_type().trim().equalsIgnoreCase("User")) {
+        } else if (complaintChats.get(position).getResource().getId().equalsIgnoreCase(GlobalData.getInstance().getUserId())) {
 
             viewHolder.resident_chat_bubble.setVisibility(View.VISIBLE);
             viewHolder.botsworth_chat_bubble.setVisibility(View.GONE);
@@ -169,6 +170,12 @@ public class CommentListAdapter extends BaseAdapter {
                     && !complaintChats.get(position).getResource().getProfile_photo_url().equalsIgnoreCase("")) {
                 Picasso.with(mContext)
                         .load(complaintChats.get(position).getResource().getProfile_photo_url())
+                        .placeholder(R.drawable.default_avatar_user)
+                        .error(R.drawable.default_avatar_user)
+                        .into(viewHolder.inputPhoto);
+            } else {
+                Picasso.with(mContext)
+                        .load(R.drawable.default_avatar_user)
                         .placeholder(R.drawable.default_avatar_user)
                         .error(R.drawable.default_avatar_user)
                         .into(viewHolder.inputPhoto);
