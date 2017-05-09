@@ -20,6 +20,8 @@ import com.squareup.picasso.Picasso;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class CommentListAdapter extends BaseAdapter {
 
     private Context mContext;
@@ -59,17 +61,25 @@ public class CommentListAdapter extends BaseAdapter {
 
             viewHolder.botsworth_chat_bubble = (RelativeLayout) convertView.findViewById(R.id.botsworth_chat_bubble);
             viewHolder.resident_chat_bubble = (RelativeLayout) convertView.findViewById(R.id.resident_chat_bubble);
+            viewHolder.system_chat_bubble = (RelativeLayout) convertView.findViewById(R.id.system_chat_bubble);
 
             viewHolder.botsworthComment = (TextView) convertView.findViewById(R.id.txt_comment_botswoth);
             viewHolder.botsworthTime = (TextView) convertView.findViewById(R.id.txt_time_botswoth);
+
             viewHolder.residentComment = (TextView) convertView.findViewById(R.id.txt_comment_resident);
             viewHolder.residentTime = (TextView) convertView.findViewById(R.id.txt_time_resident);
+
+            viewHolder.systemComment = (TextView) convertView.findViewById(R.id.systemComment);
+            viewHolder.systemTime = (TextView) convertView.findViewById(R.id.systemTime);
 
             viewHolder.activityImage = (ImageView) convertView.findViewById(R.id.activityImage);
             viewHolder.activityImageResident = (ImageView) convertView.findViewById(R.id.activityImageResident);
 
             viewHolder.loadingImage = (LinearLayout) convertView.findViewById(R.id.loadingImage);
             viewHolder.loadingImageResident = (LinearLayout) convertView.findViewById(R.id.loadingImageResident);
+
+            viewHolder.inputPhoto = (CircleImageView) convertView.findViewById(R.id.inputPhoto);
+            viewHolder.nameOther = (TextView) convertView.findViewById(R.id.nameOther);
 
             convertView.setTag(viewHolder);
 
@@ -80,10 +90,29 @@ public class CommentListAdapter extends BaseAdapter {
         viewHolder.activityImage.setTag(position);
         viewHolder.activityImageResident.setTag(position);
 
-        if (complaintChats.get(position).getResource_type() != null &&
-                complaintChats.get(position).getResource_type().trim().equalsIgnoreCase("User")) {
+        if (complaintChats.get(position).getResource() == null) {
+
+            viewHolder.system_chat_bubble.setVisibility(View.VISIBLE);
+            viewHolder.resident_chat_bubble.setVisibility(View.GONE);
+            viewHolder.botsworth_chat_bubble.setVisibility(View.GONE);
+
+            if (complaintChats.get(position).getText() != null) {
+                viewHolder.systemComment.setText(Html.fromHtml(complaintChats.get(position).getText()));
+            } else {
+                viewHolder.systemComment.setText("----");
+            }
+
+            try {
+                viewHolder.systemTime.setText(ParseDateFormat.dateFormat(mContext, complaintChats.get(position).getCreated_at()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        } else if (complaintChats.get(position).getResource_type().trim().equalsIgnoreCase("User")) {
+
             viewHolder.resident_chat_bubble.setVisibility(View.VISIBLE);
             viewHolder.botsworth_chat_bubble.setVisibility(View.GONE);
+            viewHolder.system_chat_bubble.setVisibility(View.GONE);
 
             if (complaintChats.get(position).getText() != null) {
                 viewHolder.residentComment.setText(Html.fromHtml(complaintChats.get(position).getText()));
@@ -92,7 +121,7 @@ public class CommentListAdapter extends BaseAdapter {
             }
 
             try {
-                viewHolder.residentTime.setText(ParseDateFormat.changeDateFormat(complaintChats.get(position).getCreated_at()));
+                viewHolder.residentTime.setText(ParseDateFormat.dateFormat(mContext, complaintChats.get(position).getCreated_at()));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -108,8 +137,10 @@ public class CommentListAdapter extends BaseAdapter {
             }
 
         } else {
-            viewHolder.resident_chat_bubble.setVisibility(View.GONE);
+
             viewHolder.botsworth_chat_bubble.setVisibility(View.VISIBLE);
+            viewHolder.resident_chat_bubble.setVisibility(View.GONE);
+            viewHolder.system_chat_bubble.setVisibility(View.GONE);
 
             if (complaintChats.get(position).getText() != null) {
                 viewHolder.botsworthComment.setText(Html.fromHtml(complaintChats.get(position).getText()));
@@ -117,7 +148,7 @@ public class CommentListAdapter extends BaseAdapter {
                 viewHolder.botsworthComment.setText("----");
             }
             try {
-                viewHolder.botsworthTime.setText(ParseDateFormat.changeDateFormat(complaintChats.get(position).getCreated_at()));
+                viewHolder.botsworthTime.setText(ParseDateFormat.dateFormat(mContext, complaintChats.get(position).getCreated_at()));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -131,18 +162,32 @@ public class CommentListAdapter extends BaseAdapter {
                 viewHolder.activityImage.setVisibility(View.GONE);
                 viewHolder.loadingImage.setVisibility(View.GONE);
             }
+
+            viewHolder.nameOther.setText(complaintChats.get(position).getResource().getName());
+
+            if (complaintChats.get(position).getResource().getProfile_photo_url() != null
+                    && !complaintChats.get(position).getResource().getProfile_photo_url().equalsIgnoreCase("")) {
+                Picasso.with(mContext)
+                        .load(complaintChats.get(position).getResource().getProfile_photo_url())
+                        .placeholder(R.drawable.default_avatar_user)
+                        .error(R.drawable.default_avatar_user)
+                        .into(viewHolder.inputPhoto);
+            }
         }
 
         return convertView;
     }
 
     private static class ViewHolder {
-        private RelativeLayout botsworth_chat_bubble, resident_chat_bubble;
-        private TextView botsworthComment, residentComment;
-        private TextView botsworthTime, residentTime;
+        private RelativeLayout botsworth_chat_bubble, resident_chat_bubble, system_chat_bubble;
+        private TextView botsworthComment, residentComment, systemComment;
+        private TextView botsworthTime, residentTime, systemTime;
 
-        private ImageView activityImage, activityImageResident;
-        private LinearLayout loadingImageResident, loadingImage;
+        private ImageView activityImage, activityImageResident, activityImageSystem;
+        private LinearLayout loadingImageResident, loadingImage, loadingImageSystem;
+
+        private TextView nameOther;
+        private CircleImageView inputPhoto;
 
     }
 

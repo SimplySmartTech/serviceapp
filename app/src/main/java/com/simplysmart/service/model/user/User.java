@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public class User implements Parcelable {
 
+    private String profile_photo_url;
     private String id;
     private String name;
     private String username;
@@ -24,6 +25,7 @@ public class User implements Parcelable {
 
 
     protected User(Parcel in) {
+        profile_photo_url = in.readString();
         id = in.readString();
         name = in.readString();
         username = in.readString();
@@ -38,6 +40,7 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(profile_photo_url);
         dest.writeString(id);
         dest.writeString(name);
         dest.writeString(username);
@@ -66,6 +69,14 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    public String getProfile_photo_url() {
+        return profile_photo_url;
+    }
+
+    public void setProfile_photo_url(String profile_photo_url) {
+        this.profile_photo_url = profile_photo_url;
+    }
 
     public ArrayList<AccessPolicy> getPolicy() {
         return policy;
