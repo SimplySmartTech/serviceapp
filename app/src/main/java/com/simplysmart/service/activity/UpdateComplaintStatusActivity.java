@@ -150,6 +150,11 @@ public class UpdateComplaintStatusActivity extends BaseActivity {
             case "Close":
                 complaintObject.setClosed_reason(reasonText);
                 break;
+
+            case "Start":
+                complaintObject.setStarted_reason(reasonText);
+                break;
+
         }
 
         complaintUpdateRequest.setComplaint(complaintObject);
