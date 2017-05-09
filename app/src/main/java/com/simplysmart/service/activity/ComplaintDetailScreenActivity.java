@@ -405,7 +405,9 @@ public class ComplaintDetailScreenActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            getComplaintDetail(intent.getStringExtra("complaint_id"));
+            if (intent.getStringExtra("complaint_id") != null && intent.getStringExtra("complaint_id").equalsIgnoreCase(complaint_id)) {
+                getComplaintDetail(intent.getStringExtra("complaint_id"));
+            }
         }
     };
 

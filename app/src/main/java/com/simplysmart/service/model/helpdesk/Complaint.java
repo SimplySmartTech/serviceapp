@@ -34,6 +34,7 @@ public class Complaint implements Parcelable {
     private String blocked_reason;
     private String rejected_reason;
     private String closed_reason;
+    private String started_reason;
 
     private Unit unit;
 
@@ -63,6 +64,7 @@ public class Complaint implements Parcelable {
         blocked_reason = in.readString();
         rejected_reason = in.readString();
         closed_reason = in.readString();
+        started_reason = in.readString();
         unit = in.readParcelable(Unit.class.getClassLoader());
         resident = in.readParcelable(User.class.getClassLoader());
     }
@@ -88,6 +90,7 @@ public class Complaint implements Parcelable {
         dest.writeString(blocked_reason);
         dest.writeString(rejected_reason);
         dest.writeString(closed_reason);
+        dest.writeString(started_reason);
         dest.writeParcelable(unit, flags);
         dest.writeParcelable(resident, flags);
     }
@@ -108,6 +111,14 @@ public class Complaint implements Parcelable {
             return new Complaint[size];
         }
     };
+
+    public String getStarted_reason() {
+        return started_reason;
+    }
+
+    public void setStarted_reason(String started_reason) {
+        this.started_reason = started_reason;
+    }
 
     public String getCategory_short_name() {
         return category_short_name;
