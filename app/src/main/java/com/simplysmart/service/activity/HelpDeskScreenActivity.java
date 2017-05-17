@@ -305,7 +305,7 @@ public class HelpDeskScreenActivity extends GetLocationBaseActivity implements L
         TextView companyName = (TextView) view.findViewById(R.id.companyName);
         TextView userName = (TextView) view.findViewById(R.id.userName);
 
-        companyLogo.setImageResource(R.drawable.ic_launcher);
+        companyLogo.setImageResource(R.mipmap.ic_launcher);
         companyName.setText(residentData.getCompany().getName());
         userName.setText(residentData.getName());
 

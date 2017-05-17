@@ -30,7 +30,7 @@ public class AlarmService extends IntentService {
 
     private void sendNotification(String s) {
 
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationManager alarmNotificationManager = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
@@ -39,7 +39,7 @@ public class AlarmService extends IntentService {
         NotificationCompat.Builder alarmNotificationBuilder = new NotificationCompat.Builder(this)
                 .setContentTitle("Attendance")
                 .setAutoCancel(true)
-                .setSmallIcon(R.drawable.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(s))
                 .setSound(alarmUri)
                 .setLargeIcon(icon)
