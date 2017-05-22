@@ -30,7 +30,7 @@
         android:layout_below="@id/toolbar_Layout"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        layout="@layout/sensor_data_layout" />
+        layout="@layout/matrix_sensor_data_layout" />
 
     <include layout ="@layout/custom_error_layout"/>
 

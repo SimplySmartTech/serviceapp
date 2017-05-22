@@ -8,7 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.adapter.SensorListAdapter;
+import com.simplysmart.service.adapter.MatrixSensorListAdapter;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.SensorTable;
@@ -16,7 +16,7 @@ import com.simplysmart.service.model.matrix.MatrixData;
 
 import java.util.List;
 
-public class SensorListActivity extends BaseActivity {
+public class MatrixSensorListActivity extends BaseActivity {
 
     private MatrixData data;
     private boolean backdated;
@@ -24,7 +24,7 @@ public class SensorListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sensor_list);
+        setContentView(R.layout.activity_matrix_sensor_list);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -46,8 +46,8 @@ public class SensorListActivity extends BaseActivity {
     private void getSensorList(String utility_id){
         List<SensorTable> sensors = SensorTable.getSensorList(utility_id);
         RecyclerView sensorList = (RecyclerView) findViewById(R.id.sensorList);
-        SensorListAdapter adapter = new SensorListAdapter(SensorListActivity.this, sensors,backdated);
-        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(SensorListActivity.this, 2);
+        MatrixSensorListAdapter adapter = new MatrixSensorListAdapter(MatrixSensorListActivity.this, sensors,backdated);
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MatrixSensorListActivity.this, 2);
         sensorList.setLayoutManager(gridLayoutManager);
         sensorList.setAdapter(adapter);
     }

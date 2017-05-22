@@ -21,14 +21,14 @@ import java.util.List;
  * Created by shekhar on 20/10/16.
  */
 
-public class SensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
+public class MatrixSensorListAdapter extends RecyclerView.Adapter<ChildViewHolder> {
 
     private Context mContext;
     private List<SensorTable> sensorData;
     private Typeface textTypeface;
     private boolean backdated;
 
-    public SensorListAdapter(Context context, List<SensorTable> data,boolean backdated) {
+    public MatrixSensorListAdapter(Context context, List<SensorTable> data, boolean backdated) {
         mContext = context;
         sensorData = data;
         this.backdated = backdated;

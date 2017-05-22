@@ -10,6 +10,7 @@ import android.view.Window;
 
 import com.activeandroid.query.Delete;
 import com.simplysmart.service.R;
+import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.database.AttendanceTable;
 import com.simplysmart.service.database.FinalReadingTable;
 import com.simplysmart.service.database.MatrixTable;
@@ -32,7 +33,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         //Used for force fully reset application (logout forcefully) set flag true for reset user
-        resetApplication(true);
+        resetApplication(false);
 
         switchToNextActivity();
     }
@@ -48,7 +49,15 @@ public class SplashActivity extends Activity {
 
                 Intent i;
                 if (isLogin) {
-                    i = new Intent(SplashActivity.this, HelpDeskScreenActivity.class);
+
+                    SharedPreferences UserInfo = SplashActivity.this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                    GlobalData.getInstance().setSubDomain(UserInfo.getString("subdomain", ""));
+
+                    if (GlobalData.getInstance().getSubDomain().equalsIgnoreCase("mailhem")) {
+                        i = new Intent(SplashActivity.this, MainActivity.class);
+                    } else {
+                        i = new Intent(SplashActivity.this, HelpDeskScreenActivity.class);
+                    }
                 } else {
                     i = new Intent(SplashActivity.this, LoginActivity.class);
                 }
