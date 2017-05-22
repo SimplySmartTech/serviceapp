@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.InputReadingFormActivity;
-import com.simplysmart.service.activity.SensorListActivity;
+import com.simplysmart.service.activity.MatrixSensorListActivity;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.viewholder.ParentViewHolder;
@@ -90,7 +90,7 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
             @Override
             public void onClick(View v) {
                 if (data.getSensors() != null && data.getSensors().size() > 1) {
-                    Intent i = new Intent(mContext, SensorListActivity.class);
+                    Intent i = new Intent(mContext, MatrixSensorListActivity.class);
                     i.putExtra(StringConstants.METRIC_DATA, data);
                     mContext.startActivity(i);
                 } else {
@@ -105,7 +105,7 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
             @Override
             public void onClick(View v) {
                 if (data.getSensors() != null && data.getSensors().size() > 1) {
-                    Intent i = new Intent(mContext, SensorListActivity.class);
+                    Intent i = new Intent(mContext, MatrixSensorListActivity.class);
                     i.putExtra(StringConstants.METRIC_DATA, data);
                     mContext.startActivity(i);
                 } else {
