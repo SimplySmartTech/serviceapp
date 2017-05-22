@@ -28,7 +28,7 @@ public class GlobalData extends com.activeandroid.app.Application {
     private String coordinates;
     private String userCurrentLocationAddress;
 
-    private ArrayList<Unit> units;
+    private ArrayList<Unit> sites;
     private ArrayList<AccessPolicy> accessPolicy;
 
     @Override
@@ -42,6 +42,14 @@ public class GlobalData extends com.activeandroid.app.Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 //        MultiDex.install(this);
+    }
+
+    public ArrayList<Unit> getSites() {
+        return sites;
+    }
+
+    public void setSites(ArrayList<Unit> sites) {
+        this.sites = sites;
     }
 
     public String getUserCurrentLocationAddress() {
@@ -66,14 +74,6 @@ public class GlobalData extends com.activeandroid.app.Application {
 
     public void setCoordinates(String coordinates) {
         this.coordinates = coordinates;
-    }
-
-    public ArrayList<Unit> getUnits() {
-        return units;
-    }
-
-    public void setUnits(ArrayList<Unit> units) {
-        this.units = units;
     }
 
     public String getAuthToken() {

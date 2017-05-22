@@ -29,11 +29,13 @@ import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.gcm.QuickstartPreferences;
 import com.simplysmart.service.gcm.RegistrationIntentService;
 import com.simplysmart.service.model.common.APIError;
+import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.LoginRequest;
 import com.simplysmart.service.model.user.LoginResponse;
 import com.simplysmart.service.model.user.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -171,21 +173,13 @@ public class LoginActivity extends BaseActivity {
                         if (response.isSuccessful()) {
                             if (response.body().isAuthenticated()) {
 
-                                Gson gson = new Gson();
-
-                                Log.d("Response", ":" + gson.toJson(response.body()));
                                 llCompanySpinner.setVisibility(View.GONE);
                                 setUserData(response.body());
-
-                                Intent i;
-                                if (GlobalData.getInstance().getSubDomain().equalsIgnoreCase("mailhem")) {
-                                    i = new Intent(LoginActivity.this, MainActivity.class);
-                                } else {
-                                    i = new Intent(LoginActivity.this, HelpDeskScreenActivity.class);
+                                Intent i = navigateToDefaultScreen();
+                                if (i != null) {
+                                    startActivity(i);
+                                    finish();
                                 }
-                                startActivity(i);
-                                finish();
-
                             } else if (response.code() == 401) {
                                 handleAuthorizationFailed();
 
@@ -278,12 +272,11 @@ public class LoginActivity extends BaseActivity {
 
                         if (response.isSuccessful() && response.body().getData() != null) {
                             setUserData(response.body());
-                            Log.d("Response:", "Response Login" + response.body());
-                            //Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                            Intent i = new Intent(LoginActivity.this, HelpDeskScreenActivity.class);
-                            startActivity(i);
-                            finish();
-
+                            Intent i = navigateToDefaultScreen();
+                            if (i != null) {
+                                startActivity(i);
+                                finish();
+                            }
                         } else if (response.code() == 401) {
                             handleAuthorizationFailed();
                         } else {
@@ -344,6 +337,34 @@ public class LoginActivity extends BaseActivity {
             return false;
         }
         return true;
+    }
+
+    private Intent navigateToDefaultScreen() {
+
+        Intent intent = null;
+        HashMap<String, Class> menuCLickList = new HashMap<>();
+        menuCLickList.put("metrics", MainActivity.class);
+        menuCLickList.put("notification", null);
+        menuCLickList.put("helpdesk", HelpDeskScreenActivity.class);
+        menuCLickList.put("sensors", SiteSensorsScreenActivity.class);
+        menuCLickList.put("attendance", AttendanceActivity.class);
+        menuCLickList.put("visitors", VisitorActivity.class);
+
+        SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        GlobalData.getInstance().setSubDomain(UserInfo.getString("subdomain", ""));
+
+        Gson gson = new Gson();
+        String jsonUnitInfo = UserInfo.getString("unit_info", "");
+        User residentData = gson.fromJson(jsonUnitInfo, User.class);
+
+        GlobalData.getInstance().setAccessPolicy(residentData.getPolicy());
+
+        for (AccessPolicy accessPolicy : residentData.getPolicy()) {
+            if (menuCLickList.containsKey(accessPolicy.getName().toLowerCase()) && accessPolicy.isDefaultVal()) {
+                intent = new Intent(LoginActivity.this, menuCLickList.get(accessPolicy.getName().toLowerCase()));
+            }
+        }
+        return intent;
     }
 
 }

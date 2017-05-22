@@ -18,6 +18,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -89,7 +90,7 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
     private NavigationView navigationView;
     private DrawerLayout drawer;
 
-    private ArrayList<Unit> units;
+    private ArrayList<Unit> sites;
     private User residentData;
 
     private boolean isRunning = true;
@@ -111,6 +112,22 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
 
         setAlarmForNotification();
 
+        TextView comingSoon = (TextView) findViewById(R.id.coming_soon);
+        if (comingSoon != null) {
+            comingSoon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer != null) {
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    }
+                    AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
+                            .show(getFragmentManager(), "logout");
+                }
+            });
+        }
     }
 
     private void checkForUpdate() {
@@ -137,27 +154,6 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(UPDATE_METRIC_SENSOR_LIST_ROW);
         isRunning = false;
         super.onDestroy();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.logout:
-                AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
-                        .show(getFragmentManager(), "logout");
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -246,11 +242,11 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
     }
 
     //Do network call to fetch matrix data
-    private void getMatrixRequest(String unitId, String subDomain) {
+    private void getMatrixRequest(String siteId, String subDomain) {
 
         if (NetworkUtilities.isInternet(MainActivity.this)) {
             ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-            Call<MatrixResponse> call = apiInterface.getMetrics(unitId, subDomain);
+            Call<MatrixResponse> call = apiInterface.getMetrics(siteId, subDomain);
             call.enqueue(new Callback<MatrixResponse>() {
 
                 @Override
@@ -376,10 +372,10 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
         String jsonAccessPolicy = UserInfo.getString("access_policy", "");
         AccessPolicy policy = gson.fromJson(jsonAccessPolicy, AccessPolicy.class);
 
-        if (residentData.getUnits() != null && residentData.getUnits().size() > 0) {
-            GlobalData.getInstance().setUnits(residentData.getUnits());
-            GlobalData.getInstance().setSelectedUnitId(residentData.getUnits().get(0).getId());
-            GlobalData.getInstance().setSelectedUnit(residentData.getUnits().get(0).getName());
+        if (residentData.getSites() != null && residentData.getSites().size() > 0) {
+            GlobalData.getInstance().setSites(residentData.getSites());
+            GlobalData.getInstance().setSelectedUnitId(residentData.getSites().get(0).getId());
+            GlobalData.getInstance().setSelectedUnit(residentData.getSites().get(0).getName());
             initializeRemainingStuff();
         } else {
             AlertDialogStandard.newInstance(getString(R.string.app_name), "No data found for this user.", "", "CLOSE")
@@ -404,9 +400,9 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
         setDataInHeader(navigationView);
 
         Menu menu = navigationView.getMenu();
-        units = GlobalData.getInstance().getUnits();
-        for (int i = 0; i < units.size(); i++) {
-            menu.add(R.id.plants, i, StringConstants.ORDER_PLANTS, units.get(i).getName()).setIcon(R.drawable.plant_icon);
+        sites = GlobalData.getInstance().getSites();
+        for (int i = 0; i < sites.size(); i++) {
+            menu.add(R.id.plants, i, StringConstants.ORDER_PLANTS, sites.get(i).getName()).setIcon(R.drawable.plant_icon);
         }
 
         yesterdayButton = menu.findItem(R.id.backdated);
@@ -490,7 +486,7 @@ public class MainActivity extends GetLocationBaseActivity implements LogoutListe
                         return true;
                     default:
                         int id = item.getItemId();
-                        Unit unit = units.get(id);
+                        Unit unit = sites.get(id);
 
                         backdated = false;
                         submitButton.setVisibility(View.VISIBLE);

@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.view.Window;
 
 import com.activeandroid.query.Delete;
+import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.database.AttendanceTable;
@@ -18,6 +19,10 @@ import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.database.VisitorTable;
+import com.simplysmart.service.model.user.AccessPolicy;
+import com.simplysmart.service.model.user.User;
+
+import java.util.HashMap;
 
 
 public class SplashActivity extends Activity {
@@ -33,7 +38,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         //Used for force fully reset application (logout forcefully) set flag true for reset user
-        resetApplication(false);
+        resetApplication(true);
 
         switchToNextActivity();
     }
@@ -49,20 +54,14 @@ public class SplashActivity extends Activity {
 
                 Intent i;
                 if (isLogin) {
-
-                    SharedPreferences UserInfo = SplashActivity.this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                    GlobalData.getInstance().setSubDomain(UserInfo.getString("subdomain", ""));
-
-                    if (GlobalData.getInstance().getSubDomain().equalsIgnoreCase("mailhem")) {
-                        i = new Intent(SplashActivity.this, MainActivity.class);
-                    } else {
-                        i = new Intent(SplashActivity.this, HelpDeskScreenActivity.class);
-                    }
+                    i = navigateToDefaultScreen();
                 } else {
                     i = new Intent(SplashActivity.this, LoginActivity.class);
                 }
-                startActivity(i);
-                finish();
+                if (i != null) {
+                    startActivity(i);
+                    finish();
+                }
             }
         }, SPLASH_TIME_OUT);
     }
@@ -90,6 +89,35 @@ public class SplashActivity extends Activity {
         } else {
             editor.remove("logoutUser").apply();
         }
+    }
+
+
+    private Intent navigateToDefaultScreen() {
+
+        Intent intent = null;
+        HashMap<String, Class> menuCLickList = new HashMap<>();
+        menuCLickList.put("metrics", MainActivity.class);
+        menuCLickList.put("notification", null);
+        menuCLickList.put("helpdesk", HelpDeskScreenActivity.class);
+        menuCLickList.put("sensors", SiteSensorsScreenActivity.class);
+        menuCLickList.put("attendance", AttendanceActivity.class);
+        menuCLickList.put("visitors", VisitorActivity.class);
+
+        SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        GlobalData.getInstance().setSubDomain(UserInfo.getString("subdomain", ""));
+
+        Gson gson = new Gson();
+        String jsonUnitInfo = UserInfo.getString("unit_info", "");
+        User residentData = gson.fromJson(jsonUnitInfo, User.class);
+
+        GlobalData.getInstance().setAccessPolicy(residentData.getPolicy());
+
+        for (AccessPolicy accessPolicy : residentData.getPolicy()) {
+            if (menuCLickList.containsKey(accessPolicy.getName().toLowerCase()) && accessPolicy.isDefaultVal()) {
+                intent = new Intent(SplashActivity.this, menuCLickList.get(accessPolicy.getName().toLowerCase()));
+            }
+        }
+        return intent;
     }
 
 }

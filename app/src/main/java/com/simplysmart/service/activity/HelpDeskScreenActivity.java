@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -82,6 +83,23 @@ public class HelpDeskScreenActivity extends GetLocationBaseActivity implements L
 
         Intent msgIntent = new Intent(this, FetchCategories.class);
         startService(msgIntent);
+
+        TextView comingSoon = (TextView) findViewById(R.id.coming_soon);
+        if (comingSoon != null) {
+            comingSoon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                    if (drawer != null) {
+                        if (drawer.isDrawerOpen(GravityCompat.START)) {
+                            drawer.closeDrawer(GravityCompat.START);
+                        }
+                    }
+                    AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
+                            .show(getFragmentManager(), "logout");
+                }
+            });
+        }
     }
 
     private void checkForUpdate() {
@@ -144,11 +162,6 @@ public class HelpDeskScreenActivity extends GetLocationBaseActivity implements L
                 getFragmentManager().beginTransaction().addToBackStack(null)
                         .replace(R.id.llContent, historyComplaint).commitAllowingStateLoss();
                 break;
-
-            case R.id.logout:
-                AlertDialogLogout.newInstance("Logout", "Do you want to logout?", "No", "Logout")
-                        .show(getFragmentManager(), "logout");
-                break;
         }
         return true;
     }
@@ -173,8 +186,6 @@ public class HelpDeskScreenActivity extends GetLocationBaseActivity implements L
         String jsonUnitInfo = UserInfo.getString("unit_info", "");
         residentData = gson.fromJson(jsonUnitInfo, User.class);
 
-        Log.d("Json Unit :", gson.toJson(residentData));
-
         GlobalData.getInstance().setAccessPolicy(residentData.getPolicy());
         GlobalData.getInstance().setUserId(residentData.getId());
 
@@ -197,7 +208,6 @@ public class HelpDeskScreenActivity extends GetLocationBaseActivity implements L
         setDataInHeader(navigationView);
 
         Menu menu = navigationView.getMenu();
-//        units = GlobalData.getInstance().getUnits();
 
         for (int i = 0; i < residentData.getPolicy().size(); i++) {
             menu.add(R.id.plants, i, StringConstants.ORDER_PLANTS, residentData.getPolicy().get(i).getName()).setIcon(R.drawable.plant_icon);

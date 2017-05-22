@@ -80,6 +80,20 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|stateHidden" />
 
+        <activity
+            android:name=".activity.ReadingDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".activity.SiteSensorsScreenActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".activity.RedirectionActivity"
+            android:screenOrientation="portrait"/>
+
         <!-- Push Notification GCM Services & Receivers -->
         <service android:name=".gcm.RegistrationIntentService" />
 

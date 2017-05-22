@@ -16,6 +16,8 @@ import com.simplysmart.service.model.helpdesk.MessageResponseClass;
 import com.simplysmart.service.model.matrix.AllReadingsData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.matrix.ReadingData;
+import com.simplysmart.service.model.sensor.SensorList;
+import com.simplysmart.service.model.sensor.SensorReadingGraphResponse;
 import com.simplysmart.service.model.user.LoginRequest;
 import com.simplysmart.service.model.user.LoginResponse;
 import com.simplysmart.service.model.visitors.VisitorPost;
@@ -50,7 +52,7 @@ public interface ApiInterface {
     Call<LoginResponse> residentLoginWithSubDomain(@Query("subdomain") String subDomain, @Body LoginRequest request);
 
     @GET("/api/metrics")
-    Call<MatrixResponse> getMetrics(@Query("unit_id") String unitId,
+    Call<MatrixResponse> getMetrics(@Query("site_id") String siteId,
                                     @Query("subdomain") String subDomain);
 
     @POST("/api/sensor_readings/")
@@ -101,5 +103,17 @@ public interface ApiInterface {
     @POST("/cms/complaints")
     Call<CommonResponse> createNewTicket(@Query("subdomain") String subDomain,
                                          @Body ComplaintRequest request);
+
+    // get readings for all sensors
+    @GET("api/admin/sensors")
+    Call<SensorList> getSensorsReadings(@Query("subdomain") String subDomain,
+                                        @Query("site_id") String state);
+
+    // get consumption readings for all sensors
+    @GET("api/sensor_readings")
+    Call<SensorReadingGraphResponse> getReadingsGraph(@Query("subdomain") String subDomain,
+                                                      @Query("sensor_key") String sensor_key,
+                                                      @Query("from_date") String from_date,
+                                                      @Query("to_date") String to_date);
 
 }

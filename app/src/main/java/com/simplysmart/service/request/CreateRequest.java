@@ -15,6 +15,8 @@ import com.simplysmart.service.model.helpdesk.ComplaintDetailResponse;
 import com.simplysmart.service.model.helpdesk.ComplaintRequest;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
 import com.simplysmart.service.model.helpdesk.NewComplaint;
+import com.simplysmart.service.model.sensor.SensorList;
+import com.simplysmart.service.model.sensor.SensorReadingGraphResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -134,7 +136,8 @@ public class CreateRequest {
             }
         });
     }
-//
+
+    //
 //    public void changePassword(String residentId, ChangePasswordRequest request, final ApiCallback<CommonResponse> callback) {
 //
 //        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
@@ -209,7 +212,8 @@ public class CreateRequest {
             }
         });
     }
-//
+
+    //
 //    public void fetchCredential(final ApiCallback<CloudinaryCredential> callback) {
 //
 //        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
@@ -315,7 +319,8 @@ public class CreateRequest {
             }
         });
     }
-//
+
+    //
     public void getComplaintList(String state, String page, final ApiCallback<HelpDeskResponse> callback) {
 
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
@@ -397,7 +402,8 @@ public class CreateRequest {
             }
         });
     }
-//
+
+    //
 //    public void getPlannerDetails(String unitId, final ApiCallback<PlannerResponse> callback) {
 //
 //        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
@@ -532,53 +538,53 @@ public class CreateRequest {
 //        });
 //    }
 //
-//    public void getSensorsReadings(String unitId, final ApiCallback<SensorList> callback) {
-//
-//        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-//        Call<SensorList> responseCall = apiInterface.getSensorsReadings(AppSessionData.getInstance().getSubdomain(), unitId);
-//
-//        responseCall.enqueue(new Callback<SensorList>() {
-//
-//            @Override
-//            public void onResponse(Call<SensorList> call, Response<SensorList> response) {
-//                if (response.isSuccessful()) {
-//                    callback.onSuccess(response.body());
-//                } else {
-//                    APIError error = ErrorUtils.parseError(response);
-//                    callback.onFailure(error.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<SensorList> call, Throwable t) {
-//
-//            }
-//        });
-//    }
-//
-//    public void getSensorsReadingGraph(String sensorKey, String fromDate, String toDate, final ApiCallback<SensorReadingGraphResponse> callback) {
-//
-//        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-//        Call<SensorReadingGraphResponse> responseCall = apiInterface.getReadingsGraph(AppSessionData.getInstance().getSubdomain(), sensorKey, fromDate, toDate);
-//
-//        responseCall.enqueue(new Callback<SensorReadingGraphResponse>() {
-//
-//            @Override
-//            public void onResponse(Call<SensorReadingGraphResponse> call, Response<SensorReadingGraphResponse> response) {
-//                if (response.isSuccessful()) {
-//                    callback.onSuccess(response.body());
-//                } else {
-//                    APIError error = ErrorUtils.parseError(response);
-//                    callback.onFailure(error.message());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<SensorReadingGraphResponse> call, Throwable t) {
-//
-//            }
-//        });
-//    }
+    public void getSensorsReadings(String unitId, final ApiCallback<SensorList> callback) {
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        Call<SensorList> responseCall = apiInterface.getSensorsReadings(GlobalData.getInstance().getSubDomain(), unitId);
+
+        responseCall.enqueue(new Callback<SensorList>() {
+
+            @Override
+            public void onResponse(Call<SensorList> call, Response<SensorList> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    APIError error = ErrorUtils.parseError(response);
+                    callback.onFailure(error.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SensorList> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void getSensorsReadingGraph(String sensorKey, String fromDate, String toDate, final ApiCallback<SensorReadingGraphResponse> callback) {
+
+        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        Call<SensorReadingGraphResponse> responseCall = apiInterface.getReadingsGraph(GlobalData.getInstance().getSubDomain(), sensorKey, fromDate, toDate);
+
+        responseCall.enqueue(new Callback<SensorReadingGraphResponse>() {
+
+            @Override
+            public void onResponse(Call<SensorReadingGraphResponse> call, Response<SensorReadingGraphResponse> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    APIError error = ErrorUtils.parseError(response);
+                    callback.onFailure(error.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SensorReadingGraphResponse> call, Throwable t) {
+
+            }
+        });
+    }
 //
 //    public void getTransactionCredentials(WalletCredentialRequest request, final ApiCallback<WalletCredentialResponse> callback) {
 //

@@ -18,7 +18,7 @@ public class User implements Parcelable {
     private String role_code;
     private String api_key;
     private String auth_token;
-    private ArrayList<Unit> units;
+    private ArrayList<Unit> sites;
     private ArrayList<AccessPolicy> policy;
 
     private Company company;
@@ -33,7 +33,7 @@ public class User implements Parcelable {
         role_code = in.readString();
         api_key = in.readString();
         auth_token = in.readString();
-        units = in.createTypedArrayList(Unit.CREATOR);
+        sites = in.createTypedArrayList(Unit.CREATOR);
         policy = in.createTypedArrayList(AccessPolicy.CREATOR);
         company = in.readParcelable(Company.class.getClassLoader());
     }
@@ -48,7 +48,7 @@ public class User implements Parcelable {
         dest.writeString(role_code);
         dest.writeString(api_key);
         dest.writeString(auth_token);
-        dest.writeTypedList(units);
+        dest.writeTypedList(sites);
         dest.writeTypedList(policy);
         dest.writeParcelable(company, flags);
     }
@@ -142,19 +142,19 @@ public class User implements Parcelable {
         this.auth_token = auth_token;
     }
 
-    public ArrayList<Unit> getUnits() {
-        return units;
-    }
-
-    public void setUnits(ArrayList<Unit> units) {
-        this.units = units;
-    }
-
     public Company getCompany() {
         return company;
     }
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public ArrayList<Unit> getSites() {
+        return sites;
+    }
+
+    public void setSites(ArrayList<Unit> sites) {
+        this.sites = sites;
     }
 }
