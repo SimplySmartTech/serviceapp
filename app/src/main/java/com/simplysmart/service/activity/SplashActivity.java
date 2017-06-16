@@ -73,18 +73,26 @@ public class SplashActivity extends Activity {
 
         if (reset) {
             if (logoutUser) {
-                SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                SharedPreferences.Editor userInfoEdit = UserInfo.edit();
-                userInfoEdit.clear().apply();
-                editor.putBoolean("logoutUser", false).apply();
+                try {
+                    SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor userInfoEdit = UserInfo.edit();
+                    userInfoEdit.clear().apply();
+                    editor.putBoolean("logoutUser", false).apply();
 
-                new Delete().from(MatrixTable.class).execute();
-                new Delete().from(SensorTable.class).execute();
-                new Delete().from(ReadingTable.class).execute();
-                new Delete().from(FinalReadingTable.class).execute();
-                new Delete().from(TareWeightTable.class).execute();
-                new Delete().from(AttendanceTable.class).execute();
-                new Delete().from(VisitorTable.class).execute();
+                    try {
+                        new Delete().from(MatrixTable.class).execute();
+                        new Delete().from(SensorTable.class).execute();
+                        new Delete().from(ReadingTable.class).execute();
+                        new Delete().from(FinalReadingTable.class).execute();
+                        new Delete().from(TareWeightTable.class).execute();
+                        new Delete().from(AttendanceTable.class).execute();
+                        new Delete().from(VisitorTable.class).execute();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             editor.remove("logoutUser").apply();
