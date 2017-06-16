@@ -74,7 +74,7 @@ public class ParseDateFormat {
     public static String getDateFromTimestamp(String timeStampStr, String outputFormat) {
         try {
             DateFormat sdf = new SimpleDateFormat(outputFormat, Locale.getDefault());
-            Date netDate = (new Date(Long.parseLong(timeStampStr) * 1000L));
+            Date netDate = (new Date(Long.parseLong(timeStampStr)));
             return sdf.format(netDate);
         } catch (Exception ignored) {
             return "xx";
@@ -141,5 +141,24 @@ public class ParseDateFormat {
         } else {
             return requiredDateFormatOverWeek.format(dateTime);
         }
+    }
+
+    public static String getLastWeekDate() throws ParseException {
+
+        DateFormat timeZoneSdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+
+        Calendar overWeek = Calendar.getInstance();
+        overWeek.add(Calendar.DATE, -10);
+        Date dateTime = overWeek.getTime();
+        return timeZoneSdf.format(dateTime);
+    }
+
+    public static String getCurrentMonthFirstDate() {
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        System.out.println(c.getTime());
+
+        return String.valueOf(c.getTime());
     }
 }

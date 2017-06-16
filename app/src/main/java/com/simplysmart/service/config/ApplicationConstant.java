@@ -3,7 +3,7 @@ package com.simplysmart.service.config;
 public class ApplicationConstant {
 
     //Flag for debugging log mode
-    public static boolean isDebuggable = false;
+    public static boolean isDebuggable = true;
 
     //Api url component
     public static final String PROTOCOL = "http://";

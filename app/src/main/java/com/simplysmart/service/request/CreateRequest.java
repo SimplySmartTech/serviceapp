@@ -564,7 +564,7 @@ public class CreateRequest {
 
     public void getSensorsReadingGraph(String sensorKey, String fromDate, String toDate, final ApiCallback<SensorReadingGraphResponse> callback) {
 
-        ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
+        ApiInterface apiInterface = ServiceGeneratorV2.createService(ApiInterface.class);
         Call<SensorReadingGraphResponse> responseCall = apiInterface.getReadingsGraph(GlobalData.getInstance().getSubDomain(), sensorKey, fromDate, toDate);
 
         responseCall.enqueue(new Callback<SensorReadingGraphResponse>() {

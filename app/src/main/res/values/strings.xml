@@ -96,4 +96,15 @@
         <item>Low</item>
     </string-array>
 
+    <string-array name="durationSpinner">
+        <item>Today</item>
+        <item>Yesterday</item>
+        <item>Last 7 days</item>
+        <item>This month</item>
+        <!--<item>Last month</item>-->
+        <!--<item>Last 3 months</item>-->
+        <!--<item>Last 6 months</item>-->
+        <!--<item>Last Year</item>-->
+    </string-array>
+
 </resources>
