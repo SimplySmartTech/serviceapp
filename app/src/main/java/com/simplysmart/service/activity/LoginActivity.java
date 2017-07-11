@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -349,6 +348,7 @@ public class LoginActivity extends BaseActivity {
         menuCLickList.put("sensors", SiteSensorsScreenActivity.class);
         menuCLickList.put("attendance", AttendanceActivity.class);
         menuCLickList.put("visitors", VisitorActivity.class);
+        menuCLickList.put("status", SiteStatusScreenActivity.class);
 
         SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         GlobalData.getInstance().setSubDomain(UserInfo.getString("subdomain", ""));

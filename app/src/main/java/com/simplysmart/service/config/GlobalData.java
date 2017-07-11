@@ -143,5 +143,4 @@ public class GlobalData extends com.activeandroid.app.Application {
         }
         return mGlobalData;
     }
-
 }

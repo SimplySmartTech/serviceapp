@@ -145,7 +145,7 @@ public class SensorInfoTodayList extends Fragment implements SwipeRefreshLayout.
 //        progressBar.setVisibility(View.VISIBLE);
         swipeRefreshLayout.setRefreshing(true);
 
-        CreateRequest.getInstance().getSensorsReadings(GlobalData.getInstance().getSelectedUnitId(), new ApiCallback<SensorList>() {
+        CreateRequest.getInstance().getSensorsReadings(GlobalData.getInstance().getSelectedUnitId(), "", new ApiCallback<SensorList>() {
 
             @Override
             public void onSuccess(SensorList response) {

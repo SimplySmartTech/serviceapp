@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.simplysmart.service.R;
-import com.simplysmart.service.activity.ReadingDetailsActivity;
-import com.simplysmart.service.adapter.SensorListAdapter;
+import com.simplysmart.service.activity.StatusReadingDetailsActivity;
+import com.simplysmart.service.adapter.StatusListTodayAdapter;
 import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
@@ -33,19 +34,17 @@ import com.simplysmart.service.model.sensor.SensorList;
 import com.simplysmart.service.request.CreateRequest;
 import com.simplysmart.service.util.ParseDateFormat;
 
-
 /**
  * Created by shekhar on 22/5/17.
  */
-
-public class SensorInfoList extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class StatusInfoTodayList extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
     //    private ProgressBar progressBar;
     private RelativeLayout content_layout;
     private TextView no_data_found;
     private ListView sensorInfoList;
     private View rootView;
-    private SensorListAdapter sensorListAdapter;
+    private StatusListTodayAdapter sensorListAdapter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -106,6 +105,7 @@ public class SensorInfoList extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onResume() {
         super.onResume();
+        Log.d("HELLO", "ON RESUME CALLED");
         IntentFilter intentFilter = new IntentFilter("UnitName");
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(onUnitIDSelection, intentFilter);
 
@@ -132,8 +132,8 @@ public class SensorInfoList extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Intent newIntent = new Intent(getActivity(), ReadingDetailsActivity.class);
-                newIntent.putExtra("date", ParseDateFormat.getYesterdayDateString("dd/MM/yyyy"));
+                Intent newIntent = new Intent(getActivity(), StatusReadingDetailsActivity.class);
+                newIntent.putExtra("date", ParseDateFormat.getCurrentTimeStamp("dd/MM/yyyy"));
                 newIntent.putExtra("sensorData", sensorListAdapter.getSensorListData().getData().get(i));
                 getActivity().startActivity(newIntent);
             }
@@ -145,7 +145,7 @@ public class SensorInfoList extends Fragment implements SwipeRefreshLayout.OnRef
 //        progressBar.setVisibility(View.VISIBLE);
         swipeRefreshLayout.setRefreshing(true);
 
-        CreateRequest.getInstance().getSensorsReadings(GlobalData.getInstance().getSelectedUnitId(),"", new ApiCallback<SensorList>() {
+        CreateRequest.getInstance().getSensorsReadings(GlobalData.getInstance().getSelectedUnitId(), "status", new ApiCallback<SensorList>() {
 
             @Override
             public void onSuccess(SensorList response) {
@@ -165,7 +165,7 @@ public class SensorInfoList extends Fragment implements SwipeRefreshLayout.OnRef
     private void setDataInList(SensorList response) {
 
         if (response != null && response.getData().size() > 0) {
-            sensorListAdapter = new SensorListAdapter(response, getActivity(), getFragmentManager());
+            sensorListAdapter = new StatusListTodayAdapter(response, getActivity(), getFragmentManager());
             sensorInfoList.setAdapter(sensorListAdapter);
             sensorInfoList.setVisibility(View.VISIBLE);
         } else {

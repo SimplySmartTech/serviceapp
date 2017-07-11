@@ -1,7 +1,7 @@
 package com.simplysmart.service.model.sensor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by shekhar on 02/01/17.
@@ -13,7 +13,7 @@ public class SensorReadingGraphResponse {
     private int total;
     private Axis axis;
 
-    private HashMap<String, ArrayList<ArrayList<String>>> data;
+    private LinkedHashMap<String, ArrayList<ArrayList<String>>> data;
 
 
     public String getReading_unit() {
@@ -40,11 +40,11 @@ public class SensorReadingGraphResponse {
         this.axis = axis;
     }
 
-    public HashMap<String, ArrayList<ArrayList<String>>> getData() {
+    public LinkedHashMap<String, ArrayList<ArrayList<String>>> getData() {
         return data;
     }
 
-    public void setData(HashMap<String, ArrayList<ArrayList<String>>> data) {
+    public void setData(LinkedHashMap<String, ArrayList<ArrayList<String>>> data) {
         this.data = data;
     }
 }

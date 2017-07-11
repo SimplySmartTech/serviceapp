@@ -107,13 +107,15 @@ public interface ApiInterface {
     // get readings for all sensors
     @GET("api/admin/sensors")
     Call<SensorList> getSensorsReadings(@Query("subdomain") String subDomain,
-                                        @Query("site_id") String state);
+                                        @Query("site_id") String state,
+                                        @Query("type") String type);
 
     // get consumption readings for all sensors
     @GET("api/sensor_readings")
     Call<SensorReadingGraphResponse> getReadingsGraph(@Query("subdomain") String subDomain,
                                                       @Query("sensor_key") String sensor_key,
                                                       @Query("from_date") String from_date,
-                                                      @Query("to_date") String to_date);
+                                                      @Query("to_date") String to_date,
+                                                      @Query("type") String type);
 
 }

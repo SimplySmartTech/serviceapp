@@ -538,10 +538,10 @@ public class CreateRequest {
 //        });
 //    }
 //
-    public void getSensorsReadings(String unitId, final ApiCallback<SensorList> callback) {
+    public void getSensorsReadings(String unitId, String type, final ApiCallback<SensorList> callback) {
 
         ApiInterface apiInterface = ServiceGenerator.createService(ApiInterface.class);
-        Call<SensorList> responseCall = apiInterface.getSensorsReadings(GlobalData.getInstance().getSubDomain(), unitId);
+        Call<SensorList> responseCall = apiInterface.getSensorsReadings(GlobalData.getInstance().getSubDomain(), unitId, type);
 
         responseCall.enqueue(new Callback<SensorList>() {
 
@@ -562,10 +562,10 @@ public class CreateRequest {
         });
     }
 
-    public void getSensorsReadingGraph(String sensorKey, String fromDate, String toDate, final ApiCallback<SensorReadingGraphResponse> callback) {
+    public void getSensorsReadingGraph(String sensorKey, String fromDate, String toDate, String type, final ApiCallback<SensorReadingGraphResponse> callback) {
 
         ApiInterface apiInterface = ServiceGeneratorV2.createService(ApiInterface.class);
-        Call<SensorReadingGraphResponse> responseCall = apiInterface.getReadingsGraph(GlobalData.getInstance().getSubDomain(), sensorKey, fromDate, toDate);
+        Call<SensorReadingGraphResponse> responseCall = apiInterface.getReadingsGraph(GlobalData.getInstance().getSubDomain(), sensorKey, fromDate, toDate, type);
 
         responseCall.enqueue(new Callback<SensorReadingGraphResponse>() {
 

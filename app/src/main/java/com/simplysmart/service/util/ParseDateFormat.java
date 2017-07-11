@@ -143,22 +143,24 @@ public class ParseDateFormat {
         }
     }
 
-    public static String getLastWeekDate() throws ParseException {
+    public static String getLastSevenDate() throws ParseException {
 
         DateFormat timeZoneSdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
 
         Calendar overWeek = Calendar.getInstance();
-        overWeek.add(Calendar.DATE, -10);
+        overWeek.add(Calendar.DATE, -7);
         Date dateTime = overWeek.getTime();
         return timeZoneSdf.format(dateTime);
     }
 
     public static String getCurrentMonthFirstDate() {
 
+        DateFormat timeZoneSdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_MONTH, 1);
         System.out.println(c.getTime());
 
-        return String.valueOf(c.getTime());
+        return timeZoneSdf.format(c.getTime());
     }
 }

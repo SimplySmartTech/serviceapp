@@ -2,24 +2,24 @@ package com.simplysmart.service.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.animation.Easing;
-import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.simplysmart.service.R;
 import com.simplysmart.service.callback.ApiCallback;
 import com.simplysmart.service.common.DebugLog;
@@ -36,27 +36,31 @@ import java.util.Map;
 /**
  * Created by shekhar on 22/5/17.
  */
-public class ReadingDetailsActivity extends BaseActivity {
+public class StatusReadingDetailsActivity extends BaseActivity {
 
     private ProgressBar progressBar;
     private LinearLayout content_layout;
     private TextView no_data_found;
     private TextView yAxisLogo;
     private SensorItem sensorItem;
-    private BarChart graphView;
+    private LineChart graphView;
     private YAxis leftAxis;
-    private int color = 0;
     private String date;
     private String xAxisLable = "";
 
     private Spinner durationSpinner;
+    private Spinner typeSpinner;
 
     private TextView readingValue, readingAtValue;
+
+    private LinkedHashMap<String, ArrayList<ArrayList<String>>> graphData = new LinkedHashMap<>();
+
+    private final String TYPE = "status_graph";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reading_details);
+        setContentView(R.layout.activity_status_graph_reading_details);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -65,14 +69,12 @@ public class ReadingDetailsActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setTitle("Reading Details");
 
-
         if (getIntent().getExtras() != null) {
             date = getIntent().getStringExtra("date");
             sensorItem = getIntent().getParcelableExtra("sensorData");
         }
 
         initializeWidgets();
-        color = ContextCompat.getColor(this, R.color.colorAccent);
     }
 
     @Override
@@ -98,10 +100,11 @@ public class ReadingDetailsActivity extends BaseActivity {
         progressBar = (ProgressBar) findViewById(R.id.progressBar2);
         content_layout = (LinearLayout) findViewById(R.id.content_layout);
         no_data_found = (TextView) findViewById(R.id.no_data_found);
-        graphView = (BarChart) findViewById(R.id.graphView);
+        graphView = (LineChart) findViewById(R.id.graphView);
         yAxisLogo = (TextView) findViewById(R.id.y_axis_logo);
 
         durationSpinner = (Spinner) findViewById(R.id.durationSpinner);
+        typeSpinner = (Spinner) findViewById(R.id.typeSpinner);
 
         readingValue = (TextView) findViewById(R.id.readingValue);
         readingAtValue = (TextView) findViewById(R.id.readingAtValue);
@@ -127,9 +130,9 @@ public class ReadingDetailsActivity extends BaseActivity {
 
                 if (durationSpinner.getSelectedItem().toString().toLowerCase().equalsIgnoreCase("today")) {
 
-                    if (NetworkUtilities.isInternet(ReadingDetailsActivity.this)) {
+                    if (NetworkUtilities.isInternet(StatusReadingDetailsActivity.this)) {
                         no_data_found.setVisibility(View.GONE);
-                        getSensorsReadingGraph(date, date, "");
+                        getSensorsReadingGraph(date, date, TYPE);
                     } else {
                         no_data_found.setVisibility(View.VISIBLE);
                         no_data_found.setText(getResources().getString(R.string.error_no_internet_connection));
@@ -139,9 +142,9 @@ public class ReadingDetailsActivity extends BaseActivity {
 
                 } else if (durationSpinner.getSelectedItem().toString().toLowerCase().equalsIgnoreCase("yesterday")) {
 
-                    if (NetworkUtilities.isInternet(ReadingDetailsActivity.this)) {
+                    if (NetworkUtilities.isInternet(StatusReadingDetailsActivity.this)) {
                         no_data_found.setVisibility(View.GONE);
-                        getSensorsReadingGraph(ParseDateFormat.getYesterdayDateString("dd/MM/yyyy"), ParseDateFormat.getYesterdayDateString("dd/MM/yyyy"), "");
+                        getSensorsReadingGraph(ParseDateFormat.getYesterdayDateString("dd/MM/yyyy"), ParseDateFormat.getYesterdayDateString("dd/MM/yyyy"), TYPE);
                     } else {
                         no_data_found.setVisibility(View.VISIBLE);
                         no_data_found.setText(getResources().getString(R.string.error_no_internet_connection));
@@ -151,9 +154,9 @@ public class ReadingDetailsActivity extends BaseActivity {
 
                 } else if (durationSpinner.getSelectedItem().toString().toLowerCase().equalsIgnoreCase("Last 7 days")) {
                     try {
-                        if (NetworkUtilities.isInternet(ReadingDetailsActivity.this)) {
+                        if (NetworkUtilities.isInternet(StatusReadingDetailsActivity.this)) {
                             no_data_found.setVisibility(View.GONE);
-                            getSensorsReadingGraph(ParseDateFormat.getLastSevenDate(), date, "");
+                            getSensorsReadingGraph(ParseDateFormat.getLastSevenDate(), date, TYPE);
                         } else {
                             no_data_found.setVisibility(View.VISIBLE);
                             no_data_found.setText(getResources().getString(R.string.error_no_internet_connection));
@@ -165,9 +168,9 @@ public class ReadingDetailsActivity extends BaseActivity {
                     }
                 } else if (durationSpinner.getSelectedItem().toString().toLowerCase().equalsIgnoreCase("This month")) {
                     try {
-                        if (NetworkUtilities.isInternet(ReadingDetailsActivity.this)) {
+                        if (NetworkUtilities.isInternet(StatusReadingDetailsActivity.this)) {
                             no_data_found.setVisibility(View.GONE);
-                            getSensorsReadingGraph(ParseDateFormat.getCurrentMonthFirstDate(), date, "");
+                            getSensorsReadingGraph(ParseDateFormat.getCurrentMonthFirstDate(), date, TYPE);
                         } else {
                             no_data_found.setVisibility(View.VISIBLE);
                             no_data_found.setText(getResources().getString(R.string.error_no_internet_connection));
@@ -177,6 +180,20 @@ public class ReadingDetailsActivity extends BaseActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (graphData != null) {
+                    setGraphValue(typeSpinner.getSelectedItem().toString());
                 }
             }
 
@@ -205,7 +222,8 @@ public class ReadingDetailsActivity extends BaseActivity {
                             xAxisLable = response.getAxis().getX();
                             yAxisLogo.setText(response.getAxis().getY());
                         }
-                        setGraphData(response.getData());
+                        graphData = response.getData();
+                        setGraphData();
                     }
                 }
 
@@ -220,37 +238,18 @@ public class ReadingDetailsActivity extends BaseActivity {
         }
     }
 
-    private void setGraphData(LinkedHashMap<String, ArrayList<ArrayList<String>>> graphData) {
+    private void setGraphData() {
 
         initGraphProperties();
 
-        ArrayList<ArrayList<String>> timeList = new ArrayList<>();
-        ArrayList<ArrayList<Float>> yValuesList = new ArrayList<>();
-
-        ArrayList<String> legendLabels = new ArrayList<>();
+        ArrayList<String> sensorTypeList = new ArrayList<>();
 
         for (Map.Entry<String, ArrayList<ArrayList<String>>> entry : graphData.entrySet()) {
-            String key = entry.getKey();
-            ArrayList<ArrayList<String>> value = entry.getValue();
-
-            ArrayList<String> time = new ArrayList<>();
-            ArrayList<Float> yValues = new ArrayList<>();
-
-            for (int i = 0; i < value.size(); i++) {
-
-                if (xAxisLable.equalsIgnoreCase("time")) {
-                    time.add(ParseDateFormat.getTimeFromTimestamp(value.get(i).get(0), "HH:mm"));
-                } else {
-                    time.add(ParseDateFormat.getDateFromTimestamp(value.get(i).get(0), "dd MMM"));
-                }
-                yValues.add(Float.parseFloat(value.get(i).get(1)));
-            }
-            legendLabels.add(key);
-            timeList.add(time);
-            yValuesList.add(yValues);
+            sensorTypeList.add(entry.getKey());
         }
 
-        renderGraph(yValuesList, timeList, legendLabels);
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, sensorTypeList);
+        typeSpinner.setAdapter(typeAdapter);
     }
 
     private void initGraphProperties() {
@@ -271,41 +270,89 @@ public class ReadingDetailsActivity extends BaseActivity {
 
         XAxis bottomAxis = graphView.getXAxis();
         bottomAxis.setDrawGridLines(false);
+        bottomAxis.setDrawAxisLine(true);
         bottomAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         bottomAxis.setSpaceBetweenLabels(1);
         bottomAxis.setTextSize(9);
         bottomAxis.setAvoidFirstLastClipping(true);
     }
 
+    private void setGraphValue(String sensorType) {
+
+        ArrayList<ArrayList<String>> timeList = new ArrayList<>();
+        ArrayList<ArrayList<Float>> yValuesList = new ArrayList<>();
+
+        ArrayList<String> legendLabels = new ArrayList<>();
+
+        int count = 0;
+
+        for (Map.Entry<String, ArrayList<ArrayList<String>>> entry : graphData.entrySet()) {
+            String key = entry.getKey();
+
+            if (key.equalsIgnoreCase(sensorType)) {
+                count++;
+                ArrayList<ArrayList<String>> value = entry.getValue();
+
+                ArrayList<String> time = new ArrayList<>();
+                ArrayList<Float> yValues = new ArrayList<>();
+
+                for (int i = 0; i < value.size(); i++) {
+
+                    if (xAxisLable.equalsIgnoreCase("time")) {
+                        time.add(ParseDateFormat.getTimeFromTimestamp(value.get(i).get(0), "HH:mm"));
+                    } else {
+                        time.add(ParseDateFormat.getDateFromTimestamp(value.get(i).get(0), "dd MMM"));
+                    }
+                    yValues.add(Float.parseFloat(value.get(i).get(1)));
+                }
+                legendLabels.add(key);
+                timeList.add(time);
+                yValuesList.add(yValues);
+            }
+        }
+
+        if (count == 1) {
+            renderGraph(yValuesList, timeList, legendLabels);
+        }
+    }
+
     private void renderGraph(ArrayList<ArrayList<Float>> yValuesList, ArrayList<ArrayList<String>> timeList, ArrayList<String> legendLabels) {
 
         ArrayList<String> colors = randomCodeGenerator(yValuesList.size());
 
-        ArrayList<BarDataSet> dataSets = new ArrayList<>();
+        ArrayList<LineDataSet> dataSets = new ArrayList<>();
 
         for (int j = 0; j < timeList.size(); j++) {
 
             ArrayList<Float> yValues = yValuesList.get(j);
 
-            ArrayList<BarEntry> MainGraphLine = new ArrayList<>();
+            ArrayList<Entry> MainGraphLine = new ArrayList<>();
 
             for (int i = 0; i < timeList.get(0).size(); i++) {
-                MainGraphLine.add(new BarEntry(yValues.get(i), i));
+                MainGraphLine.add(new Entry(yValues.get(i), i));
             }
 
-            BarDataSet set1 = new BarDataSet(MainGraphLine, legendLabels.get(j));
+            LineDataSet set1 = new LineDataSet(MainGraphLine, legendLabels.get(j));
             set1.setValueTextColor(Color.DKGRAY);
             set1.setValueTextSize(9f);
-            set1.setDrawValues(false);
             set1.setColor(Color.parseColor(colors.get(j)));
+
+            set1.setLineWidth(2f);
+            set1.setCircleSize(0f);
+            set1.setDrawCircleHole(false);
+            set1.setFillAlpha(65);
+            set1.setDrawFilled(false);
             set1.setDrawValues(false);
+            set1.setDrawCubic(false);
+            set1.setCubicIntensity(0.2f);
+
             dataSets.add(set1);
         }
 
         ArrayList<String> time = timeList.get(0);
 
         // create a data object with the data sets
-        BarData data = new BarData(time, dataSets);
+        LineData data = new LineData(time, dataSets);
         data.setValueTextColor(Color.BLACK);
         data.setValueTextSize(9f);
 
@@ -322,11 +369,10 @@ public class ReadingDetailsActivity extends BaseActivity {
 
         ArrayList<String> hexColorMap = new ArrayList<>();
 
-        hexColorMap.add("#26A69A");
-        hexColorMap.add("#607D8B");
-        hexColorMap.add("#33CCFF");
-        hexColorMap.add("#CC68BD");
-        hexColorMap.add("#26A6A1");
+//        hexColorMap.add("#26A69A");
+//        hexColorMap.add("#607D8B");
+//        hexColorMap.add("#33CCFF");
+//        hexColorMap.add("#CC68BD");
 
         for (int a = 0; a < colorCount; a++) {
             String code = "" + (int) (Math.random() * 256);

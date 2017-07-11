@@ -99,7 +99,6 @@ public class SplashActivity extends Activity {
         }
     }
 
-
     private Intent navigateToDefaultScreen() {
 
         Intent intent = null;
@@ -110,6 +109,7 @@ public class SplashActivity extends Activity {
         menuCLickList.put("sensors", SiteSensorsScreenActivity.class);
         menuCLickList.put("attendance", AttendanceActivity.class);
         menuCLickList.put("visitors", VisitorActivity.class);
+        menuCLickList.put("status", SiteStatusScreenActivity.class);
 
         SharedPreferences UserInfo = this.getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
         GlobalData.getInstance().setSubDomain(UserInfo.getString("subdomain", ""));
