@@ -38,7 +38,7 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         //Used for force fully reset application (logout forcefully) set flag true for reset user
-        resetApplication(true);
+        resetApplication(false);
 
         switchToNextActivity();
     }
