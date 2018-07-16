@@ -1,8 +1,9 @@
 apply plugin: 'com.android.library'
 
 android {
+
     compileSdkVersion versions.compileSdkVersion
-    buildToolsVersion versions.buildToolsVersion
+//    buildToolsVersion versions.buildToolsVersion
 
     defaultConfig {
         minSdkVersion versions.minSdkVersion
@@ -16,7 +17,8 @@ android {
             minifyEnabled false
         }
     }
-    buildToolsVersion '25.0.0'
+    buildToolsVersion versions.buildToolsVersion
+    buildToolsVersion '26.0.3'
 }
 
 dependencies {
