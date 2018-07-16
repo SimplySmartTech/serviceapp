@@ -103,7 +103,7 @@ public class SplashActivity extends Activity {
 
         Intent intent = null;
         HashMap<String, Class> menuCLickList = new HashMap<>();
-        menuCLickList.put("metrics", MainActivity.class);
+        menuCLickList.put("metrics", MainActivityV2.class);
         menuCLickList.put("notification", null);
         menuCLickList.put("helpdesk", HelpDeskScreenActivity.class);
         menuCLickList.put("sensors", SiteSensorsScreenActivity.class);

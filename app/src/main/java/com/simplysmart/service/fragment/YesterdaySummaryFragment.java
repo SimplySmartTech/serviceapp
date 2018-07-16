@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.MainActivity;
+import com.simplysmart.service.activity.MainActivityV2;
 import com.simplysmart.service.adapter.YesterdaySummaryListAdapter;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
@@ -275,7 +276,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements EditDialog
         add_new_data.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getActivity(), MainActivity.class);
+                Intent i = new Intent(getActivity(), MainActivityV2.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
             }

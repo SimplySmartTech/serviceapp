@@ -58,7 +58,7 @@ public class SummaryActivity extends BaseActivity {
 
         switch (id) {
             case android.R.id.home:
-                Intent i = new Intent(this, MainActivity.class);
+                Intent i = new Intent(this, MainActivityV2.class);
                 i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 supportFinishAfterTransition();

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 /**
  * Created by shekhar on 20/10/16.
+ * Updated by shekhar on 16/07/18.
  */
 public class MatrixData implements Parcelable  {
 
@@ -18,8 +19,14 @@ public class MatrixData implements Parcelable  {
 
     private ArrayList<SensorData> sensors;
 
-    public MatrixData(){}
+    //New fields
+    private String name;
+    private ArrayList<ValueInputType> sub_menu;
+    private ArrayList<VehicleType> vehicles;
 
+    public MatrixData(){
+
+    }
 
     protected MatrixData(Parcel in) {
         type = in.readString();
@@ -103,5 +110,29 @@ public class MatrixData implements Parcelable  {
 
     public void setSensors(ArrayList<SensorData> sensors) {
         this.sensors = sensors;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ArrayList<ValueInputType> getSub_menu() {
+        return sub_menu;
+    }
+
+    public void setSub_menu(ArrayList<ValueInputType> sub_menu) {
+        this.sub_menu = sub_menu;
+    }
+
+    public ArrayList<VehicleType> getVehicles() {
+        return vehicles;
+    }
+
+    public void setVehicles(ArrayList<VehicleType> vehicles) {
+        this.vehicles = vehicles;
     }
 }
