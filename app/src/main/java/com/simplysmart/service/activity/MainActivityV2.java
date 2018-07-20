@@ -1,8 +1,6 @@
 package com.simplysmart.service.activity;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -19,7 +17,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -55,7 +53,6 @@ import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
 import com.simplysmart.service.model.user.User;
-import com.simplysmart.service.service.AlarmReceiver;
 import com.yayandroid.locationmanager.LocationConfiguration;
 import com.yayandroid.locationmanager.constants.FailType;
 import com.yayandroid.locationmanager.constants.ProviderType;
@@ -94,7 +91,7 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
 
         isRunning = true;
         getUserInfo();
-        getLocation();
+//        getLocation();
 
         TextView comingSoon = (TextView) findViewById(R.id.coming_soon);
         if (comingSoon != null) {
@@ -310,7 +307,7 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
 //        }
 
         matrixTableAdapter = new MatrixTableAdapterV2(this, response.getMetrics(), backdated);
-        RecyclerView.LayoutManager gridLayoutManager = new LinearLayoutManager(MainActivityV2.this);
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivityV2.this,2);
         matrixList.setLayoutManager(gridLayoutManager);
         matrixList.setAdapter(matrixTableAdapter);
 
@@ -531,35 +528,6 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
     public void logoutUser() {
         logout();
         finish();
-    }
-
-    private void setAlarmForNotification() {
-        Calendar calendar = Calendar.getInstance();
-        SharedPreferences preferences = getSharedPreferences("UserInfo", MODE_PRIVATE);
-        String alarmTime = preferences.getString(StringConstants.ATTENDANCE_AT, "09:00");
-        try {
-            String hour = alarmTime.substring(0, 2);
-            String minute = alarmTime.substring(3, 4);
-
-            calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
-            calendar.set(Calendar.MINUTE, Integer.parseInt(minute));
-
-            if (Calendar.getInstance().getTimeInMillis() > calendar.getTimeInMillis()) {
-                calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
-            }
-
-            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            Intent alarmIntent = new Intent(MainActivityV2.this, AlarmReceiver.class);
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivityV2.this, 0, alarmIntent, 0);
-
-            if (alarmManager != null) {
-                alarmManager.cancel(pendingIntent);
-            }
-            alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

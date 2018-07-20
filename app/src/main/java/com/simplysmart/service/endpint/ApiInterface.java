@@ -14,6 +14,7 @@ import com.simplysmart.service.model.helpdesk.ComplaintUpdateRequest;
 import com.simplysmart.service.model.helpdesk.HelpDeskResponse;
 import com.simplysmart.service.model.helpdesk.MessageResponseClass;
 import com.simplysmart.service.model.matrix.AllReadingsData;
+import com.simplysmart.service.model.matrix.MatrixReadingData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.matrix.ReadingData;
 import com.simplysmart.service.model.sensor.SensorList;
@@ -118,4 +119,7 @@ public interface ApiInterface {
                                                       @Query("to_date") String to_date,
                                                       @Query("type") String type);
 
+
+    @POST("/api/metrics/")
+    Call<JsonObject> submitMatrixReading(@Body MatrixReadingData readingData);
 }

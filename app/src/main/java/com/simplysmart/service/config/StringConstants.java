@@ -54,4 +54,5 @@ public class StringConstants {
 
     public static final String ATTENDANCE_AT = "attendance_at";
     public static final String DISABLE_GALLERY = "disable_gallery";
+
 }

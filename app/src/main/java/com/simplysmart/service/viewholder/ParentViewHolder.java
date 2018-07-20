@@ -13,13 +13,13 @@ import com.simplysmart.service.R;
 
 public class ParentViewHolder extends RecyclerView.ViewHolder{
 
-    public TextView sensor_type;
+    public TextView typeName;
     public TextView unit;
     public LinearLayout parent;
 
     public ParentViewHolder(View itemView) {
         super(itemView);
-        this.sensor_type = (TextView)itemView.findViewById(R.id.typeName);
+        this.typeName = (TextView)itemView.findViewById(R.id.typeName);
         this.unit = (TextView) itemView.findViewById(R.id.unit);
         this.parent = (LinearLayout) itemView.findViewById(R.id.parentLayout);
     }

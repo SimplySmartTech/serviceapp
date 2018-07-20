@@ -77,4 +77,9 @@ public class ValueInputType implements Parcelable {
         dest.writeString(metric);
         dest.writeByte((byte) (bucket_system ? 1 : 0));
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

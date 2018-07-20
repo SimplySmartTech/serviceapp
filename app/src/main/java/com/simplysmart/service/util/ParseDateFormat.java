@@ -163,4 +163,33 @@ public class ParseDateFormat {
 
         return timeZoneSdf.format(c.getTime());
     }
+
+    public static String getDate(long milliSeconds) {
+
+        String dateFormat = "dd-MM-yyyy hh:mm a";
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
+
+    public static String getDateV2(long milliSeconds) {
+
+        String dateFormat = "dd/MM/yyyy";
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
+
+    public static String getCurrentDate(String outputFormat) {
+        try {
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat df = new SimpleDateFormat(outputFormat, Locale.getDefault());
+            return df.format(c.getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

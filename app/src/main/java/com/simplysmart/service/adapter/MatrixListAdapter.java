@@ -75,18 +75,18 @@ public class MatrixListAdapter extends RecyclerView.Adapter<ParentViewHolder> {
 
         if (tooltip.equals("")) {
             holder.unit.setVisibility(View.GONE);
-            holder.sensor_type.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+            holder.typeName.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         } else {
             holder.unit.setText(tooltip);
         }
 
         if (isUnicode) {
-            holder.sensor_type.setText(sensorName + "( " + "\u00B0" + " C)");
+            holder.typeName.setText(sensorName + "( " + "\u00B0" + " C)");
         } else {
-            holder.sensor_type.setText(sensorName + " (" + unit + ")");
+            holder.typeName.setText(sensorName + " (" + unit + ")");
         }
 
-        holder.sensor_type.setOnClickListener(new View.OnClickListener() {
+        holder.typeName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (data.getSensors() != null && data.getSensors().size() > 1) {

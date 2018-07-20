@@ -55,4 +55,9 @@ public class VehicleType implements Parcelable {
     public void setCapacity(double capacity) {
         this.capacity = capacity;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

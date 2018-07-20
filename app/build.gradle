@@ -54,11 +54,12 @@ repositories {
 }
 
 ext {
-    SUPPORT_LIB_VERSION = "26.0.1"
+    SUPPORT_LIB_VERSION = "26.1.0"
     GOOGLE_PLAY_SERVICE_VERSION = "11.0.2"
 }
 
 dependencies {
+
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -81,9 +82,9 @@ dependencies {
     compile "com.android.support:cardview-v7:$SUPPORT_LIB_VERSION"
     compile "com.google.android.gms:play-services-gcm:$GOOGLE_PLAY_SERVICE_VERSION"
 
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile 'com.amazonaws:aws-android-sdk-core:2.3.+'
@@ -93,9 +94,12 @@ dependencies {
 
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.android.support.constraint:constraint-layout:1.1.2'
     testCompile 'junit:junit:4.12'
     compile 'de.hdodenhof:circleimageview:2.2.0'
+
+    implementation "android.arch.persistence.room:runtime:1.1.1"
+    annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
 }
 
 apply plugin: 'com.google.gms.google-services'

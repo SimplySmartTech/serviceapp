@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by shekhar on 20/10/16.
  * Updated by shekhar on 16/07/18.
  */
-public class MatrixData implements Parcelable  {
+public class MatrixData implements Parcelable {
 
     private String type;
     private String utility_id;
@@ -21,10 +21,15 @@ public class MatrixData implements Parcelable  {
 
     //New fields
     private String name;
-    private ArrayList<ValueInputType> sub_menu;
+    private String unit;
+    private String identifier;
+    private String metric;
+    private boolean bucket_system;
+
     private ArrayList<VehicleType> vehicles;
 
-    public MatrixData(){
+
+    public MatrixData() {
 
     }
 
@@ -35,6 +40,12 @@ public class MatrixData implements Parcelable  {
         order = in.readInt();
         mandatory = in.readByte() != 0;
         sensors = in.createTypedArrayList(SensorData.CREATOR);
+        name = in.readString();
+        unit = in.readString();
+        identifier = in.readString();
+        metric = in.readString();
+        bucket_system = in.readByte() != 0;
+        vehicles = in.createTypedArrayList(VehicleType.CREATOR);
     }
 
     @Override
@@ -45,6 +56,12 @@ public class MatrixData implements Parcelable  {
         dest.writeInt(order);
         dest.writeByte((byte) (mandatory ? 1 : 0));
         dest.writeTypedList(sensors);
+        dest.writeString(name);
+        dest.writeString(unit);
+        dest.writeString(identifier);
+        dest.writeString(metric);
+        dest.writeByte((byte) (bucket_system ? 1 : 0));
+        dest.writeTypedList(vehicles);
     }
 
     @Override
@@ -63,6 +80,14 @@ public class MatrixData implements Parcelable  {
             return new MatrixData[size];
         }
     };
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
 
     public int getOrder() {
         return order;
@@ -120,19 +145,35 @@ public class MatrixData implements Parcelable  {
         this.name = name;
     }
 
-    public ArrayList<ValueInputType> getSub_menu() {
-        return sub_menu;
-    }
-
-    public void setSub_menu(ArrayList<ValueInputType> sub_menu) {
-        this.sub_menu = sub_menu;
-    }
-
     public ArrayList<VehicleType> getVehicles() {
         return vehicles;
     }
 
     public void setVehicles(ArrayList<VehicleType> vehicles) {
         this.vehicles = vehicles;
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getMetric() {
+        return metric;
+    }
+
+    public void setMetric(String metric) {
+        this.metric = metric;
+    }
+
+    public boolean isBucket_system() {
+        return bucket_system;
+    }
+
+    public void setBucket_system(boolean bucket_system) {
+        this.bucket_system = bucket_system;
     }
 }

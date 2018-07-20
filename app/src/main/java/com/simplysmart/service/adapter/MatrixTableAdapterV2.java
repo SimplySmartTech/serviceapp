@@ -1,12 +1,15 @@
 package com.simplysmart.service.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.simplysmart.service.R;
+import com.simplysmart.service.activity.InputReadingFormActivityV2;
+import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.viewholder.ParentViewHolder;
 
@@ -38,73 +41,24 @@ public class MatrixTableAdapterV2 extends RecyclerView.Adapter<ParentViewHolder>
 
         final MatrixData data = matrixData.get(position);
 
-        holder.sensor_type.setText(data.getName());
+        holder.typeName.setText(data.getName());
+        holder.unit.setText(data.getUnit());
 
-//        String sensorName = "";
-//        if (data.type != null) {
-//            sensorName = data.type;
-//        }
-//
-//        final List<SensorTable> sensorTable = SensorTable.getSensorList(data.utility_id);
-//        String unit = sensorTable.get(0).unit;
-//
-//        String tooltip = "";
-//        if (sensorTable.get(0).tooltip != null && sensorTable.get(0).tooltip.equalsIgnoreCase("")) {
-//            tooltip = sensorTable.get(0).tooltip;
-//        }
-//
-//        String unicodeUnit = "";
-//        boolean isUnicode = false;
-//        for (int i = 0; i < unit.length(); i++) {
-//            if (unit.contains("\\")) {
-//                isUnicode = true;
-//            }
-//        }
-//
-//        if (tooltip.equals("")) {
-//            holder.unit.setVisibility(View.GONE);
-//            holder.sensor_type.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-//        } else {
-//            holder.unit.setText(tooltip);
-//        }
-//
-//        if (isUnicode) {
-//            holder.sensor_type.setText(sensorName + "( " + "\u00B0" + " C)");
-//        } else {
-//            holder.sensor_type.setText(sensorName + " (" + unit + ")");
-//        }
-//
-//        holder.sensor_type.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (sensorTable.size() > 1) {
-//                    Intent i = new Intent(mContext, MatrixSensorListActivity.class);
-//                    i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
-//                    i.putExtra(StringConstants.BACKDATA,backdated);
-//                    mContext.startActivity(i);
-//                } else {
-//                    Intent i = new Intent(mContext, InputReadingFormActivity.class);
-//                    i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
-//                    i.putExtra(StringConstants.SENSOR_NAME, sensorTable.get(0).sensor_name);
-//                    i.putExtra(StringConstants.BACKDATA,backdated);
-//                    mContext.startActivity(i);
-//                }
-//            }
-//        });
+        holder.typeName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, InputReadingFormActivityV2.class);
+                intent.putExtra(StringConstants.METRIC_DATA, data);
+                mContext.startActivity(intent);
+            }
+        });
 
         holder.unit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (sensorTable != null && sensorTable.size() > 1) {
-//                    Intent i = new Intent(mContext, MatrixSensorListActivity.class);
-//                    i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
-//                    mContext.startActivity(i);
-//                } else {
-//                    Intent i = new Intent(mContext, InputReadingFormActivity.class);
-//                    i.putExtra(StringConstants.UTILITY_ID, data.utility_id);
-//                    i.putExtra(StringConstants.SENSOR_NAME, sensorTable.get(0).sensor_name);
-//                    mContext.startActivity(i);
-//                }
+                Intent intent = new Intent(mContext, InputReadingFormActivityV2.class);
+                intent.putExtra(StringConstants.METRIC_DATA, data);
+                mContext.startActivity(intent);
             }
         });
     }
