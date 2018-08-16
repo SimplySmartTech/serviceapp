@@ -1,6 +1,8 @@
 package com.simplysmart.service.activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -8,18 +10,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.TabAdapter;
 import com.simplysmart.service.common.CommonMethod;
-import com.simplysmart.service.config.GlobalData;
-import com.simplysmart.service.database.ReadingTable;
-import com.simplysmart.service.fragment.TodaySummaryFragment;
+import com.simplysmart.service.fragment.TodaySummaryFragmentV2;
 import com.simplysmart.service.fragment.YesterdaySummaryFragment;
+import com.simplysmart.service.model.matrix.MatrixReadingData;
+import com.simplysmart.service.model.matrix.ReadingDataResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -106,19 +108,31 @@ public class SummaryActivityV2 extends BaseActivity {
 
         ArrayList<String> dates = new ArrayList<>();
         ArrayList<Long> timeStamps = new ArrayList<>();
-        List<ReadingTable> allReadings = ReadingTable.getAllReadings(GlobalData.getInstance().getSelectedUnitId());
+        ArrayList<MatrixReadingData> readingDataArrayList = new ArrayList<>();
 
-        for (int i = 0; i < allReadings.size(); i++) {
+        SharedPreferences ReadingInfo = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        String readingDataString = ReadingInfo.getString("ReadingInfo", "");
 
-            String date = allReadings.get(i).date_of_reading;
-            if (dates.size() > 0) {
-                if (!dates.contains(date)) {
+        if (!readingDataString.isEmpty()) {
+            Gson gson = new Gson();
+            ReadingDataResponse readingDataResponse = gson.fromJson(readingDataString, ReadingDataResponse.class);
+            readingDataArrayList.addAll(readingDataResponse.getReadings());
+        }
+
+        if (readingDataArrayList.size() > 0) {
+
+            for (int i = 0; i < readingDataArrayList.size(); i++) {
+
+                String date = getDate(Long.parseLong(readingDataArrayList.get(i).getTimestamp()), "dd-MM-yyyy");
+                if (dates.size() > 0) {
+                    if (!dates.contains(date)) {
+                        dates.add(date);
+                        timeStamps.add(Long.parseLong(readingDataArrayList.get(i).getTimestamp()));
+                    }
+                } else {
                     dates.add(date);
-                    timeStamps.add(allReadings.get(i).timestamp);
+                    timeStamps.add(Long.parseLong(readingDataArrayList.get(i).getTimestamp()));
                 }
-            } else {
-                dates.add(date);
-                timeStamps.add(allReadings.get(i).timestamp);
             }
         }
 
@@ -135,31 +149,31 @@ public class SummaryActivityV2 extends BaseActivity {
             String today = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
 
             if (date1.equals(today) || date2.equals(today)) {
-                tabAdapter.addFragment(new TodaySummaryFragment(), "Today");
+                tabAdapter.addFragment(new TodaySummaryFragmentV2(), "Today");
                 tabAdapter.addFragment(new YesterdaySummaryFragment(), "Yesterday");
             } else {
                 if (CommonMethod.diffInDays(date1, "dd-MM-yyyy", date2, "dd-MM-yyyy") > 0) {
-                    tabAdapter.addFragment(new TodaySummaryFragment(), date1);
+                    tabAdapter.addFragment(new TodaySummaryFragmentV2(), date1);
                     tabAdapter.addFragment(new YesterdaySummaryFragment(), date2);
                 } else {
-                    tabAdapter.addFragment(new TodaySummaryFragment(), date2);
+                    tabAdapter.addFragment(new TodaySummaryFragmentV2(), date2);
                     tabAdapter.addFragment(new YesterdaySummaryFragment(), date1);
                 }
             }
         } else if (timeStamps.size() > 0) {
 
             if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dateForReadings, "dd/MM/yyyy") == -1) {
-                tabAdapter.addFragment(new TodaySummaryFragment(), dates.get(0));
+                tabAdapter.addFragment(new TodaySummaryFragmentV2(), dates.get(0));
                 tabAdapter.addFragment(new YesterdaySummaryFragment(), CommonMethod.getNextPrevDate(dates.get(0), "dd/MM/yyyy", true));
             } else if (CommonMethod.diffInDays(dates.get(0), "dd/MM/yyyy", dateForReadings, "dd/MM/yyyy") <= -2) {
-                tabAdapter.addFragment(new TodaySummaryFragment(), CommonMethod.getNextPrevDate(dates.get(0), "dd/MM/yyyy", false));
+                tabAdapter.addFragment(new TodaySummaryFragmentV2(), CommonMethod.getNextPrevDate(dates.get(0), "dd/MM/yyyy", false));
                 tabAdapter.addFragment(new YesterdaySummaryFragment(), dates.get(0));
             } else {
-                tabAdapter.addFragment(new TodaySummaryFragment(), "Today");
+                tabAdapter.addFragment(new TodaySummaryFragmentV2(), "Today");
                 tabAdapter.addFragment(new YesterdaySummaryFragment(), "Yesterday");
             }
         } else {
-            tabAdapter.addFragment(new TodaySummaryFragment(), "Today");
+            tabAdapter.addFragment(new TodaySummaryFragmentV2(), "Today");
             tabAdapter.addFragment(new YesterdaySummaryFragment(), "Yesterday");
         }
 
@@ -186,7 +200,7 @@ public class SummaryActivityV2 extends BaseActivity {
 
     public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat, Locale.getDefault());
         // Create a calendar object that will convert the date and time value in milliseconds to date.
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);

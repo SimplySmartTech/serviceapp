@@ -168,14 +168,27 @@ public class InputReadingFormActivityV2 extends BaseActivity implements EditDial
         }
     }
 
-    private void setDataToPreference() {
+    private void setDataToPreference(MatrixReadingData readingData) {
+
+        SharedPreferences ReadingInfo = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        String readingDataString = ReadingInfo.getString("ReadingInfo", "");
 
         Gson gson = new Gson();
-        String readingDataString = gson.toJson(new ReadingDataResponse(readingDataArrayList));
-        SharedPreferences ReadingInfo = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor preferencesEditor = ReadingInfo.edit();
-        preferencesEditor.putString("ReadingInfo", readingDataString);
-        preferencesEditor.apply();
+        if (!readingDataString.isEmpty()) {
+            ReadingDataResponse readingDataResponse = gson.fromJson(readingDataString, ReadingDataResponse.class);
+            ArrayList<MatrixReadingData> matrixReadingData = readingDataResponse.getReadings();
+            matrixReadingData.add(readingData);
+            readingDataResponse.setReadings(matrixReadingData);
+            String finalReadingDataString = gson.toJson(readingDataResponse);
+            SharedPreferences.Editor preferencesEditor = ReadingInfo.edit();
+            preferencesEditor.putString("ReadingInfo", finalReadingDataString);
+            preferencesEditor.apply();
+        } else {
+            String finalReadingDataString = gson.toJson(new ReadingDataResponse(readingDataArrayList));
+            SharedPreferences.Editor preferencesEditor = ReadingInfo.edit();
+            preferencesEditor.putString("ReadingInfo", finalReadingDataString);
+            preferencesEditor.apply();
+        }
     }
 
     private void setDataInList(ArrayList<MatrixReadingData> readings) {
@@ -375,7 +388,7 @@ public class InputReadingFormActivityV2 extends BaseActivity implements EditDial
         showSnackBar(mParentLayout, "Data Saved");
         mInputReadingValue.setText("");
         readingDataArrayList.add(readingData);
-        setDataToPreference();
+        setDataToPreference(readingData);
         setDataInList(readingDataArrayList);
 
 //        if (NetworkUtilities.isInternet(InputReadingFormActivityV2.this)) {
@@ -390,9 +403,9 @@ public class InputReadingFormActivityV2 extends BaseActivity implements EditDial
 //                    if (response.isSuccessful()) {
 //                        showSnackBar(mParentLayout, "Data uploaded successfully");
 //                        mInputReadingValue.setText("");
-//                        readingDataArrayList.add(readingData);
-//                        setDataToPreference();
-//                        setDataInList(readingDataArrayList);
+////                        readingDataArrayList.add(readingData);
+////                        setDataToPreference();
+////                        setDataInList(readingDataArrayList);
 //                    }
 //                }
 //
