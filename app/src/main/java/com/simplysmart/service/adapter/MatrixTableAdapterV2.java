@@ -1,5 +1,6 @@
 package com.simplysmart.service.adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.InputReadingFormActivityV2;
 import com.simplysmart.service.config.StringConstants;
+import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.viewholder.ParentViewHolder;
 
@@ -37,7 +39,7 @@ public class MatrixTableAdapterV2 extends RecyclerView.Adapter<ParentViewHolder>
     }
 
     @Override
-    public void onBindViewHolder(ParentViewHolder holder, int position) {
+    public void onBindViewHolder(ParentViewHolder holder, final int position) {
 
         final MatrixData data = matrixData.get(position);
 
@@ -47,20 +49,32 @@ public class MatrixTableAdapterV2 extends RecyclerView.Adapter<ParentViewHolder>
         holder.typeName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, InputReadingFormActivityV2.class);
-                intent.putExtra(StringConstants.METRIC_DATA, data);
-                mContext.startActivity(intent);
+                if (position == matrixData.size() - 1) {
+                    AlertDialogStandard.newInstance(mContext.getString(R.string.app_name), "Add New Sensor", "", "OK")
+                            .show(((Activity) mContext).getFragmentManager(), "add new");
+                } else {
+                    switchToInputReadingScreen(data);
+                }
             }
         });
 
         holder.unit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, InputReadingFormActivityV2.class);
-                intent.putExtra(StringConstants.METRIC_DATA, data);
-                mContext.startActivity(intent);
+                if (position == matrixData.size() - 1) {
+                    AlertDialogStandard.newInstance(mContext.getString(R.string.app_name), "Add New Sensor", "", "OK")
+                            .show(((Activity) mContext).getFragmentManager(), "add new");
+                } else {
+                    switchToInputReadingScreen(data);
+                }
             }
         });
+    }
+
+    private void switchToInputReadingScreen(MatrixData data) {
+        Intent intent = new Intent(mContext, InputReadingFormActivityV2.class);
+        intent.putExtra(StringConstants.METRIC_DATA, data);
+        mContext.startActivity(intent);
     }
 
     @Override

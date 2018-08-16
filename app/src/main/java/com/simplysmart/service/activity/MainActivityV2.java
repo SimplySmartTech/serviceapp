@@ -49,6 +49,7 @@ import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.LogoutListener;
 import com.simplysmart.service.model.common.APIError;
+import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.MatrixResponse;
 import com.simplysmart.service.model.user.AccessPolicy;
 import com.simplysmart.service.model.user.Unit;
@@ -177,7 +178,8 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
             getMatrixRequest(GlobalData.getInstance().getSelectedUnitId(), GlobalData.getInstance().getSubDomain());
         } else {
             swipeRefreshLayout.setRefreshing(true);
-            setOfflineData();
+//            setOfflineData();
+            getDataFromPreference();
             swipeRefreshLayout.setRefreshing(false);
         }
     }
@@ -282,38 +284,42 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
 
         swipeRefreshLayout.setRefreshing(false);
 
-//        ArrayList<MatrixData> matrixDataArrayList = response.getData();
-//        ArrayList<TareWeight> tareWeights = response.getTare_weights();
-//
-//        try {
-//            for (int i = 0; i < matrixDataArrayList.size(); i++) {
-//                MatrixTable matrixTable = new MatrixTable(matrixDataArrayList.get(i), GlobalData.getInstance().getSelectedUnitId());
-//                matrixTable.save();
-//
-//                //Save sensors for this metric.
-//                for (int j = 0; j < matrixDataArrayList.get(i).getSensors().size(); j++) {
-//                    SensorTable sensorTable = new SensorTable(matrixDataArrayList.get(i).getSensors().get(j));
-//                    sensorTable.save();
-//                }
-//            }
-//
-//            for (int i = 0; i < tareWeights.size(); i++) {
-//                TareWeightTable tareWeightTable = new TareWeightTable(tareWeights.get(i), GlobalData.getInstance().getSelectedUnitId());
-//                tareWeightTable.save();
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        ArrayList<MatrixData> matrixData = response.getFinalMetrics();
+        setDataToPreference(matrixData);
 
-        matrixTableAdapter = new MatrixTableAdapterV2(this, response.getMetrics(), backdated);
-        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivityV2.this,2);
+        matrixTableAdapter = new MatrixTableAdapterV2(this, matrixData, backdated);
+        RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivityV2.this, 3);
         matrixList.setLayoutManager(gridLayoutManager);
         matrixList.setAdapter(matrixTableAdapter);
 
-//        List<MatrixTable> matrixList = MatrixTable.getMatrixList(GlobalData.getInstance().getSelectedUnitId());
-//        setDataInList(matrixList);
+    }
 
+    private void getDataFromPreference() {
+
+        SharedPreferences ReadingInfo = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        String MatrixResponseString = ReadingInfo.getString("MatrixResponse", "");
+
+        if (!MatrixResponseString.isEmpty()) {
+            Gson gson = new Gson();
+            MatrixResponse readingDataResponse = gson.fromJson(MatrixResponseString, MatrixResponse.class);
+
+            matrixTableAdapter = new MatrixTableAdapterV2(this, readingDataResponse.getMetrics(), backdated);
+            RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(MainActivityV2.this, 3);
+            matrixList.setLayoutManager(gridLayoutManager);
+            matrixList.setAdapter(matrixTableAdapter);
+        }
+    }
+
+    private void setDataToPreference(ArrayList<MatrixData> matrixData) {
+
+        Gson gson = new Gson();
+        MatrixResponse response = new MatrixResponse();
+        response.setMetrics(matrixData);
+        String MatrixResponseString = gson.toJson(response);
+        SharedPreferences ReadingInfo = getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor preferencesEditor = ReadingInfo.edit();
+        preferencesEditor.putString("MatrixResponse", MatrixResponseString);
+        preferencesEditor.apply();
     }
 
     private void setDataInList(List<MatrixTable> list) {
@@ -494,7 +500,8 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
                                 }
                             });
                         } else {
-                            setOfflineData();
+//                            setOfflineData();
+                            getDataFromPreference();
                         }
                         return true;
                 }

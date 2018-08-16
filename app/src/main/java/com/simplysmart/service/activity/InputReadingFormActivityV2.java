@@ -46,7 +46,6 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.ReadingListAdapterV2;
 import com.simplysmart.service.aws.AWSConstants;
@@ -54,11 +53,8 @@ import com.simplysmart.service.aws.Util;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
 import com.simplysmart.service.config.GlobalData;
-import com.simplysmart.service.config.NetworkUtilities;
-import com.simplysmart.service.config.ServiceGeneratorV2;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.ReadingTable;
-import com.simplysmart.service.endpint.ApiInterface;
 import com.simplysmart.service.interfaces.EditDialogListener;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.model.matrix.MatrixReadingData;
@@ -80,10 +76,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.view.View.GONE;
 
@@ -380,34 +372,39 @@ public class InputReadingFormActivityV2 extends BaseActivity implements EditDial
             readingData.setReading(mInputReadingValue.getText().toString().trim());
         }
 
-        if (NetworkUtilities.isInternet(InputReadingFormActivityV2.this)) {
+        showSnackBar(mParentLayout, "Data Saved");
+        mInputReadingValue.setText("");
+        readingDataArrayList.add(readingData);
+        setDataToPreference();
+        setDataInList(readingDataArrayList);
 
-            showActivitySpinner();
-            ApiInterface apiInterface = ServiceGeneratorV2.createService(ApiInterface.class);
-            Call<JsonObject> call = apiInterface.submitMatrixReading(readingData);
-            call.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
-                    dismissActivitySpinner();
-                    if (response.isSuccessful()) {
-                        showSnackBar(mParentLayout, "Data uploaded successfully");
-                        mInputReadingValue.setText("");
-
-                        readingDataArrayList.add(readingData);
-                        setDataToPreference();
-                        setDataInList(readingDataArrayList);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    dismissActivitySpinner();
-                    showSnackBar(mParentLayout, getString(R.string.error_in_network));
-                }
-            });
-        } else {
-            showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection));
-        }
+//        if (NetworkUtilities.isInternet(InputReadingFormActivityV2.this)) {
+//
+//            showActivitySpinner();
+//            ApiInterface apiInterface = ServiceGeneratorV2.createService(ApiInterface.class);
+//            Call<JsonObject> call = apiInterface.submitMatrixReading(readingData);
+//            call.enqueue(new Callback<JsonObject>() {
+//                @Override
+//                public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
+//                    dismissActivitySpinner();
+//                    if (response.isSuccessful()) {
+//                        showSnackBar(mParentLayout, "Data uploaded successfully");
+//                        mInputReadingValue.setText("");
+//                        readingDataArrayList.add(readingData);
+//                        setDataToPreference();
+//                        setDataInList(readingDataArrayList);
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<JsonObject> call, Throwable t) {
+//                    dismissActivitySpinner();
+//                    showSnackBar(mParentLayout, getString(R.string.error_in_network));
+//                }
+//            });
+//        } else {
+//            showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection));
+//        }
     }
 
     public void customImagePicker() {

@@ -14,15 +14,23 @@ public class MatrixResponse implements Parcelable {
     private ArrayList<MatrixData> metrics;
     private ArrayList<TareWeight> tare_weights;
 
-    protected MatrixResponse(Parcel in) {
+    private ArrayList<MatrixData> getFinalMetrics;
+
+    public MatrixResponse(Parcel in) {
         metrics = in.createTypedArrayList(MatrixData.CREATOR);
         tare_weights = in.createTypedArrayList(TareWeight.CREATOR);
+        getFinalMetrics = in.createTypedArrayList(MatrixData.CREATOR);
+    }
+
+    public MatrixResponse() {
+
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(metrics);
         dest.writeTypedList(tare_weights);
+        dest.writeTypedList(getFinalMetrics);
     }
 
     @Override
@@ -64,6 +72,21 @@ public class MatrixResponse implements Parcelable {
 
     public void setTare_weights(ArrayList<TareWeight> tare_weights) {
         this.tare_weights = tare_weights;
+    }
+
+    public ArrayList<MatrixData> getFinalMetrics() {
+
+        ArrayList<MatrixData> finalList = new ArrayList<>();
+        if (metrics == null) return finalList;
+
+        for (MatrixData metric : metrics) {
+            for (MatrixData matrixData : metric.getSub_menu()) {
+                matrixData.setVehicles(metric.getVehicles());
+            }
+            finalList.addAll(metric.getSub_menu());
+        }
+
+        return finalList;
     }
 
 }

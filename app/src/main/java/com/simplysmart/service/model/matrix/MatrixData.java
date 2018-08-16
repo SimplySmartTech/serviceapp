@@ -26,6 +26,7 @@ public class MatrixData implements Parcelable {
     private String metric;
     private boolean bucket_system;
 
+    private ArrayList<MatrixData> sub_menu;
     private ArrayList<VehicleType> vehicles;
 
 
@@ -45,6 +46,7 @@ public class MatrixData implements Parcelable {
         identifier = in.readString();
         metric = in.readString();
         bucket_system = in.readByte() != 0;
+        sub_menu = in.createTypedArrayList(MatrixData.CREATOR);
         vehicles = in.createTypedArrayList(VehicleType.CREATOR);
     }
 
@@ -61,6 +63,7 @@ public class MatrixData implements Parcelable {
         dest.writeString(identifier);
         dest.writeString(metric);
         dest.writeByte((byte) (bucket_system ? 1 : 0));
+        dest.writeTypedList(sub_menu);
         dest.writeTypedList(vehicles);
     }
 
@@ -80,6 +83,14 @@ public class MatrixData implements Parcelable {
             return new MatrixData[size];
         }
     };
+
+    public ArrayList<MatrixData> getSub_menu() {
+        return sub_menu;
+    }
+
+    public void setSub_menu(ArrayList<MatrixData> sub_menu) {
+        this.sub_menu = sub_menu;
+    }
 
     public String getUnit() {
         return unit;
