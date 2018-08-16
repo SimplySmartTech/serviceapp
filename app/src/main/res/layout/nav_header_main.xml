@@ -21,9 +21,10 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:padding="10dp"
-            app:srcCompat="@drawable/ic_launcher" />
+            app:srcCompat="@mipmap/ic_launcher" />
 
         <LinearLayout
+            android:id="@+id/nameLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/companyLogo"
@@ -79,6 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true" />
+
     </RelativeLayout>
 
 </LinearLayout>

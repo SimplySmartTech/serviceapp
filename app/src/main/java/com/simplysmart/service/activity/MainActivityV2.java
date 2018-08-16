@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.activeandroid.query.Delete;
-import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.MatrixTableAdapterV2;
@@ -41,7 +40,6 @@ import com.simplysmart.service.config.NetworkUtilities;
 import com.simplysmart.service.config.ServiceGeneratorV2;
 import com.simplysmart.service.config.StringConstants;
 import com.simplysmart.service.database.MatrixTable;
-import com.simplysmart.service.database.ReadingTable;
 import com.simplysmart.service.database.SensorTable;
 import com.simplysmart.service.database.TareWeightTable;
 import com.simplysmart.service.dialog.AlertDialogLogout;
@@ -215,7 +213,7 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
         TextView companyName = (TextView) view.findViewById(R.id.companyName);
         TextView userName = (TextView) view.findViewById(R.id.userName);
 
-        companyLogo.setImageResource(R.drawable.ic_launcher);
+        companyLogo.setImageResource(R.mipmap.ic_launcher);
         companyName.setText(residentData.getCompany().getName());
         userName.setText(residentData.getName());
 
@@ -414,8 +412,8 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
         String month;
         int dateOfMonth;
 
-        ReadingTable readings = new Select().from(ReadingTable.class).executeSingle();
-        if (readings != null) {
+//        ReadingTable readings = new Select().from(ReadingTable.class).executeSingle();
+//        if (readings != null) {
 //            String oldDate = getDate(readings.timestamp, "dd-MM-yyyy");
 //            String newDate = getDate(Calendar.getInstance().getTimeInMillis(), "dd-MM-yyyy");
 //            if (!oldDate.equals(newDate)) {
@@ -428,18 +426,18 @@ public class MainActivityV2 extends GetLocationBaseActivity implements LogoutLis
 //                dateOfMonth = calendar.get(Calendar.DATE);
 //                buttonText = "Submit readings for " + dateOfMonth + " " + month;
 //            }
-            buttonText = "Submit readings";
-        } else {
+//            buttonText = "Submit readings";
+//        } else {
             month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault());
             dateOfMonth = calendar.get(Calendar.DATE);
             buttonText = "Submit readings for " + dateOfMonth + " " + month;
-        }
+//        }
 
         submitButton.setText(buttonText);
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(MainActivityV2.this, SummaryActivity.class);
+                Intent i = new Intent(MainActivityV2.this, SummaryActivityV2.class);
                 startActivity(i);
             }
         });
