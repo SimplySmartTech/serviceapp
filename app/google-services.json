@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:290115473097:android:4d65c5f3e5fc6fae",
         "android_client_info": {
-          "package_name": "com.simplysmart.service"
+          "package_name": "com.simplysmart.service.wastemanagement"
         }
       },
       "oauth_client": [

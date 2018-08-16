@@ -6,7 +6,7 @@ android {
 //    buildToolsVersion versions.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.simplysmart.service"
+        applicationId "com.simplysmart.service.wastemanagement"
         minSdkVersion versions.minSdkVersion
         targetSdkVersion versions.targetSdkVersion
         versionCode 15
