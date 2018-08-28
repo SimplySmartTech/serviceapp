@@ -102,13 +102,6 @@ public class TodaySummaryFragmentV2 extends BaseFragment implements EditDialogLi
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-//        if (NetworkUtilities.isInternet(getActivity())) {
-//            Intent i = new Intent(getActivity(), PhotoUploadService.class);
-//            i.putExtra(StringConstants.USE_UNIT, true);
-//            i.putExtra(StringConstants.UNIT_ID, GlobalData.getInstance().getSelectedUnitId());
-//            getActivity().startService(i);
-//        }
-
         bindViews();
         showActivitySpinner();
 //        setDataForSummary();
@@ -162,6 +155,17 @@ public class TodaySummaryFragmentV2 extends BaseFragment implements EditDialogLi
         summary = (RecyclerView) rootView.findViewById(R.id.summary);
         submit = (Button) rootView.findViewById(R.id.submit);
 
+        no_data_found = (TextView) rootView.findViewById(R.id.no_data_found);
+        add_new_data = (Button) rootView.findViewById(R.id.add_reading_now);
+        add_new_data.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), MainActivityV2.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
+            }
+        });
+
         sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
         Calendar c = Calendar.getInstance();
@@ -170,7 +174,6 @@ public class TodaySummaryFragmentV2 extends BaseFragment implements EditDialogLi
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
                 if (NetworkUtilities.isInternet(getActivity())) {
 
@@ -187,54 +190,28 @@ public class TodaySummaryFragmentV2 extends BaseFragment implements EditDialogLi
                             @Override
                             public void onResponse(Call<JsonObject> call, final Response<JsonObject> response) {
 
-                                if (finalI == readingDataArrayList.size() - 1) {
-                                    dismissActivitySpinner();
-                                    hideList();
-                                    SharedPreferences ReadingInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor preferencesEditor = ReadingInfo.edit();
-                                    preferencesEditor.putString("ReadingInfo", "");
-                                    preferencesEditor.apply();
+                                if (response.isSuccessful()) {
+                                    if (finalI == readingDataArrayList.size() - 1) {
+                                        dismissActivitySpinner();
+                                        hideList();
+                                        SharedPreferences ReadingInfo = getActivity().getSharedPreferences("UserInfo", Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor preferencesEditor = ReadingInfo.edit();
+                                        preferencesEditor.putString("ReadingInfo", "");
+                                        preferencesEditor.apply();
+                                    }
                                 }
-
-//                                if (response.isSuccessful()) {
-//                                    showSnackBar(mParentLayout, "Data uploaded successfully");
-//                                    mInputReadingValue.setText("");
-//                        readingDataArrayList.add(readingData);
-//                        setDataToPreference();
-//                        setDataInList(readingDataArrayList);
-//                                }
                             }
 
                             @Override
                             public void onFailure(Call<JsonObject> call, Throwable t) {
                                 if (finalI == readingDataArrayList.size() - 1)
                                     dismissActivitySpinner();
-//                                showSnackBar(mParentLayout, getString(R.string.error_in_network));
                             }
                         });
-
                     }
                 } else {
-//                    showSnackBar(mParentLayout, getString(R.string.error_no_internet_connection));
+                    showSnackBar(rootView, getString(R.string.error_no_internet_connection), true);
                 }
-
-//                String mandatory = checkAllMandatoryReadings();
-//                if (mandatory.equals("")) {
-//                    checkAndSubmitData();
-//                } else {
-//                    showMandatoryDialog(mandatory);
-//                }
-            }
-        });
-
-        no_data_found = (TextView) rootView.findViewById(R.id.no_data_found);
-        add_new_data = (Button) rootView.findViewById(R.id.add_reading_now);
-        add_new_data.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getActivity(), MainActivityV2.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(i);
             }
         });
     }
@@ -337,6 +314,7 @@ public class TodaySummaryFragmentV2 extends BaseFragment implements EditDialogLi
     }
 
     private void setDataInList(ArrayList<MatrixReadingData> readings) {
+
         Collections.sort(readings, new Comparator<MatrixReadingData>() {
             @Override
             public int compare(MatrixReadingData lhs, MatrixReadingData rhs) {

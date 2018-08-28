@@ -15,17 +15,20 @@ public class MatrixReadingData implements Parcelable {
     private String timestamp;
     private String unit;
 
-    public MatrixReadingData(Parcel in) {
+    private String sensor_name;
+
+    public MatrixReadingData() {
+
+    }
+
+    protected MatrixReadingData(Parcel in) {
         subdomain = in.readString();
         site_id = in.readString();
         reading = in.readString();
         identifier = in.readString();
         timestamp = in.readString();
         unit = in.readString();
-    }
-
-    public MatrixReadingData() {
-
+        sensor_name = in.readString();
     }
 
     @Override
@@ -36,6 +39,7 @@ public class MatrixReadingData implements Parcelable {
         dest.writeString(identifier);
         dest.writeString(timestamp);
         dest.writeString(unit);
+        dest.writeString(sensor_name);
     }
 
     @Override
@@ -54,6 +58,14 @@ public class MatrixReadingData implements Parcelable {
             return new MatrixReadingData[size];
         }
     };
+
+    public String getSensor_name() {
+        return sensor_name;
+    }
+
+    public void setSensor_name(String sensor_name) {
+        this.sensor_name = sensor_name;
+    }
 
     public String getUnit() {
         return unit;

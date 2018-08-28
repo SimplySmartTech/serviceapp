@@ -1,6 +1,5 @@
 package com.simplysmart.service.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +10,6 @@ import android.view.ViewGroup;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.InputReadingFormActivityV2;
 import com.simplysmart.service.config.StringConstants;
-import com.simplysmart.service.dialog.AlertDialogStandard;
 import com.simplysmart.service.model.matrix.MatrixData;
 import com.simplysmart.service.viewholder.ParentViewHolder;
 
@@ -49,24 +47,14 @@ public class MatrixTableAdapterV2 extends RecyclerView.Adapter<ParentViewHolder>
         holder.typeName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (position == matrixData.size() - 1) {
-                    AlertDialogStandard.newInstance(mContext.getString(R.string.app_name), "Add New Sensor", "", "OK")
-                            .show(((Activity) mContext).getFragmentManager(), "add new");
-                } else {
-                    switchToInputReadingScreen(data);
-                }
+                switchToInputReadingScreen(data);
             }
         });
 
         holder.unit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (position == matrixData.size() - 1) {
-                    AlertDialogStandard.newInstance(mContext.getString(R.string.app_name), "Add New Sensor", "", "OK")
-                            .show(((Activity) mContext).getFragmentManager(), "add new");
-                } else {
-                    switchToInputReadingScreen(data);
-                }
+                switchToInputReadingScreen(data);
             }
         });
     }

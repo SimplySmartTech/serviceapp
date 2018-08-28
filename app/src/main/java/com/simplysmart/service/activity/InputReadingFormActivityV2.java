@@ -376,6 +376,7 @@ public class InputReadingFormActivityV2 extends BaseActivity implements EditDial
         readingData.setSubdomain(GlobalData.getInstance().getSubDomain());
         readingData.setSite_id(GlobalData.getInstance().getSelectedUnitId());
         readingData.setIdentifier(matrixData.getIdentifier());
+        readingData.setSensor_name(matrixData.getName());
         readingData.setTimestamp(String.valueOf(Calendar.getInstance().getTimeInMillis()));
 
         if (vehicleSelectionSpinnerLayout.isShown()) {
