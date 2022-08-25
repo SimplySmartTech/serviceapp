@@ -36,14 +36,14 @@ android {
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-            applicationVariants.all { variant ->
-                variant.outputs.each { output ->
-                    def newName = output.outputFile.name
-                    newName = newName.replace("app-", "Service")
-                    newName = newName.replace("release", "App")
-                    output.outputFile = new File(output.outputFile.parent, newName)
-                }
-            }
+//            applicationVariants.all { variant ->
+//                variant.outputs.each { output ->
+//                    def newName = output.outputFile.name
+//                    newName = newName.replace("app-", "Service")
+//                    newName = newName.replace("release", "App")
+//                    output.outputFile = new File(output.outputFile.parent, newName)
+//                }
+//            }
         }
     }
 }
