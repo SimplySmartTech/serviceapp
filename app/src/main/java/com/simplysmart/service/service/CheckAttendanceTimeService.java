@@ -5,10 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 
-import com.google.gson.JsonObject;
-import com.simplysmart.service.aws.Util;
+import androidx.annotation.Nullable;
+
 import com.simplysmart.service.config.GlobalData;
 import com.simplysmart.service.config.ServiceGenerator;
 import com.simplysmart.service.config.StringConstants;

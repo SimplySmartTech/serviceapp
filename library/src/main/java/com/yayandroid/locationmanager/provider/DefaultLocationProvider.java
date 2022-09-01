@@ -1,5 +1,6 @@
 package com.yayandroid.locationmanager.provider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,8 +9,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.yayandroid.locationmanager.constants.FailType;
 import com.yayandroid.locationmanager.constants.LogType;
@@ -36,6 +38,7 @@ public class DefaultLocationProvider extends LocationProvider {
         this.locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -183,7 +186,7 @@ public class DefaultLocationProvider extends LocationProvider {
         this.provider = provider;
 
         boolean locationIsAlreadyAvailable = false;
-        Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
+        @SuppressLint("MissingPermission") Location lastKnownLocation = locationManager.getLastKnownLocation(provider);
 
         if (LocationUtils.isUsable(configuration, lastKnownLocation)) {
             LogUtils.logI("LastKnowLocation is usable.", LogType.IMPORTANT);

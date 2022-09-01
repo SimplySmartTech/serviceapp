@@ -3,14 +3,6 @@ package com.simplysmart.service.gcm;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
-import com.google.android.gms.gcm.GcmPubSub;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.google.android.gms.iid.InstanceID;
-import com.simplysmart.service.R;
 
 import java.io.IOException;
 
@@ -26,7 +18,7 @@ public class RegistrationIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        /*sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String token = "";
 
         try {
@@ -49,7 +41,7 @@ public class RegistrationIntentService extends IntentService {
         // Notify UI that registration has completed, so the progress indicator can be hidden.
         Intent registrationComplete = new Intent(QuickstartPreferences.REGISTRATION_COMPLETE);
         registrationComplete.putExtra(QuickstartPreferences.GCM_TOKEN, token);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);*/
     }
 
     private void sendRegistrationToServer(String token) {
@@ -65,10 +57,10 @@ public class RegistrationIntentService extends IntentService {
      */
     // [START subscribe_topics]
     private void subscribeTopics(String token) throws IOException {
-        GcmPubSub pubSub = GcmPubSub.getInstance(this);
+       /* GcmPubSub pubSub = GcmPubSub.getInstance(this);
         for (String topic : TOPICS) {
             pubSub.subscribe(token, "/topics/" + topic, null);
-        }
+        }*/
     }
     // [END subscribe_topics]
 

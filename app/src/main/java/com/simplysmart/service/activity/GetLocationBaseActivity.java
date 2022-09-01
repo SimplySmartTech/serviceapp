@@ -21,15 +21,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.core.content.ContextCompat;
+
 import com.activeandroid.query.Delete;
+import com.google.android.material.snackbar.Snackbar;
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
@@ -135,7 +136,7 @@ public abstract class GetLocationBaseActivity extends LocationBaseActivity {
     protected void showMyDialog(String title, String message, String positiveButton) {
         try {
             AlertDialogStandard newDialog = AlertDialogStandard.newInstance(title, message, "", positiveButton);
-            newDialog.show(fragmentManager, "show dialog");
+            newDialog.show(getSupportFragmentManager(), "show dialog");
         } catch (Exception e) {
             e.printStackTrace();
         }

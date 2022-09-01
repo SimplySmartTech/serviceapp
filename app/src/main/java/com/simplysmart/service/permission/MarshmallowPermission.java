@@ -2,10 +2,10 @@ package com.simplysmart.service.permission;
 
 import android.Manifest;
 import android.app.Activity;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.view.accessibility.CaptioningManager;
+
+import androidx.core.app.ActivityCompat;
 
 public class MarshmallowPermission {
 

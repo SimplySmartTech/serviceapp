@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,6 +52,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+import androidx.appcompat.widget.Toolbar;
 
 public class CreateComplaintActivity extends BaseActivity implements View.OnClickListener {
 

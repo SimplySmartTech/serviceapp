@@ -21,12 +21,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.support.annotation.StringRes;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.yayandroid.locationmanager.constants.RequestCode;
 
@@ -65,7 +66,7 @@ public class PermissionManager {
     }
 
     public static void requestPermissions(final Object object, final PermissionListener listener, String rationale,
-          @StringRes int positiveButton,
+                                          @StringRes int positiveButton,
                                           @StringRes int negativeButton, final String... perms) {
 
         checkCallingObjectSuitability(object);

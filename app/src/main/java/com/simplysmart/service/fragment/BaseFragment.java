@@ -19,16 +19,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.activeandroid.query.Delete;
+import com.google.android.material.snackbar.Snackbar;
 import com.simplysmart.service.R;
 import com.simplysmart.service.activity.LoginActivity;
 import com.simplysmart.service.common.CommonMethod;

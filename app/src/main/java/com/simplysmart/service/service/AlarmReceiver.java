@@ -4,7 +4,8 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
+
+import androidx.legacy.content.WakefulBroadcastReceiver;
 
 /**
  * Created by shekhar on 27/12/16.

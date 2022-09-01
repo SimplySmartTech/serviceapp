@@ -2,7 +2,6 @@ package com.simplysmart.service.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -21,17 +20,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.support.annotation.RequiresPermission;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+
 import com.activeandroid.query.Delete;
+import com.google.android.material.snackbar.Snackbar;
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.CommonMethod;
 import com.simplysmart.service.common.DebugLog;
@@ -68,7 +68,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        fragmentManager = getFragmentManager();
+        fragmentManager = getSupportFragmentManager();
         context = BaseActivity.this;
 
         spinningDialog = CustomProgressDialog.showProgressDialog(context);

@@ -8,16 +8,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentResultListener;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -279,7 +282,7 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
 
     private void setDataInList() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        adapter = new SummaryListAdapter(summaryList, getActivity(), getFragmentManager());
+        adapter = new SummaryListAdapter(summaryList, getActivity(), getParentFragmentManager());
         summary.setLayoutManager(linearLayoutManager);
         summary.setAdapter(adapter);
 
@@ -514,34 +517,45 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
             ft.remove(prev);
         }
         ft.addToBackStack(null);
-
+        String key  = "";
         switch (type) {
 
             case MANDATORY_DIALOG_FRAGMENT:
                 AlertDialogMandatoryV2 alertDialogMandatory = AlertDialogMandatoryV2.newInstance("Alert", getString(R.string.alert_txt_madatory) + contentString, "", "OK");
-                alertDialogMandatory.setTargetFragment(this, MANDATORY_DIALOG_FRAGMENT);
-                alertDialogMandatory.show(getFragmentManager().beginTransaction(), "alertDialogMandatory");
+                //alertDialogMandatory.setTargetFragment(this, MANDATORY_DIALOG_FRAGMENT);
+                key = "MANDATORY_DIALOG_FRAGMENT";
+                alertDialogMandatory.show(getParentFragmentManager().beginTransaction(), "alertDialogMandatory");
                 break;
 
             case SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT:
                 SubmitReadingWithoutImageDialogV2 submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialogV2.newInstance("Alert", getString(R.string.alert_txt_upload_without_image), "No", "Yes");
-                submitReadingWithoutImageDialog.setTargetFragment(this, SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT);
-                submitReadingWithoutImageDialog.show(getFragmentManager().beginTransaction(), "submitReadingWithoutImageDialog");
+                //submitReadingWithoutImageDialog.setTargetFragment(this, SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT);
+                key = "SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT";
+                submitReadingWithoutImageDialog.show(getParentFragmentManager().beginTransaction(), "submitReadingWithoutImageDialog");
                 break;
 
             case SUBMIT_DATA_WITHOUT_INTERNET:
                 SubmitWithoutInternetDialogV2 dataToSend = SubmitWithoutInternetDialogV2.newInstance("Alert", getString(R.string.after_internet_send), "", "OK");
-                dataToSend.setTargetFragment(this, SUBMIT_DATA_WITHOUT_INTERNET);
-                dataToSend.show(getFragmentManager().beginTransaction(), "dataToSend");
+                //dataToSend.setTargetFragment(this, SUBMIT_DATA_WITHOUT_INTERNET);
+                key = "SUBMIT_DATA_WITHOUT_INTERNET";
+                dataToSend.show(getParentFragmentManager().beginTransaction(), "dataToSend");
                 break;
         }
+
+        getActivity().getSupportFragmentManager().setFragmentResultListener(key, this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+
+                onActivityResult(requestKey,result.getInt("RESULT"));
+            }
+        });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    public void onActivityResult(String requestCode, int resultCode) {
         switch (requestCode) {
 
-            case MANDATORY_DIALOG_FRAGMENT:
+            case "MANDATORY_DIALOG_FRAGMENT":
 
                 if (resultCode == Activity.RESULT_OK) {
                     DebugLog.d("CALLED MANDATORY_DIALOG_FRAGMENT");
@@ -552,7 +566,7 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
                 }
                 break;
 
-            case SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT:
+            case "SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT":
 
                 if (resultCode == Activity.RESULT_OK) {
                     DebugLog.d("CALLED SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT");
@@ -563,7 +577,7 @@ public class TodaySummaryFragment extends BaseFragment implements EditDialogList
                 }
                 break;
 
-            case SUBMIT_DATA_WITHOUT_INTERNET:
+            case "SUBMIT_DATA_WITHOUT_INTERNET":
 
                 if (resultCode == Activity.RESULT_OK) {
                     DebugLog.d("CALLED SUBMIT_DATA_WITHOUT_INTERNET");

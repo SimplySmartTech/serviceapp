@@ -1,13 +1,14 @@
 package com.simplysmart.service.adapter;
 
 import android.content.Context;
-import android.support.v4.app.FragmentManager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import androidx.fragment.app.FragmentManager;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.model.sensor.SensorItem;

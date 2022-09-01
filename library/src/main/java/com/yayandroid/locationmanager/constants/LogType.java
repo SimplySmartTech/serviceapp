@@ -1,6 +1,7 @@
 package com.yayandroid.locationmanager.constants;
 
-import android.support.annotation.IntDef;
+
+import androidx.annotation.IntDef;
 
 /**
  * Created by Yahya Bayramoglu on 10/02/16.

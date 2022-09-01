@@ -1,27 +1,34 @@
 package com.simplysmart.service.adapter;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.util.List;
 
-public class CallPagerAdapter extends FragmentPagerAdapter {
+public class CallPagerAdapter extends FragmentStateAdapter {
 	private List<Fragment> fragments;
 
-	public CallPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
+	public CallPagerAdapter(FragmentActivity fm, List<Fragment> fragments) {
 		super(fm);
 		this.fragments = fragments;
 	}
 
+
+
+	@NonNull
 	@Override
-	public Fragment getItem(int arg0) {
-		return this.fragments.get(arg0);
+	public Fragment createFragment(int position) {
+		return fragments.get(position);
 	}
 
 	@Override
-	public int getCount() {
+	public int getItemCount() {
 		return this.fragments.size();
 	}
-
 }

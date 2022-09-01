@@ -5,12 +5,13 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 
 import com.simplysmart.service.R;
 
@@ -21,6 +22,7 @@ public class SubmitReadingWithoutImageDialogV2 extends DialogFragment {
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_NEGATIVE_BUTTON = "negativeButton";
     private static final String KEY_POSITIVE_BUTTON = "positiveButton";
+    private static final String KEY = "SUBMIT_DATA_WITHOUT_IMAGE_DIALOG_FRAGMENT";
 
     public static SubmitReadingWithoutImageDialogV2 newInstance(String title, String message, String negativeButton,
                                                                 String positiveButton) {
@@ -65,14 +67,16 @@ public class SubmitReadingWithoutImageDialogV2 extends DialogFragment {
         builder.setPositiveButton("YES",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        getTargetFragment().onActivityResult(getTargetRequestCode(),
-                                Activity.RESULT_OK, getActivity().getIntent());
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("RESULT",Activity.RESULT_OK);
+                        getParentFragmentManager().setFragmentResult(KEY,bundle);
                     }
                 })
                 .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        getTargetFragment().onActivityResult(getTargetRequestCode(),
-                                Activity.RESULT_CANCELED, getActivity().getIntent());
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("RESULT",Activity.RESULT_CANCELED);
+                        getParentFragmentManager().setFragmentResult(KEY,bundle);
                     }
                 })
                 .create();

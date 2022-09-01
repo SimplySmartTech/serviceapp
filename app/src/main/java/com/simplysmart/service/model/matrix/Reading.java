@@ -2,7 +2,6 @@ package com.simplysmart.service.model.matrix;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.RequiresPermission;
 
 /**
  * Created by shailendrapsp on 4/11/16.

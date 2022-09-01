@@ -2,11 +2,12 @@ package com.simplysmart.service.viewholder;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.model.helpdesk.ComplaintLists;

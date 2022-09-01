@@ -2,12 +2,14 @@ package com.simplysmart.service.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.TabAdapter;
 import com.simplysmart.service.common.CommonMethod;
@@ -22,6 +24,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.viewpager2.widget.ViewPager2;
+
 /**
  * Created by shekhar on 4/11/16.
  */
@@ -29,7 +33,7 @@ import java.util.Locale;
 public class SummaryActivity extends BaseActivity {
 
     private TabAdapter tabAdapter;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
     private TabLayout tabLayout;
 
     @Override
@@ -76,14 +80,14 @@ public class SummaryActivity extends BaseActivity {
 
     private void bindViews() {
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager2) findViewById(R.id.viewpager);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         setupViewPager();
 
         if (tabLayout != null) {
-            tabLayout.setupWithViewPager(viewPager);
-            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     viewPager.setCurrentItem(tab.getPosition());
@@ -103,6 +107,13 @@ public class SummaryActivity extends BaseActivity {
 
                 }
             });
+            new TabLayoutMediator(tabLayout,viewPager,new TabLayoutMediator.TabConfigurationStrategy(){
+
+                @Override
+                public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                    tab.setText(tabAdapter.getPageTitle(position));
+                }
+            }).attach();
         }
     }
 
@@ -130,7 +141,7 @@ public class SummaryActivity extends BaseActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String dateForReadings = sdf.format(c.getTimeInMillis());
 
-        tabAdapter = new TabAdapter(getSupportFragmentManager(), this);
+        tabAdapter = new TabAdapter( this,this);
 
         if (timeStamps.size() > 1) {
 
@@ -169,8 +180,7 @@ public class SummaryActivity extends BaseActivity {
 
         viewPager.setAdapter(tabAdapter);
         viewPager.setCurrentItem(0);
-
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 

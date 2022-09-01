@@ -8,16 +8,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -321,7 +322,7 @@ public class YesterdaySummaryFragment extends BaseFragment implements EditDialog
     private void showImageNotUploadedDialog() {
         SubmitReadingWithoutImageDialog submitReadingWithoutImageDialog = SubmitReadingWithoutImageDialog.newInstance("Alert", "All images have not been uploaded yet. Do you want to submit readings without uploading all images ?", "No", "Yes");
         submitReadingWithoutImageDialog.setCancelable(false);
-        submitReadingWithoutImageDialog.show(getFragmentManager(), "submitReadingWithoutImageDialog");
+        submitReadingWithoutImageDialog.show(getActivity().getSupportFragmentManager(), "submitReadingWithoutImageDialog");
     }
 
     private void submitData() {

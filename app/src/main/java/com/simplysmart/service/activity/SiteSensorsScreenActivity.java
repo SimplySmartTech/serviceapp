@@ -7,14 +7,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +15,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentFactory;
+import androidx.fragment.app.FragmentManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.CallPagerAdapter;
@@ -50,7 +55,7 @@ public class SiteSensorsScreenActivity extends BaseActivity implements LogoutLis
 
     private NavigationView navigationView;
     private DrawerLayout drawer;
-    private ViewPager mPager;
+    private ViewPager2 mPager;
 
 
     private User residentData;
@@ -137,7 +142,7 @@ public class SiteSensorsScreenActivity extends BaseActivity implements LogoutLis
             GlobalData.getInstance().setSelectedUnit(residentData.getSites().get(0).getName());
         } else {
             AlertDialogStandard.newInstance(getString(R.string.app_name), "No data found for this user.", "", "CLOSE")
-                    .show(getFragmentManager(), "noDataFound");
+                    .show(getSupportFragmentManager(), "noDataFound");
         }
 
         GlobalData.getInstance().setAccessPolicy(residentData.getPolicy());
@@ -154,7 +159,7 @@ public class SiteSensorsScreenActivity extends BaseActivity implements LogoutLis
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout_v2);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view_v2);
@@ -198,9 +203,9 @@ public class SiteSensorsScreenActivity extends BaseActivity implements LogoutLis
     private void setSensorTab() {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = (ViewPager2) findViewById(R.id.pager);
 
-        List<android.support.v4.app.Fragment> fragments = new Vector<>();
+        List<Fragment> fragments = new Vector<>();
 
         tabLayout.setVisibility(View.VISIBLE);
         mPager.setVisibility(View.VISIBLE);
@@ -210,14 +215,28 @@ public class SiteSensorsScreenActivity extends BaseActivity implements LogoutLis
 
         tabLayout.addTab(tabLayout.newTab().setText("Today"));
         tabLayout.addTab(tabLayout.newTab().setText("Yesterday"));
+        fragments.add(getSupportFragmentManager().getFragmentFactory().instantiate(getClassLoader(), SensorInfoTodayList.class.getName()));
+        fragments.add(getSupportFragmentManager().getFragmentFactory().instantiate(getClassLoader(), SensorInfoList.class.getName()));
 
-        fragments.add(android.support.v4.app.Fragment.instantiate(this, SensorInfoTodayList.class.getName()));
-        fragments.add(android.support.v4.app.Fragment.instantiate(this, SensorInfoList.class.getName()));
-
-        CallPagerAdapter pagerAdapter = new CallPagerAdapter(getSupportFragmentManager(), fragments);
+        CallPagerAdapter pagerAdapter = new CallPagerAdapter(this, fragments);
         mPager.setAdapter(pagerAdapter);
 
-        mPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        mPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
+            }
+        });
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override

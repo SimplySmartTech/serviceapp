@@ -1,52 +1,44 @@
 {
   "project_info": {
-    "project_number": "290115473097",
-    "firebase_url": "https://simplysmartservice-165310.firebaseio.com",
-    "project_id": "simplysmartservice-165310",
-    "storage_bucket": "simplysmartservice-165310.appspot.com"
+    "project_number": "217380250376",
+    "project_id": "simplysmart-serviceapp",
+    "storage_bucket": "simplysmart-serviceapp.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:290115473097:android:4d65c5f3e5fc6fae",
+        "mobilesdk_app_id": "1:217380250376:android:45b52e7eab3252b02d02bd",
         "android_client_info": {
           "package_name": "com.simplysmart.service"
         }
       },
       "oauth_client": [
         {
-          "client_id": "290115473097-ugmb529slp1gj7gm1rfab2dn898t9ujb.apps.googleusercontent.com",
+          "client_id": "217380250376-n075huepotp84v6h8ri014a88av3c0p4.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.simplysmart.service",
-            "certificate_hash": "f3b01d6bf5118f94c92ef0486239e1b5e1db3038"
+            "certificate_hash": "4b1c1e3f0cbf1f5cd024bb583d93d607ffabb9b8"
           }
         },
         {
-          "client_id": "290115473097-5iet2p8d2gkpk5qq6ce7otefcga8tu5g.apps.googleusercontent.com",
+          "client_id": "217380250376-h36g94ih8lqv8tpheo57u0aeim72f799.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAvsjZhQcxP9z2KCF7AFBdu0XlO7Vr9mO4"
+          "current_key": "AIzaSyCJuN6vsZQzs9tLWNULim5vbm383HORfSc"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "290115473097-5iet2p8d2gkpk5qq6ce7otefcga8tu5g.apps.googleusercontent.com",
+              "client_id": "217380250376-h36g94ih8lqv8tpheo57u0aeim72f799.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }

@@ -1,12 +1,15 @@
 package com.simplysmart.service.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.simplysmart.service.R;
 import com.simplysmart.service.adapter.TabAdapter;
 import com.simplysmart.service.common.CommonMethod;
@@ -22,7 +25,7 @@ import com.simplysmart.service.interfaces.PageSelectedListener;
 public class VisitorActivity extends BaseActivity implements ForceScrollListener {
 
     private TabAdapter tabAdapter;
-    private ViewPager viewPager;
+    private ViewPager2 viewPager;
     private TabLayout tabLayout;
 
     @Override
@@ -37,20 +40,19 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
 
         getSupportActionBar().setTitle(getString(R.string.visitor));
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager2) findViewById(R.id.viewpager);
         tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         setupViewPager();
 
         if (tabLayout != null) {
-            tabLayout.setupWithViewPager(viewPager);
-            tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     viewPager.setCurrentItem(tab.getPosition());
                     if (tab.getPosition() == 1) {
-                        PageSelectedListener pageSelectedListener = (PageSelectedListener) tabAdapter.instantiateItem(viewPager, tab.getPosition());
-                        pageSelectedListener.onPageSelected();
+                        /*PageSelectedListener pageSelectedListener = (PageSelectedListener) tabAdapter.instantiateItem(viewPager, tab.getPosition());
+                        pageSelectedListener.onPageSelected();*/
                     }
                 }
 
@@ -64,18 +66,25 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
 
                 }
             });
+            new TabLayoutMediator(tabLayout,viewPager,new TabLayoutMediator.TabConfigurationStrategy(){
+
+                @Override
+                public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                    tab.setText(tabAdapter.getPageTitle(position));
+                }
+            }).attach();
         }
     }
 
     private void setupViewPager() {
 
-        tabAdapter = new TabAdapter(getSupportFragmentManager(), this);
+        tabAdapter = new TabAdapter(this, this);
         tabAdapter.addFragment(new NewVisitorFragment(), "New Visitor");
         tabAdapter.addFragment(new VisitorListFragment(), "Visitor List");
         viewPager.setAdapter(tabAdapter);
         viewPager.setCurrentItem(0);
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
@@ -85,8 +94,8 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
             public void onPageSelected(int position) {
                 viewPager.setCurrentItem(position);
                 if (position == 1) {
-                    PageSelectedListener pageSelectedListener = (PageSelectedListener) tabAdapter.instantiateItem(viewPager, position);
-                    pageSelectedListener.onPageSelected();
+                    /*PageSelectedListener pageSelectedListener = (PageSelectedListener) tabAdapter.instantiateItem(viewPager, position);
+                    pageSelectedListener.onPageSelected();*/
                     CommonMethod.hideKeyboard(VisitorActivity.this);
                 }
             }
@@ -124,8 +133,8 @@ public class VisitorActivity extends BaseActivity implements ForceScrollListener
     @Override
     public void scrollTo() {
         viewPager.setCurrentItem(1);
-        PageSelectedListener pageSelectedListener = (PageSelectedListener) tabAdapter.instantiateItem(viewPager, 1);
-        pageSelectedListener.onPageSelected();
+        /*PageSelectedListener pageSelectedListener = (PageSelectedListener) tabAdapter.instantiateItem(viewPager, 1);
+        pageSelectedListener.onPageSelected();*/
         CommonMethod.hideKeyboard(this);
     }
 }

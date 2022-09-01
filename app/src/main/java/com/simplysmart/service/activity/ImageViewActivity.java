@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
 
 import com.simplysmart.service.R;
 import com.simplysmart.service.common.DebugLog;
@@ -268,6 +269,7 @@ public class ImageViewActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+        super.onActivityResult(requestCode,resultCode,data);
     }
 
     private void compressAndDeleteFile(String imageUrl, boolean delete) {
@@ -330,6 +332,7 @@ public class ImageViewActivity extends BaseActivity {
 //                        .show();
             }
         }
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
 
     }
 

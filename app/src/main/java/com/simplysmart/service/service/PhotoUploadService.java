@@ -3,8 +3,6 @@ package com.simplysmart.service.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
@@ -22,6 +20,9 @@ import java.io.File;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
+
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * Created by shailendrapsp on 7/11/16.

@@ -3,7 +3,6 @@ package com.simplysmart.service.service;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
@@ -32,6 +31,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.content.ContentValues.TAG;
+
+import androidx.annotation.Nullable;
 
 /**
  * Created by shekhar on 27/12/16.

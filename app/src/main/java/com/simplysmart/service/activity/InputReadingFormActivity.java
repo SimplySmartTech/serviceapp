@@ -17,11 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -80,6 +75,12 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.view.View.GONE;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class InputReadingFormActivity extends BaseActivity implements EditDialogListener {
 
@@ -346,6 +347,7 @@ public class InputReadingFormActivity extends BaseActivity implements EditDialog
 //                        .show();
             }
         }
+        super.onRequestPermissionsResult(requestCode,permissions,grantResults);
 
     }
 

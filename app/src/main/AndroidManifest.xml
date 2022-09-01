@@ -34,6 +34,7 @@
         <activity
             android:name=".activity.SplashActivity"
             android:label="@string/app_name"
+            android:exported='true'
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -106,6 +107,13 @@
 
         <!-- Push Notification GCM Services & Receivers -->
         <service android:name=".gcm.RegistrationIntentService" />
+
+        <service android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
